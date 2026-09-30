@@ -5,7 +5,7 @@ import {
   Alert, Button, ErrorState, Flex, LoadingSpinner, Statistics, StatisticsItem, Table, TableBody, TableCell,
   TableHead, TableHeader, TableRow, Tag, Text,
 } from '@hubspot/ui-extensions';
-import { money, pct, type Runner } from './format.ts';
+import { money, pct, call, type Runner } from './format.ts';
 
 type Line = { id: string; name: string; quantity: number; price: number; marginPct: number; verdict: string;
   approver: string; floor: number; target: number; gapDollars: number };
@@ -23,7 +23,7 @@ export function DealMarginCard({ run }: { run: Runner }) {
   const [failure, setFailure] = useState<string | null>(null);
   const load = useCallback(() => {
     setFailure(null);
-    run('deal_margin', { propertiesToSend: ['hs_object_id'] })
+    call(run, 'deal_margin', { propertiesToSend: ['hs_object_id'] })
       .then((r: Result) => (r.ok ? setResult(r) : setFailure(r.error ?? 'unknown error')))
       .catch((e: Error) => setFailure(e.message));
   }, [run]);

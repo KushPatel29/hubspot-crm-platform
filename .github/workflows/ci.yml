@@ -1,0 +1,56 @@
+name: CRM platform checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+      - run: python -m pip install -e . -r requirements-dev.txt
+      - name: Lint
+        run: python -m ruff check crm_platform tests scripts
+      - name: Types (mypy, zero errors)
+        run: python -m mypy
+      - name: Model, loader, schema engine, Salesforce compilation, JS parity (coverage gate 85%)
+        run: python -m pytest -q --cov=crm_platform --cov-report=term --cov-fail-under=85
+      - name: Committed Salesforce metadata matches the models
+        run: python -m crm_platform.salesforce.metadata --check
+
+  hubspot-apps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: hubspot
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: hubspot/package-lock.json
+      - run: npm ci
+      - name: Card and function tests (HubSpot's test renderer, signed requests, resumable offers)
+        run: npm test
+      - name: Cards typecheck against @hubspot/ui-extensions
+        run: npm run typecheck
+      - name: Generated HubSpot projects match their sources
+        run: npm run check

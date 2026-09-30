@@ -3,6 +3,13 @@
 export type Runner = (name: string, options?: { parameters?: Record<string, unknown>; propertiesToSend?: string[] })
   => Promise<any>;
 
+// An app function answers { statusCode, body }; hubspot.serverless resolves to that object. Accept a bare body
+// too, so a card does not break if the runtime ever unwraps it.
+export async function call(run: Runner, name: string, options?: Parameters<Runner>[1]): Promise<any> {
+  const result = await run(name, options);
+  return result && typeof result === 'object' && 'statusCode' in result && 'body' in result ? result.body : result;
+}
+
 export function num(value: string | null | undefined): number | null {
   if (value === null || value === undefined || value === '') return null;
   const n = Number(value);

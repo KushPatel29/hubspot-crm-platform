@@ -31,6 +31,7 @@ export function authenticate(context, path, { secret = process.env.HUBSPOT_CLIEN
   return verify(secret, signedRequest(context, path), now);
 }
 
+// App functions answer { statusCode, body }; HubSpot serialises the body.
 export function respond(statusCode, body) {
-  return { statusCode, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
+  return { statusCode, body };
 }

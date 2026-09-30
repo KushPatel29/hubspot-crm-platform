@@ -6,7 +6,7 @@ import {
   Alert, Button, ButtonRow, Divider, ErrorState, Flex, Link, LoadingSpinner, StatusTag, Text, TextArea,
 } from '@hubspot/ui-extensions';
 import { useCrmProperties } from '@hubspot/ui-extensions/crm';
-import { label, money, num, type Runner } from './format.ts';
+import { label, money, num, call, type Runner } from './format.ts';
 
 type Offer = { id: string; title: string; rank: number; opportunity: number; because: string; status: string;
   note: string; dealId: string | null };
@@ -22,7 +22,7 @@ export function NextBestOfferCard({ run, portalId }: { run: Runner; portalId?: n
   const [busy, setBusy] = useState<string | null>(null);
 
   const load = useCallback(() => {
-    run('company_offers', { propertiesToSend: ['hs_object_id'] })
+    call(run, 'company_offers', { propertiesToSend: ['hs_object_id'] })
       .then((r) => (r.ok ? setOffers(r.offers) : setFailure(r.error)))
       .catch((e: Error) => setFailure(e.message));
   }, [run]);
@@ -30,7 +30,7 @@ export function NextBestOfferCard({ run, portalId }: { run: Runner; portalId?: n
 
   const decide = (offerId: string, decision: 'accept' | 'dismiss', note = '') => {
     setBusy(offerId);
-    run('decide_offer', { parameters: { offerId, decision, note } })
+    call(run, 'decide_offer', { parameters: { offerId, decision, note } })
       .then((r) => {
         if (!r.ok) setFailure(r.error);
         setDismissing(null);

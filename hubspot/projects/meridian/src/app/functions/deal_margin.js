@@ -112,6 +112,14 @@ function client({
   return api;
 }
 
+// shared/signature.js
+var MAX_AGE_MS = 5 * 60 * 1e3;
+
+// shared/endpoint.js
+function respond(statusCode, body) {
+  return { statusCode, body };
+}
+
 // shared/guardrail.js
 var APPROVAL_TIERS = [
   [0.02, "Rep"],
@@ -198,10 +206,10 @@ async function dealLines(api, dealId) {
 }
 async function main(context, { api = client() } = {}) {
   const dealId = context.propertiesToSend?.hs_object_id ?? context.parameters?.dealId;
-  if (!dealId) return { ok: false, error: "no deal in context" };
+  if (!dealId) return respond(400, { ok: false, error: "no deal in context" });
   const { lines, unscored } = await dealLines(api, dealId);
   const score = scoreDeal(lines);
-  return {
+  return respond(200, {
     ok: true,
     basis: "Invoice margin: quoted price less cost of goods. Rebates, freight and terms live in the ERP.",
     deal: {
@@ -213,7 +221,7 @@ async function main(context, { api = client() } = {}) {
     },
     lines: lines.map((line, i) => ({ ...line, ...score.lines[i] })),
     unscored: unscored.map((l) => l.name)
-  };
+  });
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

@@ -111,6 +111,14 @@ function client({
   return api;
 }
 
+// shared/signature.js
+var MAX_AGE_MS = 5 * 60 * 1e3;
+
+// shared/endpoint.js
+function respond(statusCode, body) {
+  return { statusCode, body };
+}
+
 // functions/company_offers.js
 var OFFER_PROPERTIES = [
   "offer_title",
@@ -127,7 +135,7 @@ var OFFER_PROPERTIES = [
 var STATUS_ORDER = { open: 0, accepted: 1, dismissed: 2 };
 async function main(context, { api = client() } = {}) {
   const companyId = context.propertiesToSend?.hs_object_id ?? context.parameters?.companyId;
-  if (!companyId) return { ok: false, error: "no company in context" };
+  if (!companyId) return respond(400, { ok: false, error: "no company in context" });
   const offerType = await api.customType("recommendation");
   const links = await api.associated("companies", companyId, offerType);
   const offers = await api.batchRead(offerType, links.map((l) => l.id), OFFER_PROPERTIES);
@@ -150,7 +158,7 @@ async function main(context, { api = client() } = {}) {
     });
   }
   result.sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || a.rank - b.rank);
-  return { ok: true, offers: result };
+  return respond(200, { ok: true, offers: result });
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

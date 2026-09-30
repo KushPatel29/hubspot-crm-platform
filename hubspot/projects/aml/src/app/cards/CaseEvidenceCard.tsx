@@ -9,7 +9,7 @@ import {
 import { useCrmProperties } from '@hubspot/ui-extensions/crm';
 import { allowedNext, deadline, describeRemaining } from './shared/cases.js';
 import { TYPOLOGIES } from './generated/typologies.ts';
-import { label, money, num, type Runner } from './format.ts';
+import { label, money, num, call, type Runner } from './format.ts';
 
 export const PROPERTIES = ['case_name', 'case_priority', 'due_hours', 'sla_started_at', 'typology_hypothesis',
   'evidence_references', 'recommended_next_step', 'amount_involved_cad', 'decision_status', 'hs_pipeline_stage'];
@@ -28,7 +28,7 @@ export function CaseEvidenceCard({ run, now = Date.now() }: { run: Runner; now?:
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   const load = useCallback(() => {
-    run('case_network', { propertiesToSend: ['hs_object_id'] }).then(setNetwork)
+    call(run, 'case_network', { propertiesToSend: ['hs_object_id'] }).then(setNetwork)
       .catch((e: Error) => setNetwork({ ok: false, error: e.message, subjects: [], counterparties: [] }));
   }, [run]);
   useEffect(load, [load]);
@@ -42,7 +42,7 @@ export function CaseEvidenceCard({ run, now = Date.now() }: { run: Runner; now?:
 
   const move = () => {
     if (!moving) return;
-    run('case_transition', { propertiesToSend: ['hs_object_id'], parameters: { toStage: moving, note } })
+    call(run, 'case_transition', { propertiesToSend: ['hs_object_id'], parameters: { toStage: moving, note } })
       .then((r) => {
         setMessage(r.ok ? { ok: true, text: `Moved to ${r.to}.` } : { ok: false, text: r.error });
         if (r.ok) {

@@ -50,7 +50,7 @@ const margin = {
 
 describe('Deal margin card', () => {
   it('names the verdict, the approver and the line that sets it', async () => {
-    const run = vi.fn(async () => margin);
+    const run = vi.fn(async () => ({ statusCode: 200, body: margin }));  // the shape an app function answers
     const { render, find, findAll, waitFor } = createRenderer('crm.record.tab');
     render(<DealMarginCard run={run} />);
     await waitFor(() => expect(find(Alert).props.title).toBe('Below target: Sales manager must approve'));
@@ -89,6 +89,7 @@ describe('Next best offer card', () => {
     find(Button, { variant: 'primary' }).trigger('onClick');
     await waitFor(() => expect(run).toHaveBeenCalledWith('decide_offer',
       { parameters: { offerId: '11', decision: 'accept', note: '' } }));
+    await waitFor(() => expect(find(Button, { variant: 'secondary' }).props.disabled).toBe(false));
     find(Button, { variant: 'secondary' }).trigger('onClick');
     await waitFor(() => expect(find(Button, { variant: 'destructive' }).props.disabled).toBe(true));
     find(TextArea).trigger('onChange', 'not stocked in BC' as never);

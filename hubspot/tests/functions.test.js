@@ -23,7 +23,7 @@ function signed(path, body) {
       'X-HubSpot-Signature-v3': sign(SECRET, 'POST', `${BASE}${path}`, raw, String(NOW)) },
   };
 }
-const output = (response) => JSON.parse(response.body);
+const output = (response) => response.body;
 
 function meridianDeal() {
   const fake = fakeApi();
@@ -41,7 +41,9 @@ function meridianDeal() {
 describe('deal margin and the price guardrail', () => {
   it('scores each line against its product and the deal on its worst line', async () => {
     const { fake, deal } = meridianDeal();
-    const result = await dealMargin({ propertiesToSend: { hs_object_id: deal.id } }, { api: fake.api });
+    const { statusCode, body: result } = await dealMargin({ propertiesToSend: { hs_object_id: deal.id } },
+      { api: fake.api });
+    expect(statusCode).toBe(200);
     expect(result.deal).toMatchObject({ verdict: 'Below target', approver: 'Sales manager' });
     expect(result.lines.map((l) => l.name)).toEqual(['Kettle', 'Toaster']);
     expect(result.basis).toMatch(/Invoice margin/);
@@ -119,15 +121,15 @@ describe('next best offer', () => {
   it('lists open offers first by rank', async () => {
     const { fake, company, offers } = crossSell();
     fake.state.objects['2-9'][offers[0].id].properties.offer_status = 'dismissed';
-    const result = await companyOffers({ propertiesToSend: { hs_object_id: company.id } }, { api: fake.api });
+    const { body: result } = await companyOffers({ propertiesToSend: { hs_object_id: company.id } }, { api: fake.api });
     expect(result.offers.map((o) => [o.rank, o.status])).toEqual([[2, 'open'], [1, 'dismissed']]);
   });
 
   it('turns an offer into one complete deal, even when clicked twice', async () => {
     const { fake, offers } = crossSell();
     const context = { parameters: { offerId: offers[0].id, decision: 'accept' }, userEmail: 'rep@example.com' };
-    const first = await decideOffer(context, { api: fake.api, now: NOW });
-    const second = await decideOffer(context, { api: fake.api, now: NOW });
+    const first = (await decideOffer(context, { api: fake.api, now: NOW })).body;
+    const second = (await decideOffer(context, { api: fake.api, now: NOW })).body;
     expect(first.ok && second.ok).toBe(true);
     expect(second.dealId).toBe(first.dealId);
     expect(Object.keys(fake.state.objects.deals)).toHaveLength(1);
@@ -145,7 +147,7 @@ describe('next best offer', () => {
     fake.state.failNext = 'POST /crm/v3/objects/line_items';
     await expect(decideOffer(context, { api: fake.api, now: NOW })).rejects.toThrow(/injected/);
     expect(fake.state.objects['2-9'][offers[0].id].properties.offer_status).toBe('open');
-    const retry = await decideOffer(context, { api: fake.api, now: NOW });
+    const retry = (await decideOffer(context, { api: fake.api, now: NOW })).body;
     expect(retry).toMatchObject({ ok: true, resumed: true });
     expect(Object.keys(fake.state.objects.deals)).toHaveLength(1);
     expect(Object.keys(fake.state.objects.line_items)).toHaveLength(1);
@@ -153,10 +155,11 @@ describe('next best offer', () => {
 
   it('needs a reason to dismiss', async () => {
     const { fake, offers } = crossSell();
-    expect((await decideOffer({ parameters: { offerId: offers[1].id, decision: 'dismiss', note: '' } },
-      { api: fake.api })).ok).toBe(false);
+    const refused = await decideOffer({ parameters: { offerId: offers[1].id, decision: 'dismiss', note: '' } },
+      { api: fake.api });
+    expect([refused.statusCode, refused.body.ok]).toEqual([400, false]);
     expect((await decideOffer({ parameters: { offerId: offers[1].id, decision: 'dismiss', note: 'not stocked' } },
-      { api: fake.api })).ok).toBe(true);
+      { api: fake.api })).body.ok).toBe(true);
   });
 });
 
@@ -178,18 +181,18 @@ function amlCase() {
 describe('investigation cases', () => {
   it('shows the subject and the largest shared counterparties first', async () => {
     const { fake, record } = amlCase();
-    const result = await caseNetwork({ propertiesToSend: { hs_object_id: record.id } }, { api: fake.api });
+    const { body: result } = await caseNetwork({ propertiesToSend: { hs_object_id: record.id } }, { api: fake.api });
     expect(result.subjects.map((s) => s.name)).toEqual(['Becky Horton']);
     expect(result.counterparties.map((c) => c.name)).toEqual(['Big hub', 'Small hub']);
   });
 
   it('moves a case only along allowed transitions, and logs who moved it and why', async () => {
     const { fake, record } = amlCase();
-    const refused = await caseTransition({ propertiesToSend: { hs_object_id: record.id },
+    const { body: refused } = await caseTransition({ propertiesToSend: { hs_object_id: record.id },
       parameters: { toStage: 'Closed: referred for a reporting decision', note: 'looks bad to me' } },
     { api: fake.api, now: NOW });
     expect(refused.ok).toBe(false);
-    const moved = await caseTransition({ propertiesToSend: { hs_object_id: record.id }, userEmail: 'inv@example.com',
+    const { body: moved } = await caseTransition({ propertiesToSend: { hs_object_id: record.id }, userEmail: 'inv@example.com',
       parameters: { toStage: 'Evidence requested', note: 'need the supplier invoices' } }, { api: fake.api, now: NOW });
     expect(moved).toMatchObject({ ok: true, from: 'Open triage', to: 'Evidence requested' });
     const props = fake.state.objects['2-1'][record.id].properties;

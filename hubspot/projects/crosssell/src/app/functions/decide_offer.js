@@ -110,6 +110,14 @@ function client({
   return api;
 }
 
+// shared/signature.js
+var MAX_AGE_MS = 5 * 60 * 1e3;
+
+// shared/endpoint.js
+function respond(statusCode, body) {
+  return { statusCode, body };
+}
+
 // functions/decide_offer.js
 async function ensureDeal(api, offerType, offerId, offer, company) {
   const existing = await api.associated(offerType, offerId, "deals");
@@ -161,8 +169,12 @@ async function ensureLineItem(api, dealId, sku) {
 async function main(context, { api = client(), now = Date.now() } = {}) {
   const { offerId, decision, note = "" } = context.parameters ?? {};
   const who = context.userEmail ?? `user ${context.userId ?? "unknown"}`;
-  if (!offerId || !["accept", "dismiss"].includes(decision)) return { ok: false, error: "needs offerId and decision" };
-  if (decision === "dismiss" && note.trim().length < 5) return { ok: false, error: "say why the offer is dismissed" };
+  if (!offerId || !["accept", "dismiss"].includes(decision)) {
+    return respond(400, { ok: false, error: "needs offerId and decision" });
+  }
+  if (decision === "dismiss" && note.trim().length < 5) {
+    return respond(400, { ok: false, error: "say why the offer is dismissed" });
+  }
   const offerType = await api.customType("recommendation");
   const [record] = await api.batchRead(offerType, [offerId], [
     "offer_title",
@@ -170,20 +182,22 @@ async function main(context, { api = client(), now = Date.now() } = {}) {
     "offer_status",
     "offer_revenue_opportunity"
   ]);
-  if (!record) return { ok: false, error: "offer not found" };
+  if (!record) return respond(400, { ok: false, error: "offer not found" });
   const offer = record.properties;
   const decided = {
     offer_decided_at: new Date(now).toISOString(),
     offer_decision_note: `${who}: ${note.trim() || "accepted"}`.slice(0, 1e3)
   };
   if (decision === "dismiss") {
-    if (offer.offer_status !== "open") return { ok: false, error: `offer is already ${offer.offer_status}` };
+    if (offer.offer_status !== "open") {
+      return respond(400, { ok: false, error: `offer is already ${offer.offer_status}` });
+    }
     await api.patch(`/crm/v3/objects/${offerType}/${offerId}`, { properties: { offer_status: "dismissed", ...decided } });
-    return { ok: true, dismissed: true };
+    return respond(200, { ok: true, dismissed: true });
   }
-  if (offer.offer_status === "dismissed") return { ok: false, error: "offer was dismissed" };
+  if (offer.offer_status === "dismissed") return respond(400, { ok: false, error: "offer was dismissed" });
   const [companyLink] = await api.associated(offerType, offerId, "companies");
-  if (!companyLink) return { ok: false, error: "offer has no company" };
+  if (!companyLink) return respond(400, { ok: false, error: "offer has no company" });
   const [company] = await api.batchRead("companies", [companyLink.id], ["name"]);
   const deal = await ensureDeal(api, offerType, offerId, offer, { id: company.id, name: company.properties.name });
   await api.put(
@@ -201,7 +215,7 @@ async function main(context, { api = client(), now = Date.now() } = {}) {
   if (offer.offer_status !== "accepted") {
     await api.patch(`/crm/v3/objects/${offerType}/${offerId}`, { properties: { offer_status: "accepted", ...decided } });
   }
-  return { ok: true, dealId: deal.dealId, resumed: deal.resumed };
+  return respond(200, { ok: true, dealId: deal.dealId, resumed: deal.resumed });
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

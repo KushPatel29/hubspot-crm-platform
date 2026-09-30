@@ -1,10 +1,11 @@
 // Private function behind the AML "Case evidence" card: the case's subject and the shared counterparties its
 // subject transacts with, largest network first.
 import { client } from '../shared/hubspot-api.js';
+import { respond } from '../shared/endpoint.js';
 
 export async function main(context, { api = client() } = {}) {
   const caseId = context.propertiesToSend?.hs_object_id ?? context.parameters?.caseId;
-  if (!caseId) return { ok: false, error: 'no case in context' };
+  if (!caseId) return respond(400, { ok: false, error: 'no case in context' });
   const caseType = await api.customType('investigation_case');
   const partyType = await api.customType('counterparty');
   const [record] = await api.batchRead(caseType, [caseId], ['hs_pipeline', 'hs_pipeline_stage']);
@@ -22,7 +23,7 @@ export async function main(context, { api = client() } = {}) {
       subjects.push({ id: entry.id, objectType, name: p.name ?? `${p.firstname ?? ''} ${p.lastname ?? ''}`.trim() });
     }
   }
-  return {
+  return respond(200, {
     ok: true,
     stage,
     subjects,
@@ -30,5 +31,5 @@ export async function main(context, { api = client() } = {}) {
       .map((p) => ({ id: p.id, name: p.properties.counterparty_name, type: p.properties.counterparty_type,
         region: p.properties.counterparty_region, hotSubjects: Number(p.properties.hot_subjects) }))
       .sort((a, b) => b.hotSubjects - a.hotSubjects || a.name.localeCompare(b.name)),
-  };
+  });
 }

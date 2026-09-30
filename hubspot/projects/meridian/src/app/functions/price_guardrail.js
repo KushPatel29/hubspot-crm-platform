@@ -247,7 +247,7 @@ function authenticate(context, path, { secret = process.env.HUBSPOT_CLIENT_SECRE
   return verify(secret, signedRequest(context, path), now);
 }
 function respond(statusCode, body) {
-  return { statusCode, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
+  return { statusCode, body };
 }
 
 // functions/deal_margin.js

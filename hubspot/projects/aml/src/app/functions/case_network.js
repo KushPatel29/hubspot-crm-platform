@@ -110,10 +110,18 @@ function client({
   return api;
 }
 
+// shared/signature.js
+var MAX_AGE_MS = 5 * 60 * 1e3;
+
+// shared/endpoint.js
+function respond(statusCode, body) {
+  return { statusCode, body };
+}
+
 // functions/case_network.js
 async function main(context, { api = client() } = {}) {
   const caseId = context.propertiesToSend?.hs_object_id ?? context.parameters?.caseId;
-  if (!caseId) return { ok: false, error: "no case in context" };
+  if (!caseId) return respond(400, { ok: false, error: "no case in context" });
   const caseType = await api.customType("investigation_case");
   const partyType = await api.customType("counterparty");
   const [record] = await api.batchRead(caseType, [caseId], ["hs_pipeline", "hs_pipeline_stage"]);
@@ -135,7 +143,7 @@ async function main(context, { api = client() } = {}) {
       subjects.push({ id: entry.id, objectType, name: p.name ?? `${p.firstname ?? ""} ${p.lastname ?? ""}`.trim() });
     }
   }
-  return {
+  return respond(200, {
     ok: true,
     stage,
     subjects,
@@ -146,7 +154,7 @@ async function main(context, { api = client() } = {}) {
       region: p.properties.counterparty_region,
       hotSubjects: Number(p.properties.hot_subjects)
     })).sort((a, b) => b.hotSubjects - a.hotSubjects || a.name.localeCompare(b.name))
-  };
+  });
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
