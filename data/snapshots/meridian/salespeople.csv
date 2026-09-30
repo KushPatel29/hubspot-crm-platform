@@ -1,0 +1,13 @@
+salesperson_id,salesperson,home_region,tenure_years,discount_appetite,quota_units
+SP100,Dana Whitfield,West,11.0,0.82,151585.0
+SP101,Marcus Oyelaran,West,6.5,1.24,138425.0
+SP102,Priya Raghunathan,West,3.0,1.41,139072.0
+SP103,Tom Beauchemin,Southwest,8.0,0.95,143634.0
+SP104,Alix Fontaine,Southwest,2.0,1.33,117384.0
+SP105,Rowan Achterberg,Midwest,14.0,0.74,143852.0
+SP106,Simone Delacroix,Midwest,4.5,1.12,152004.0
+SP107,Yusuf Kandemir,Northeast,9.0,0.88,127674.0
+SP108,Nikita Petrenko,Northeast,1.5,1.52,134297.0
+SP109,Hollis Marchetti,Southeast,7.0,1.03,114449.0
+SP110,Bea Okonkwo,Southeast,5.0,1.18,142096.0
+SP111,Jonah Stavrides,Midwest,12.0,0.79,138263.0

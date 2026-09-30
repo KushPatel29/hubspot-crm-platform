@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Meridian_Price_Sensitivity__c</fullName>
+    <label>Price sensitivity</label>
+    <description>The pricing project's elasticity score for the account.</description>
+    <inlineHelpText>The pricing project's elasticity score for the account.</inlineHelpText>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>4</scale>
+    <type>Number</type>
+</CustomField>

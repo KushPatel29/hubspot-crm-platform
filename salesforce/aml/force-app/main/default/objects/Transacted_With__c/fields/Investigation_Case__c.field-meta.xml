@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Investigation_Case__c</fullName>
+    <label>Investigation case</label>
+    <referenceTo>Investigation_Case__c</referenceTo>
+    <relationshipLabel>Transacted with links</relationshipLabel>
+    <relationshipName>Transacted_With_Investigation_Case_Links</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

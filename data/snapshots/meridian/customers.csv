@@ -1,0 +1,151 @@
+customer_id,customer_name,segment,channel,region,tier,price_list,payment_terms,range_breadth,volume_weight,price_sensitivity,avg_drop_size_units,salesperson_id,salesperson,buyer_firstname,buyer_lastname
+CU2000,Sunshine Marketplace,Independent Retailer,Retail,Southwest,D,List,Net 45,7,0.4527,8.075,576.1,SP103,Tom Beauchemin,Wei,Morin
+CU2001,Coastal Distribution,Subscription Box Operator,Wholesale,West,C,Contract,Net 45,10,1.502,8.039,364.9,SP102,Priya Raghunathan,Maya,Roy
+CU2002,Riverside Logistics,Marketplace Seller,Marketplace,Midwest,C,List,Net 15,14,1.7756,16.662,335.9,SP106,Simone Delacroix,Chloe,Nguyen
+CU2003,Alder Import Co,Regional Retail Chain,Retail,Midwest,C,List,2/10 Net 30,16,1.8158,12.332,647.2,SP111,Jonah Stavrides,Maya,Campbell
+CU2004,Stanley Import Co,Independent Retailer,Retail,West,D,List,Net 45,8,0.4191,8.255,52.3,SP100,Dana Whitfield,Marcus,Lee
+CU2005,Coastal Ventures,Independent Retailer,Retail,Southeast,C,List,2/10 Net 30,12,1.3888,8.649,57.4,SP109,Hollis Marchetti,Sofia,Côté
+CU2006,Coastal Merchants,Independent Retailer,Retail,West,A,Contract,Net 45,33,5.6843,9.915,516.3,SP100,Dana Whitfield,Zara,Nguyen
+CU2007,Juniper Supply,Sub-Distributor,Wholesale,Southeast,D,List,Net 45,8,0.4187,16.479,158.7,SP109,Hollis Marchetti,Noor,Brown
+CU2008,Kitsilano Marketplace,Independent Retailer,Retail,West,C,Contract,Net 30,11,1.9064,8.028,114.0,SP102,Priya Raghunathan,Amara,Dubois
+CU2009,Sunshine Supply,Marketplace Seller,Marketplace,West,D,List,Net 30,9,0.5564,18.821,180.1,SP100,Dana Whitfield,Marcus,Kim
+CU2010,Coastal Marketplace,Sub-Distributor,Wholesale,West,A,Contract,Net 45,35,4.8468,13.542,238.6,SP100,Dana Whitfield,Marcus,Patel
+CU2011,Okanagan Merchants,Regional Retail Chain,Retail,Northeast,C,Negotiated,Net 30,11,1.2349,11.26,87.3,SP108,Nikita Petrenko,Ethan,Fraser
+CU2012,Burrard Commerce,Government & Education,B2B Direct,West,C,List,Net 45,11,1.4173,5.343,232.4,SP102,Priya Raghunathan,Avery,Taylor
+CU2013,Stanley Trading Co,Independent Retailer,Retail,Southeast,D,List,Net 45,4,0.712,10.318,154.8,SP109,Hollis Marchetti,Maya,Kaur
+CU2014,Salish Outfitters,Marketplace Seller,Marketplace,Southwest,C,List,Net 30,12,1.7461,18.226,124.2,SP104,Alix Fontaine,Daniel,Wong
+CU2015,Alder Retail Group,Corporate & B2B Buyer,B2B Direct,West,B,Contract,Net 30,23,2.3903,7.193,991.2,SP100,Dana Whitfield,Mateo,Anderson
+CU2016,Alder Logistics,Corporate & B2B Buyer,B2B Direct,Midwest,A,List,Net 45,39,8.4895,7.381,1215.7,SP106,Simone Delacroix,Liam,Chen
+CU2017,Kootenay Merchants,Government & Education,B2B Direct,West,C,List,Net 45,17,0.8866,5.286,203.4,SP102,Priya Raghunathan,Ravi,Singh
+CU2018,Chilcotin Retail Group,Independent Retailer,Retail,West,C,List,Net 30,18,1.8521,8.344,360.3,SP100,Dana Whitfield,Owen,Singh
+CU2019,Kootenay Commerce,E-commerce Pure-Play,Marketplace,Northeast,C,List,Net 45,13,0.8513,12.423,327.2,SP107,Yusuf Kandemir,Avery,Morin
+CU2020,Cedar Merchants,Marketplace Seller,Marketplace,Southwest,C,List,2/10 Net 30,14,1.5373,18.115,387.4,SP103,Tom Beauchemin,Chloe,Gagnon
+CU2021,Marine Merchants,Corporate & B2B Buyer,B2B Direct,Southeast,D,List,Net 30,6,0.3677,7.046,142.0,SP110,Bea Okonkwo,Liam,Nguyen
+CU2022,Summit Ventures,Regional Retail Chain,Retail,West,A,Contract,Net 30,32,8.1192,10.737,432.2,SP102,Priya Raghunathan,Maya,Roy
+CU2023,Summit Wholesale,E-commerce Pure-Play,Marketplace,Northeast,A,Negotiated,2/10 Net 30,30,10.4649,13.298,207.4,SP107,Yusuf Kandemir,Marcus,Ahmed
+CU2024,Granville Outfitters,Corporate & B2B Buyer,B2B Direct,Northeast,D,List,Net 15,6,0.5315,7.049,136.9,SP106,Simone Delacroix,Noor,Ahmed
+CU2025,Fraser Merchants,E-commerce Pure-Play,Marketplace,Southeast,C,List,Net 45,12,0.9354,12.864,217.8,SP109,Hollis Marchetti,Priya,Roy
+CU2026,Riverside Supply,Marketplace Seller,Marketplace,Northeast,D,List,Net 30,9,0.7385,18.455,138.2,SP108,Nikita Petrenko,Zara,Ahmed
+CU2027,Summit Depot,Marketplace Seller,Marketplace,West,C,List,2/10 Net 30,11,1.7799,18.707,105.4,SP105,Rowan Achterberg,Amara,Lee
+CU2028,Riverside Import Co,Independent Retailer,Retail,Southeast,C,Negotiated,Net 30,13,1.4319,10.14,546.8,SP102,Priya Raghunathan,Wei,Nguyen
+CU2029,Kootenay Procurement,Independent Retailer,Retail,West,D,List,Net 60,8,0.6188,9.848,384.5,SP101,Marcus Oyelaran,Owen,Brown
+CU2030,Mount Depot,Independent Retailer,Retail,West,B,Negotiated,Net 60,28,2.5801,9.764,359.1,SP101,Marcus Oyelaran,Marcus,Dubois
+CU2031,Juniper Direct,Corporate & B2B Buyer,B2B Direct,Northeast,D,List,Net 30,9,0.6438,7.252,139.7,SP108,Nikita Petrenko,Marcus,Ahmed
+CU2032,Mount Outfitters,Sub-Distributor,Wholesale,Southeast,D,Negotiated,Net 30,6,0.4966,15.23,81.9,SP109,Hollis Marchetti,Avery,Clarke
+CU2033,Selkirk Import Co,Independent Retailer,Retail,Midwest,D,List,2/10 Net 30,5,0.4009,9.505,114.3,SP106,Simone Delacroix,Sofia,Tremblay
+CU2034,Harbour Outfitters,Marketplace Seller,Marketplace,Midwest,D,Contract,Net 45,8,0.5167,15.684,479.3,SP110,Bea Okonkwo,Priya,Singh
+CU2035,Salish Trading Co,Corporate & B2B Buyer,B2B Direct,Southeast,D,List,Net 45,9,0.7126,7.886,44.9,SP109,Hollis Marchetti,Hannah,Wong
+CU2036,Fraser Wholesale,Regional Retail Chain,Retail,Midwest,C,List,Net 30,13,0.8822,11.745,198.7,SP107,Yusuf Kandemir,Elena,Taylor
+CU2037,Harbour Wholesale,Marketplace Seller,Marketplace,Northeast,B,List,2/10 Net 30,24,3.8829,14.318,370.8,SP107,Yusuf Kandemir,Liam,Chen
+CU2038,Chilcotin Distribution,Marketplace Seller,Marketplace,Midwest,D,List,Net 30,4,0.704,18.551,113.4,SP106,Simone Delacroix,Ethan,Garcia
+CU2039,Okanagan Direct,Marketplace Seller,Marketplace,West,D,Negotiated,Net 60,4,0.586,14.937,115.7,SP101,Marcus Oyelaran,Liam,Kim
+CU2040,Alder Distribution,Independent Retailer,Retail,Southwest,D,Negotiated,2/10 Net 30,9,0.358,10.191,55.5,SP104,Alix Fontaine,Noor,Garcia
+CU2041,Okanagan Import Co,Sub-Distributor,Wholesale,West,C,List,Net 30,13,1.5571,15.224,54.3,SP100,Dana Whitfield,Zara,Garcia
+CU2042,Okanagan Wholesale,Corporate & B2B Buyer,B2B Direct,Southwest,D,Negotiated,Net 30,10,0.7685,7.794,66.8,SP109,Hollis Marchetti,Leah,Ahmed
+CU2043,Kootenay Retail Group,Government & Education,B2B Direct,Midwest,B,Negotiated,Net 60,28,2.9516,5.397,301.5,SP106,Simone Delacroix,Maya,Martin
+CU2044,Harbour Direct,Corporate & B2B Buyer,B2B Direct,West,C,List,Net 15,11,1.5541,6.962,84.6,SP100,Dana Whitfield,Leah,Patel
+CU2045,Sunshine Import Co,Subscription Box Operator,Wholesale,Southeast,C,List,Net 15,18,1.7404,8.303,125.1,SP109,Hollis Marchetti,Samuel,Singh
+CU2046,Kitsilano Depot,Marketplace Seller,Marketplace,Northeast,D,List,Net 30,6,0.6173,14.219,37.0,SP107,Yusuf Kandemir,Avery,Martin
+CU2047,Kitsilano Supply,Corporate & B2B Buyer,B2B Direct,West,D,Negotiated,Net 45,6,0.6101,6.973,42.9,SP101,Marcus Oyelaran,Sofia,Kim
+CU2048,Coastal Import Co,E-commerce Pure-Play,Marketplace,Midwest,D,Negotiated,Net 30,7,0.4311,12.464,54.5,SP100,Dana Whitfield,Kenji,Anderson
+CU2049,Mount Distribution,Independent Retailer,Retail,West,C,List,Net 30,18,1.5611,9.671,315.8,SP101,Marcus Oyelaran,Wei,Chen
+CU2050,Cedar Import Co,Marketplace Seller,Marketplace,Southwest,A,Contract,Net 30,43,7.2581,14.154,224.0,SP104,Alix Fontaine,Priya,Brown
+CU2051,Mount Import Co,Subscription Box Operator,Wholesale,West,C,List,Net 30,12,1.5524,7.15,235.9,SP108,Nikita Petrenko,Sofia,Chen
+CU2052,Selkirk Ventures,Marketplace Seller,Marketplace,Midwest,D,Negotiated,Net 15,10,0.4561,18.602,146.6,SP106,Simone Delacroix,Leah,Chen
+CU2053,Selkirk Outfitters,Corporate & B2B Buyer,B2B Direct,Midwest,C,List,Net 15,17,1.3607,7.619,613.9,SP105,Rowan Achterberg,Marcus,Tremblay
+CU2054,Cedar Direct,Marketplace Seller,Marketplace,Southwest,C,Contract,Net 15,13,1.4367,14.861,245.3,SP104,Alix Fontaine,Owen,Wong
+CU2055,Riverside Outfitters,Marketplace Seller,Marketplace,Northeast,C,List,Net 30,17,1.5303,14.944,98.8,SP107,Yusuf Kandemir,Avery,Wilson
+CU2056,Juniper Trading Co,Regional Retail Chain,Retail,West,D,List,Net 30,7,0.5416,10.74,133.4,SP102,Priya Raghunathan,Amara,Anderson
+CU2057,Okanagan Retail Group,Subscription Box Operator,Wholesale,Southeast,C,Negotiated,Net 30,12,1.2247,6.891,198.1,SP110,Bea Okonkwo,Avery,Martin
+CU2058,Selkirk Logistics,Corporate & B2B Buyer,B2B Direct,West,C,List,Net 30,12,1.4452,7.256,312.8,SP104,Alix Fontaine,Ethan,Côté
+CU2059,Granville Trading Co,Independent Retailer,Retail,Northeast,D,List,2/10 Net 30,8,0.7338,8.66,24.6,SP108,Nikita Petrenko,Hannah,Patel
+CU2060,Fraser Retail Group,Subscription Box Operator,Wholesale,Midwest,D,List,Net 30,8,0.5539,8.431,81.8,SP106,Simone Delacroix,Daniel,Lee
+CU2061,Marine Logistics,Marketplace Seller,Marketplace,Southwest,D,Negotiated,Net 30,5,0.7221,16.002,158.4,SP104,Alix Fontaine,Lucas,Campbell
+CU2062,Summit Logistics,Independent Retailer,Retail,Southeast,C,List,Net 30,10,1.1252,9.077,196.5,SP109,Hollis Marchetti,Hannah,Morin
+CU2063,Stanley Marketplace,Sub-Distributor,Wholesale,Northeast,B,Contract,Net 30,22,3.674,16.759,838.8,SP100,Dana Whitfield,Kenji,Gagnon
+CU2064,Cedar Logistics,Independent Retailer,Retail,Southeast,D,List,Net 30,9,0.5709,8.082,74.1,SP111,Jonah Stavrides,Wei,Chen
+CU2065,Juniper Marketplace,Government & Education,B2B Direct,West,C,Negotiated,Net 30,14,1.2598,6.278,81.2,SP100,Dana Whitfield,Zara,Ahmed
+CU2066,Marine Wholesale,Corporate & B2B Buyer,B2B Direct,Midwest,D,Contract,Net 30,9,0.7535,6.645,126.2,SP105,Rowan Achterberg,Samuel,Morin
+CU2067,Alder Trading Co,Independent Retailer,Retail,Northeast,D,Negotiated,Net 30,6,0.6242,10.072,80.3,SP111,Jonah Stavrides,Kenji,Singh
+CU2068,Burrard Logistics,E-commerce Pure-Play,Marketplace,Southwest,D,List,2/10 Net 30,10,0.5245,13.596,115.9,SP104,Alix Fontaine,Ethan,Côté
+CU2069,Harbour Ventures,E-commerce Pure-Play,Marketplace,West,C,List,2/10 Net 30,10,0.909,12.517,451.7,SP102,Priya Raghunathan,Mateo,Wilson
+CU2070,Riverside Direct,Marketplace Seller,Marketplace,West,B,Negotiated,Net 45,27,2.06,16.53,1372.7,SP102,Priya Raghunathan,Maya,Lee
+CU2071,Harbour Marketplace,Regional Retail Chain,Retail,West,B,List,Net 60,23,3.5177,12.896,864.9,SP100,Dana Whitfield,Priya,Clarke
+CU2072,Chilcotin Direct,Marketplace Seller,Marketplace,Southeast,B,Negotiated,Net 45,24,3.9103,17.336,289.9,SP109,Hollis Marchetti,Daniel,Kaur
+CU2073,Marine Retail Group,Marketplace Seller,Marketplace,Southwest,D,Contract,Net 30,6,0.4701,16.714,172.1,SP103,Tom Beauchemin,Elena,Campbell
+CU2074,Burrard Wholesale,Corporate & B2B Buyer,B2B Direct,Northeast,C,List,Net 60,15,1.8628,7.425,2461.8,SP104,Alix Fontaine,Leah,Fraser
+CU2075,Coastal Depot,Independent Retailer,Retail,West,D,List,Net 30,8,0.4981,7.96,171.3,SP100,Dana Whitfield,Wei,Côté
+CU2076,Mount Commerce,Government & Education,B2B Direct,Southeast,C,List,Net 30,16,1.7107,6.673,265.4,SP103,Tom Beauchemin,Liam,Clarke
+CU2077,Burrard Direct,Corporate & B2B Buyer,B2B Direct,Southeast,B,Negotiated,Net 60,22,4.2624,6.813,230.9,SP110,Bea Okonkwo,Avery,Chen
+CU2078,Juniper Distribution,E-commerce Pure-Play,Marketplace,West,C,List,Net 30,18,1.8508,12.796,220.5,SP100,Dana Whitfield,Aisha,Ahmed
+CU2079,Harbour Procurement,Marketplace Seller,Marketplace,Midwest,D,List,2/10 Net 30,9,0.7695,14.506,64.6,SP111,Jonah Stavrides,Samuel,Lee
+CU2080,Cedar Depot,Government & Education,B2B Direct,Midwest,A,Contract,Net 60,38,10.0795,5.417,2469.1,SP111,Jonah Stavrides,Marcus,Côté
+CU2081,Kootenay Direct,Regional Retail Chain,Retail,West,C,List,2/10 Net 30,18,0.9903,12.184,182.7,SP100,Dana Whitfield,Ravi,Nguyen
+CU2082,Harbour Import Co,E-commerce Pure-Play,Marketplace,Northeast,D,List,Net 45,9,0.7136,12.421,210.5,SP108,Nikita Petrenko,Aisha,Chen
+CU2083,Granville Ventures,Marketplace Seller,Marketplace,Southeast,B,Contract,Net 30,21,3.7945,14.593,442.6,SP110,Bea Okonkwo,Ethan,Campbell
+CU2084,Stanley Ventures,Marketplace Seller,Marketplace,Southeast,D,List,Net 45,6,0.5866,18.685,289.1,SP109,Hollis Marchetti,Samuel,Chen
+CU2085,Chilcotin Procurement,Government & Education,B2B Direct,Northeast,D,List,2/10 Net 30,7,0.4304,6.741,82.0,SP107,Yusuf Kandemir,Wei,Tremblay
+CU2086,Coastal Outfitters,Marketplace Seller,Marketplace,Northeast,C,List,Net 30,17,0.9893,18.08,599.1,SP107,Yusuf Kandemir,Maya,Roy
+CU2087,Selkirk Procurement,Sub-Distributor,Wholesale,Southwest,C,Contract,Net 15,16,0.974,13.795,120.9,SP104,Alix Fontaine,Amara,Garcia
+CU2088,Juniper Commerce,Independent Retailer,Retail,Southeast,D,List,Net 30,9,0.4712,10.006,102.0,SP110,Bea Okonkwo,Lucas,Chen
+CU2089,Granville Distribution,Marketplace Seller,Marketplace,Midwest,D,List,Net 30,8,0.5882,17.164,36.2,SP100,Dana Whitfield,Samuel,Tremblay
+CU2090,Fraser Logistics,Sub-Distributor,Wholesale,Southwest,D,Negotiated,Net 45,8,0.381,14.212,154.4,SP102,Priya Raghunathan,Liam,Nguyen
+CU2091,Selkirk Depot,Independent Retailer,Retail,Southeast,B,Negotiated,Net 45,25,2.7437,9.76,139.1,SP109,Hollis Marchetti,Maya,Garcia
+CU2092,Alder Procurement,Marketplace Seller,Marketplace,Northeast,D,List,Net 30,10,0.6338,17.934,38.8,SP107,Yusuf Kandemir,Ravi,Lee
+CU2093,Burrard Retail Group,Independent Retailer,Retail,Southwest,D,Negotiated,2/10 Net 30,4,0.7551,10.321,112.4,SP104,Alix Fontaine,Avery,Roy
+CU2094,Harbour Retail Group,Regional Retail Chain,Retail,Midwest,C,List,Net 30,13,1.7679,11.429,46.3,SP105,Rowan Achterberg,Kenji,Brown
+CU2095,Riverside Procurement,Sub-Distributor,Wholesale,Midwest,C,Negotiated,Net 15,13,1.214,13.557,337.6,SP105,Rowan Achterberg,Hannah,Brown
+CU2096,Riverside Distribution,Marketplace Seller,Marketplace,Southeast,A,List,Net 30,39,7.8378,14.332,464.2,SP110,Bea Okonkwo,Hannah,Nguyen
+CU2097,Summit Import Co,Subscription Box Operator,Wholesale,Southwest,C,List,Net 45,10,1.5527,7.711,153.8,SP104,Alix Fontaine,Kenji,Brown
+CU2098,Fraser Depot,Subscription Box Operator,Wholesale,Northeast,C,List,Net 60,16,1.7716,7.873,99.8,SP108,Nikita Petrenko,Sofia,Anderson
+CU2099,Cedar Wholesale,E-commerce Pure-Play,Marketplace,West,B,Negotiated,Net 30,21,3.8501,13.7,343.6,SP102,Priya Raghunathan,Zara,Lee
+CU2100,Alder Depot,Independent Retailer,Retail,West,C,List,Net 15,17,1.2265,8.851,191.9,SP102,Priya Raghunathan,Ethan,Martin
+CU2101,Marine Distribution,Independent Retailer,Retail,West,D,Negotiated,Net 30,9,0.7628,9.858,130.1,SP100,Dana Whitfield,Maya,Campbell
+CU2102,Harbour Trading Co,Sub-Distributor,Wholesale,Southeast,D,Contract,Net 30,10,0.6143,14.522,190.7,SP110,Bea Okonkwo,Hannah,Gagnon
+CU2103,Summit Commerce,Marketplace Seller,Marketplace,Southwest,D,Contract,Net 45,10,0.4058,18.66,46.8,SP104,Alix Fontaine,Sofia,Anderson
+CU2104,Summit Marketplace,Corporate & B2B Buyer,B2B Direct,Southwest,C,List,2/10 Net 30,17,1.2873,7.277,1426.6,SP104,Alix Fontaine,Chloe,Côté
+CU2105,Stanley Procurement,Marketplace Seller,Marketplace,Southwest,D,Negotiated,Net 30,8,0.3521,15.034,176.5,SP104,Alix Fontaine,Noor,Brown
+CU2106,Fraser Supply,Sub-Distributor,Wholesale,West,D,Negotiated,Net 30,5,0.4903,14.671,106.0,SP101,Marcus Oyelaran,Avery,Fraser
+CU2107,Selkirk Trading Co,E-commerce Pure-Play,Marketplace,Midwest,A,List,2/10 Net 30,41,9.6557,12.821,1023.0,SP109,Hollis Marchetti,Elena,Kim
+CU2108,Okanagan Distribution,Sub-Distributor,Wholesale,West,B,List,Net 45,23,2.6466,12.982,813.1,SP102,Priya Raghunathan,Marcus,Roy
+CU2109,Kootenay Logistics,Subscription Box Operator,Wholesale,Southwest,C,Contract,Net 30,15,1.8484,8.052,525.2,SP104,Alix Fontaine,Chloe,Nguyen
+CU2110,Chilcotin Marketplace,Independent Retailer,Retail,Midwest,D,List,Net 30,4,0.4035,9.514,47.2,SP106,Simone Delacroix,Mateo,Fraser
+CU2111,Kitsilano Procurement,Independent Retailer,Retail,West,C,List,Net 15,15,1.8939,10.307,905.4,SP100,Dana Whitfield,Noor,Patel
+CU2112,Stanley Wholesale,Government & Education,B2B Direct,Northeast,C,Negotiated,Net 30,18,1.166,5.509,316.3,SP108,Nikita Petrenko,Owen,Morin
+CU2113,Coastal Retail Group,Independent Retailer,Retail,Southeast,B,List,Net 60,21,2.7344,7.91,286.2,SP109,Hollis Marchetti,Wei,Singh
+CU2114,Mount Retail Group,Corporate & B2B Buyer,B2B Direct,Southwest,D,Negotiated,Net 15,4,0.7762,7.347,93.9,SP103,Tom Beauchemin,Lucas,Wong
+CU2115,Riverside Retail Group,Sub-Distributor,Wholesale,West,C,Contract,Net 45,17,1.806,16.611,300.2,SP101,Marcus Oyelaran,Maya,Lee
+CU2116,Stanley Commerce,Independent Retailer,Retail,Northeast,D,Contract,Net 30,5,0.7634,9.467,147.3,SP108,Nikita Petrenko,Liam,Nguyen
+CU2117,Summit Distribution,Marketplace Seller,Marketplace,West,C,Negotiated,Net 15,17,1.7282,18.788,350.6,SP100,Dana Whitfield,Zara,Côté
+CU2118,Marine Trading Co,Regional Retail Chain,Retail,West,D,List,Net 15,8,0.6602,12.554,202.8,SP101,Marcus Oyelaran,Aisha,Tremblay
+CU2119,Granville Logistics,Marketplace Seller,Marketplace,Southeast,C,List,Net 60,11,1.5989,14.797,326.4,SP110,Bea Okonkwo,Ethan,Patel
+CU2120,Stanley Retail Group,Independent Retailer,Retail,West,D,List,Net 15,8,0.5584,10.259,251.2,SP101,Marcus Oyelaran,Jordan,Lee
+CU2121,Riverside Marketplace,Corporate & B2B Buyer,B2B Direct,Northeast,B,Contract,Net 30,28,2.3524,6.517,214.6,SP108,Nikita Petrenko,Kenji,Côté
+CU2122,Chilcotin Depot,Marketplace Seller,Marketplace,Southeast,C,List,2/10 Net 30,10,0.9361,14.83,61.8,SP110,Bea Okonkwo,Noor,Morin
+CU2123,Fraser Direct,Independent Retailer,Retail,West,D,Contract,Net 30,7,0.5586,9.555,331.6,SP100,Dana Whitfield,Sofia,Fraser
+CU2124,Mount Procurement,Marketplace Seller,Marketplace,West,B,List,2/10 Net 30,25,3.6985,17.463,157.5,SP107,Yusuf Kandemir,Mateo,Dubois
+CU2125,Mount Trading Co,Marketplace Seller,Marketplace,Northeast,B,Negotiated,Net 30,29,4.3105,15.798,125.4,SP108,Nikita Petrenko,Samuel,Roy
+CU2126,Sunshine Outfitters,Marketplace Seller,Marketplace,Southwest,C,Contract,Net 30,17,1.5496,16.675,182.4,SP104,Alix Fontaine,Maya,Wilson
+CU2127,Sunshine Direct,Corporate & B2B Buyer,B2B Direct,Southeast,A,List,Net 30,37,5.8114,7.175,289.5,SP110,Bea Okonkwo,Leah,Garcia
+CU2128,Granville Marketplace,Marketplace Seller,Marketplace,Southeast,D,List,Net 30,9,0.6567,14.218,162.1,SP110,Bea Okonkwo,Priya,Taylor
+CU2129,Okanagan Outfitters,Regional Retail Chain,Retail,West,C,List,Net 30,17,1.5525,10.732,77.8,SP100,Dana Whitfield,Samuel,Kaur
+CU2130,Salish Ventures,Corporate & B2B Buyer,B2B Direct,Southeast,C,List,Net 30,10,1.1631,7.117,353.3,SP110,Bea Okonkwo,Ravi,Fraser
+CU2131,Sunshine Trading Co,Regional Retail Chain,Retail,Midwest,C,List,Net 30,16,1.4714,11.846,276.5,SP106,Simone Delacroix,Kenji,Campbell
+CU2132,Salish Wholesale,Subscription Box Operator,Wholesale,Southwest,D,List,2/10 Net 30,5,0.3752,8.529,72.9,SP104,Alix Fontaine,Elena,Chen
+CU2133,Okanagan Trading Co,Marketplace Seller,Marketplace,Northeast,D,List,Net 60,8,0.4544,18.429,177.5,SP108,Nikita Petrenko,Priya,Wilson
+CU2134,Stanley Direct,Marketplace Seller,Marketplace,Southwest,C,List,Net 30,11,1.6725,16.981,130.9,SP104,Alix Fontaine,Hannah,Morin
+CU2135,Okanagan Marketplace,Sub-Distributor,Wholesale,Southeast,B,Negotiated,2/10 Net 30,26,4.2449,14.769,594.3,SP108,Nikita Petrenko,Priya,Anderson
+CU2136,Alder Marketplace,Government & Education,B2B Direct,West,C,Negotiated,Net 30,16,1.5991,5.355,175.6,SP100,Dana Whitfield,Owen,Taylor
+CU2137,Juniper Procurement,E-commerce Pure-Play,Marketplace,Southeast,D,List,2/10 Net 30,9,0.4116,14.872,188.6,SP110,Bea Okonkwo,Zara,Nguyen
+CU2138,Okanagan Commerce,Marketplace Seller,Marketplace,Southeast,D,List,Net 30,9,0.4581,15.246,600.5,SP110,Bea Okonkwo,Daniel,Kaur
+CU2139,Cedar Procurement,E-commerce Pure-Play,Marketplace,Northeast,C,Negotiated,2/10 Net 30,17,1.8852,12.408,65.3,SP108,Nikita Petrenko,Kenji,Kim
+CU2140,Kitsilano Outfitters,Subscription Box Operator,Wholesale,Southwest,D,Negotiated,Net 30,6,0.6737,9.166,104.8,SP104,Alix Fontaine,Aisha,Kim
+CU2141,Sunshine Ventures,Marketplace Seller,Marketplace,Midwest,C,Negotiated,Net 30,10,1.7748,18.011,142.6,SP106,Simone Delacroix,Daniel,Côté
+CU2142,Mount Direct,Marketplace Seller,Marketplace,Midwest,B,Negotiated,Net 15,26,3.7625,15.732,802.5,SP111,Jonah Stavrides,Jordan,Morin
+CU2143,Burrard Outfitters,Sub-Distributor,Wholesale,Southeast,B,Negotiated,Net 30,30,4.3397,13.248,211.5,SP109,Hollis Marchetti,Leah,Roy
+CU2144,Coastal Procurement,Marketplace Seller,Marketplace,West,C,List,2/10 Net 30,13,1.8136,18.294,253.2,SP102,Priya Raghunathan,Zara,Lee
+CU2145,Harbour Logistics,Regional Retail Chain,Retail,West,D,Negotiated,Net 15,6,0.5789,14.165,50.1,SP100,Dana Whitfield,Liam,Campbell
+CU2146,Kootenay Marketplace,E-commerce Pure-Play,Marketplace,West,D,List,Net 15,6,0.5879,16.21,42.7,SP100,Dana Whitfield,Avery,Chen
+CU2147,Cedar Retail Group,Marketplace Seller,Marketplace,West,D,List,Net 15,9,0.4466,18.881,137.0,SP100,Dana Whitfield,Elena,Côté
+CU2148,Salish Supply,Regional Retail Chain,Retail,Midwest,C,Negotiated,2/10 Net 30,11,1.5874,11.581,71.8,SP106,Simone Delacroix,Chloe,Fraser
+CU2149,Mount Ventures,Corporate & B2B Buyer,B2B Direct,Northeast,D,List,Net 30,9,0.3761,6.091,70.4,SP107,Yusuf Kandemir,Maya,Brown

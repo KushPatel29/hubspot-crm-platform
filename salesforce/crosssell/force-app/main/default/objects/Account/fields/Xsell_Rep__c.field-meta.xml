@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Xsell_Rep__c</fullName>
+    <label>Rep</label>
+    <description>Kept as a property: no HubSpot user per rep.</description>
+    <inlineHelpText>Kept as a property: no HubSpot user per rep.</inlineHelpText>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>a_fontaine</fullName>
+                <default>false</default>
+                <label>A. Fontaine</label>
+            </value>
+            <value>
+                <fullName>b_okafor</fullName>
+                <default>false</default>
+                <label>B. Okafor</label>
+            </value>
+            <value>
+                <fullName>c_delgado</fullName>
+                <default>false</default>
+                <label>C. Delgado</label>
+            </value>
+            <value>
+                <fullName>d_tremblay</fullName>
+                <default>false</default>
+                <label>D. Tremblay</label>
+            </value>
+            <value>
+                <fullName>e_novak</fullName>
+                <default>false</default>
+                <label>E. Novak</label>
+            </value>
+            <value>
+                <fullName>f_osei</fullName>
+                <default>false</default>
+                <label>F. Osei</label>
+            </value>
+            <value>
+                <fullName>g_lindqvist</fullName>
+                <default>false</default>
+                <label>G. Lindqvist</label>
+            </value>
+            <value>
+                <fullName>h_moreau</fullName>
+                <default>false</default>
+                <label>H. Moreau</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

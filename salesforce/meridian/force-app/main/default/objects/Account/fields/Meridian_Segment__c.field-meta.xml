@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Meridian_Segment__c</fullName>
+    <label>Segment</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>corporate_b2b_buyer</fullName>
+                <default>false</default>
+                <label>Corporate &amp; B2B Buyer</label>
+            </value>
+            <value>
+                <fullName>e_commerce_pure_play</fullName>
+                <default>false</default>
+                <label>E-commerce Pure-Play</label>
+            </value>
+            <value>
+                <fullName>government_education</fullName>
+                <default>false</default>
+                <label>Government &amp; Education</label>
+            </value>
+            <value>
+                <fullName>independent_retailer</fullName>
+                <default>false</default>
+                <label>Independent Retailer</label>
+            </value>
+            <value>
+                <fullName>marketplace_seller</fullName>
+                <default>false</default>
+                <label>Marketplace Seller</label>
+            </value>
+            <value>
+                <fullName>regional_retail_chain</fullName>
+                <default>false</default>
+                <label>Regional Retail Chain</label>
+            </value>
+            <value>
+                <fullName>sub_distributor</fullName>
+                <default>false</default>
+                <label>Sub-Distributor</label>
+            </value>
+            <value>
+                <fullName>subscription_box_operator</fullName>
+                <default>false</default>
+                <label>Subscription Box Operator</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,183 @@
+{
+  "generated_by": "scripts/extract_sources.py",
+  "tenants": {
+    "meridian": {
+      "repository": "KushPatel29/pricing-costing-analytics",
+      "commit": "20fffc403a4a2d2835c141562f5cf87873abeb99",
+      "files": [
+        {
+          "file": "data/snapshots/meridian/customers.csv",
+          "rows": 150,
+          "sha256": "2ff8e24daa9679d62c05a73d9812337bb16d85a46a30fe97cd833a16fcc499c0",
+          "sources": [
+            {
+              "path": "data/dim_customer.csv",
+              "sha256": "5c74956375b787ccb6d804ebd164c804818fdaab73995288152f272f3be8e5d7"
+            }
+          ],
+          "rule": "every customer; buyer_firstname/buyer_lastname are synthetic (buyer_name)"
+        },
+        {
+          "file": "data/snapshots/meridian/products.csv",
+          "rows": 240,
+          "sha256": "f64f6e846eb25b8fb5b378facc23323de5e1f68a8d9ea558d3e5415c04e6e124",
+          "sources": [
+            {
+              "path": "data/dim_product.csv",
+              "sha256": "961714881fe7438ae70327a97a16cac0801e69e41fb9ca90ece38f73f637ca3b"
+            },
+            {
+              "path": "data/fact_quote.csv",
+              "sha256": "01bfd39284f631b63d2aa882515d01202492b75acf3c0a0d7d5aa087a093c40d"
+            }
+          ],
+          "rule": "every product; reference_list_price and reference_unit_cost are the medians of that product's quoted list price and final cost over all quotes, or cost / (1 - target margin) for a product never quoted"
+        },
+        {
+          "file": "data/snapshots/meridian/salespeople.csv",
+          "rows": 12,
+          "sha256": "82b7b4a54a7eff677d89f04adf7f199b3352dcca553822c390ebbcbe8dfc1e54",
+          "sources": [
+            {
+              "path": "data/dim_salesperson.csv",
+              "sha256": "82b7b4a54a7eff677d89f04adf7f199b3352dcca553822c390ebbcbe8dfc1e54"
+            }
+          ],
+          "rule": "every salesperson"
+        },
+        {
+          "file": "data/snapshots/meridian/quotes.csv",
+          "rows": 480,
+          "sha256": "8d4cd4c269ae48ff64f0f575e94ddfa7cf5da36ccc86f45372548bbc87fc3cb2",
+          "sources": [
+            {
+              "path": "data/fact_quote.csv",
+              "sha256": "01bfd39284f631b63d2aa882515d01202492b75acf3c0a0d7d5aa087a093c40d"
+            }
+          ],
+          "rule": "quotes with month >= 2026-04-01, sorted by month, customer, quote"
+        }
+      ]
+    },
+    "crosssell": {
+      "repository": "KushPatel29/Customer-Recommendation-Engine",
+      "commit": "68b10eaf366040e37e5dccef36a7c3a996c33034",
+      "files": [
+        {
+          "file": "data/snapshots/crosssell/customers.csv",
+          "rows": 120,
+          "sha256": "74e9003372db1733e61c2a6242139e49e316bb384b11e0b667e8b0e661bd48df",
+          "sources": [
+            {
+              "path": "data/customers.csv",
+              "sha256": "3d7684619455453cecb57de8602a9e48cbd002289e28ad9f591374add254f496"
+            },
+            {
+              "path": "output/customer_analytics.csv",
+              "sha256": "2734ed21da4a34d6a3590be843c3dd8971b319fc1ca40dae5708fe846f254e07"
+            }
+          ],
+          "rule": "every customer joined to its analytics (total_revenue, total_margin, orders, distinct_skus, last_order, recency_days, median_reorder_days, days_overdue, churn_risk, rfm_segment, margin_pct, clv_12m_runrate); buyer names synthetic"
+        },
+        {
+          "file": "data/snapshots/crosssell/catalog.csv",
+          "rows": 38,
+          "sha256": "7e4f30323376777889d2a8ea7183fda0ba82757eb20118fa4120f7c71de263d9",
+          "sources": [
+            {
+              "path": "data/catalog.csv",
+              "sha256": "423393d8eeff75f647993d77cd23ec58e8a0d4c76468295d68d09f5bac047340"
+            }
+          ],
+          "rule": "every SKU"
+        },
+        {
+          "file": "data/snapshots/crosssell/recommendations.csv",
+          "rows": 302,
+          "sha256": "790fd68dc2c6bb6bfb064939c6d6bfcb0d91c1852e825ee8de116959d6d6472a",
+          "sources": [
+            {
+              "path": "output/cross_sell_recommendations.csv",
+              "sha256": "1125c0bbc63bf32b48e6f09f3b3fdfc1293c43d846e1176b3421ac685abf8ddf"
+            },
+            {
+              "path": "output/recommendation_eligibility_audit.csv",
+              "sha256": "2e126c61c4c6b9ae893789d78adda6d77693641cf43763773b86a486cb0ec8bf"
+            }
+          ],
+          "rule": "the top 3 recommendations per customer that pass the eligibility audit, in rank order"
+        }
+      ]
+    },
+    "aml": {
+      "repository": "KushPatel29/aml-transaction-monitoring",
+      "commit": "9aeecb6c2f7593e249b8ee0d2618ce7cdd8cb571",
+      "files": [
+        {
+          "file": "data/snapshots/aml/cases.csv",
+          "rows": 366,
+          "sha256": "cdce58a09290661c39e9c735dc584356d0a256158628bf5f62d24cae58b24d62",
+          "sources": [
+            {
+              "path": "results/investigation_case_register.csv",
+              "sha256": "cdce58a09290661c39e9c735dc584356d0a256158628bf5f62d24cae58b24d62"
+            }
+          ],
+          "rule": "every case"
+        },
+        {
+          "file": "data/snapshots/aml/subjects.csv",
+          "rows": 366,
+          "sha256": "897e7002b029e0d28225030a45430471860ac69536c01d1c7640e0e79906ac00",
+          "sources": [
+            {
+              "path": "data/generated/entities.csv.gz",
+              "sha256": "3264f18fd99f1f739c924b2a9ee459f27e197584bc22b324e0d6543158f18890"
+            }
+          ],
+          "rule": "the entity each case is about, in case order"
+        },
+        {
+          "file": "data/snapshots/aml/counterparties.csv",
+          "rows": 286,
+          "sha256": "c2e2af80a7ef49f00c8fc31e622763940c80f98ccdaf14748fc2e237308df65c",
+          "sources": [
+            {
+              "path": "data/generated/counterparties.csv.gz",
+              "sha256": "549b0777473369e20e6cf6fffd913099f87ee5f5fb3a80cf3d76c3826d9e22dd"
+            },
+            {
+              "path": "results/investigation_entity_graph.csv",
+              "sha256": "04b2b6696ec026746c78160792bf44498afbdd859593c85d14cf84851eb44acf"
+            }
+          ],
+          "rule": "counterparties that at least 2 subjects of P0/P1 cases transact with; hot_subjects is that count"
+        },
+        {
+          "file": "data/snapshots/aml/links.csv",
+          "rows": 987,
+          "sha256": "0f92c24a4451631d8eb22a16edfa7e95c257a703cfaa7c3b904a44a0a8440f99",
+          "sources": [
+            {
+              "path": "results/investigation_entity_graph.csv",
+              "sha256": "04b2b6696ec026746c78160792bf44498afbdd859593c85d14cf84851eb44acf"
+            }
+          ],
+          "rule": "entity-graph edges between those subjects and those counterparties"
+        },
+        {
+          "file": "data/snapshots/aml/typologies.csv",
+          "rows": 5,
+          "sha256": "7fc25d121dc3bfd8991b0ffa398dbc7784cdc8e1a03e1ea6b3983784e911d47b",
+          "sources": [
+            {
+              "path": "results/typology_evidence_catalogue.csv",
+              "sha256": "7fc25d121dc3bfd8991b0ffa398dbc7784cdc8e1a03e1ea6b3983784e911d47b"
+            }
+          ],
+          "rule": "the whole typology evidence catalogue"
+        }
+      ]
+    }
+  }
+}

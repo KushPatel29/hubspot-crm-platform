@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Xsell_Days_Overdue__c</fullName>
+    <label>Days overdue</label>
+    <description>Days past the usual reorder interval.</description>
+    <inlineHelpText>Days past the usual reorder interval.</inlineHelpText>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>4</scale>
+    <type>Number</type>
+</CustomField>

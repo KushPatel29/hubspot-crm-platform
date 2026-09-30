@@ -1,0 +1,367 @@
+entity_id,entity_type,display_name,segment,home_region,opened_date,payroll_base_cad,rent_cad,typical_amount_cad
+ENT-00060,individual,Becky Horton,salaried,Region F,2020-09-23,2483.03,2725.0,625.67
+ENT-00104,individual,Philip Weaver,salaried,Region A,2025-05-15,1265.21,1575.0,219.3
+ENT-00125,individual,Natalie Romero,self_employed,Region F,2025-05-02,2414.31,2750.0,112.07
+ENT-00189,individual,David Proctor,salaried,Region C,2022-07-22,2451.83,1625.0,162.92
+ENT-00303,individual,Johnny Johnson,salaried,Region A,2021-01-23,1607.2,1150.0,107.23
+ENT-00386,individual,Nathan Nelson,salaried,Region D,2020-09-13,1657.76,1625.0,209.76
+ENT-00492,individual,Dr. Lori Rodriguez,salaried,Region B,2021-07-12,3810.71,1200.0,182.12
+ENT-00589,individual,Laura White,salaried,Region D,2022-02-13,1633.47,1400.0,306.05
+ENT-00644,individual,Joyce Larson,salaried,Region A,2023-06-29,1962.32,1075.0,246.89
+ENT-00678,individual,Tyrone Bishop,salaried,Region B,2024-06-11,2465.34,1175.0,176.29
+ENT-00687,individual,Terry Austin,salaried,Region F,2022-09-30,1478.17,2275.0,160.68
+ENT-00862,individual,Brenda Espinoza,salaried,Region E,2021-01-30,1875.41,1575.0,236.44
+ENT-00882,individual,Krista Velasquez,retired,Region A,2020-10-25,3122.19,1600.0,311.66
+ENT-00891,individual,Samantha Kennedy,salaried,Region E,2023-10-14,2095.8,3100.0,419.49
+ENT-00902,individual,Brett Shah,self_employed,Region C,2023-09-25,3506.77,2725.0,142.02
+ENT-00918,individual,Emily Clark,salaried,Region C,2020-11-16,1962.91,2250.0,297.63
+ENT-00982,individual,Allen Lee,salaried,Region C,2025-06-21,1270.44,1725.0,175.45
+ENT-01150,business,"Young, Lopez and Mccarthy 0100",ecommerce,Region B,2021-11-29,0.0,0.0,812.33
+ENT-01203,business,"Evans, Gilbert and Mercado 0153",wholesale,Region A,2023-08-18,0.0,0.0,6797.23
+ENT-01228,business,"Martin, Castro and Ross 0178",wholesale,Region B,2022-05-29,0.0,0.0,1072.66
+ENT-01270,business,"Lopez, Martinez and Evans 0220",retail_cash_intensive,Region A,2021-06-22,0.0,0.0,2526.48
+ENT-01289,business,"Randall, Valenzuela and Conner 0239",wholesale,Region C,2022-02-16,0.0,0.0,4952.97
+ENT-01292,business,"Palmer, Berry and Roach 0242",professional_services,Region C,2023-06-01,0.0,0.0,3868.98
+ENT-01393,business,"Donovan, Buck and Rogers 0343",wholesale,Region F,2021-09-04,0.0,0.0,1583.76
+ENT-01460,business,Kim-Johnson 0410,wholesale,Region B,2021-05-16,0.0,0.0,1318.74
+ENT-01468,business,Mcintyre-Pittman 0418,wholesale,Region C,2022-08-18,0.0,0.0,1546.7
+ENT-01494,business,"Fox, Ross and Brown 0444",wholesale,Region A,2025-01-10,0.0,0.0,2003.12
+ENT-00120,individual,Eric Howard,salaried,Region B,2021-03-28,1670.97,2650.0,144.26
+ENT-00130,individual,Michael Smith,gig,Region D,2025-01-04,3402.4,3300.0,311.14
+ENT-00149,individual,Joseph Johnson,salaried,Region B,2024-03-10,4707.88,3150.0,253.26
+ENT-00197,individual,Elaine Love,salaried,Region F,2021-06-05,2124.09,2525.0,211.47
+ENT-00210,individual,Zachary Thomas,salaried,Region F,2025-03-07,1728.87,2300.0,114.71
+ENT-00248,individual,Joel Williams,salaried,Region D,2022-10-07,1544.22,1525.0,224.15
+ENT-00289,individual,Amber Knapp,salaried,Region B,2022-09-24,1646.67,1925.0,216.89
+ENT-00333,individual,Derek Sanders,salaried,Region E,2024-02-09,1097.28,2250.0,116.43
+ENT-00387,individual,Victor Clark,salaried,Region F,2022-03-11,1575.34,1350.0,608.82
+ENT-00454,individual,Michael York,gig,Region F,2022-02-01,2420.07,2900.0,119.77
+ENT-00496,individual,Steven Ferguson,salaried,Region C,2023-06-20,1580.33,2275.0,334.2
+ENT-00522,individual,Ashley Harrison,gig,Region E,2024-10-29,4054.3,3300.0,176.0
+ENT-00718,individual,Patricia Harris,salaried,Region C,2024-11-10,2105.93,925.0,200.43
+ENT-00868,individual,George Humphrey,salaried,Region F,2024-06-12,1753.48,2275.0,145.24
+ENT-00876,individual,Crystal Ramirez,salaried,Region F,2023-06-03,4162.98,3250.0,389.6
+ENT-00917,individual,Brittany Lee,salaried,Region D,2021-11-04,3472.61,1450.0,79.28
+ENT-00980,individual,Sharon Lopez,salaried,Region F,2020-11-30,1811.54,2250.0,218.54
+ENT-01049,individual,Jack Wyatt,salaried,Region E,2024-10-13,2151.71,1075.0,495.08
+ENT-01135,business,"Robinson, Martinez and Obrien 0085",wholesale,Region F,2024-02-05,0.0,0.0,1116.19
+ENT-01188,business,Bell-Wise 0138,wholesale,Region B,2022-11-06,0.0,0.0,2763.87
+ENT-01304,business,Conley and Sons 0254,retail_cash_intensive,Region F,2025-02-12,0.0,0.0,752.57
+ENT-01408,business,Lyons-Peck 0358,wholesale,Region B,2022-03-28,0.0,0.0,5523.57
+ENT-01436,business,Anderson-Greene 0386,professional_services,Region A,2022-11-24,0.0,0.0,6888.03
+ENT-00155,individual,Vincent Joyce,salaried,Region D,2022-11-27,2105.71,3225.0,107.63
+ENT-00195,individual,Jeffrey Burnett,retired,Region D,2021-06-17,2943.89,1900.0,129.5
+ENT-00642,individual,Amy Johnson,self_employed,Region D,2021-02-17,1662.92,1325.0,111.77
+ENT-00650,individual,Erica Becker,retired,Region E,2024-08-21,1856.49,3275.0,706.98
+ENT-00653,individual,Jacob Jacobs,gig,Region F,2020-10-19,1954.94,1450.0,106.1
+ENT-00871,individual,Matthew Davis,salaried,Region D,2024-09-12,1769.21,1225.0,127.97
+ENT-00907,individual,Dawn Carter,salaried,Region A,2023-10-16,2216.53,1425.0,163.34
+ENT-01216,business,"Patton, Sanders and Carpenter 0166",retail_cash_intensive,Region D,2024-05-01,0.0,0.0,2766.81
+ENT-01352,business,Lee Inc 0302,wholesale,Region E,2022-08-12,0.0,0.0,1200.17
+ENT-01370,business,Morris-Weaver 0320,retail_cash_intensive,Region F,2023-05-25,0.0,0.0,2389.35
+ENT-01373,business,"Mendez, Owen and Bean 0323",retail_cash_intensive,Region C,2023-06-15,0.0,0.0,3015.77
+ENT-01387,business,"Tapia, Harper and Harding 0337",wholesale,Region D,2021-08-27,0.0,0.0,6586.17
+ENT-01487,business,Romero Group 0437,retail_cash_intensive,Region A,2022-12-12,0.0,0.0,3367.05
+ENT-01056,business,Anderson-Thomas 0006,retail_cash_intensive,Region C,2024-05-30,0.0,0.0,4032.15
+ENT-01121,business,Meadows-Lawrence 0071,retail_cash_intensive,Region F,2023-10-12,0.0,0.0,3022.97
+ENT-01175,business,Martinez Group 0125,professional_services,Region E,2023-08-23,0.0,0.0,1332.59
+ENT-01230,business,Murphy Inc 0180,professional_services,Region E,2025-03-12,0.0,0.0,1222.17
+ENT-01375,business,Mccarthy-Robertson 0325,wholesale,Region E,2024-12-16,0.0,0.0,4529.8
+ENT-00049,individual,Daniel Walsh,salaried,Region E,2022-03-29,2596.27,1450.0,246.35
+ENT-01398,business,Day-Nelson 0348,wholesale,Region C,2023-11-29,0.0,0.0,3636.53
+ENT-00624,individual,Jason Mann,retired,Region B,2024-08-03,1830.5,3000.0,215.06
+ENT-01426,business,"Chavez, Wright and Williams 0376",wholesale,Region D,2024-09-18,0.0,0.0,2680.64
+ENT-01199,business,Martinez LLC 0149,professional_services,Region B,2025-01-02,0.0,0.0,1946.57
+ENT-01120,business,"Hurley, Lucas and Williams 0070",wholesale,Region C,2020-08-20,0.0,0.0,3762.78
+ENT-01483,business,"Anderson, Hayes and Fox 0433",wholesale,Region B,2020-12-12,0.0,0.0,2664.53
+ENT-01151,business,"Potter, Thomas and Barrett 0101",wholesale,Region D,2024-05-12,0.0,0.0,3142.37
+ENT-01130,business,Miranda-Perkins 0080,wholesale,Region B,2025-04-19,0.0,0.0,1497.22
+ENT-00649,individual,Thomas Davis,salaried,Region E,2020-08-31,2023.49,1500.0,140.0
+ENT-01122,business,Munoz and Sons 0072,wholesale,Region B,2023-05-27,0.0,0.0,1418.42
+ENT-01126,business,Diaz PLC 0076,wholesale,Region D,2023-07-17,0.0,0.0,3546.15
+ENT-01414,business,Roberts Group 0364,wholesale,Region F,2021-10-12,0.0,0.0,2371.31
+ENT-01423,business,Lopez Group 0373,wholesale,Region E,2023-09-30,0.0,0.0,2272.11
+ENT-01184,business,Arnold-Mckenzie 0134,wholesale,Region D,2021-10-10,0.0,0.0,1851.83
+ENT-01119,business,Barry-Munoz 0069,wholesale,Region C,2021-02-14,0.0,0.0,1116.21
+ENT-01317,business,Edwards-Watkins 0267,retail_cash_intensive,Region E,2024-05-24,0.0,0.0,3057.48
+ENT-01402,business,Powell-Stephens 0352,wholesale,Region A,2020-10-21,0.0,0.0,1051.36
+ENT-01159,business,Mckenzie LLC 0109,wholesale,Region F,2021-09-21,0.0,0.0,2118.08
+ENT-01328,business,"Hawkins, Harris and Elliott 0278",wholesale,Region C,2023-11-13,0.0,0.0,1136.22
+ENT-01252,business,"Edwards, Lewis and Singh 0202",wholesale,Region F,2021-11-28,0.0,0.0,801.33
+ENT-00688,individual,Daniel Campos,salaried,Region D,2023-08-16,3880.67,1000.0,92.36
+ENT-01100,business,"Burns, Carpenter and Gillespie 0050",wholesale,Region D,2022-07-12,0.0,0.0,2106.0
+ENT-01103,business,Craig-Doyle 0053,professional_services,Region C,2021-12-09,0.0,0.0,1271.76
+ENT-01108,business,Rhodes PLC 0058,wholesale,Region D,2022-10-02,0.0,0.0,1149.7
+ENT-01111,business,Barnes LLC 0061,wholesale,Region C,2024-05-24,0.0,0.0,12193.83
+ENT-01148,business,"Lucero, Collier and Cisneros 0098",wholesale,Region B,2023-03-26,0.0,0.0,2547.71
+ENT-01164,business,Roberts-Suarez 0114,ecommerce,Region A,2023-09-04,0.0,0.0,4465.98
+ENT-01170,business,Nunez Group 0120,wholesale,Region C,2021-12-18,0.0,0.0,1993.36
+ENT-01176,business,Cabrera and Sons 0126,wholesale,Region C,2020-09-04,0.0,0.0,3038.67
+ENT-01182,business,Bautista-Willis 0132,wholesale,Region F,2021-01-18,0.0,0.0,552.11
+ENT-01189,business,"Soto, Guerra and White 0139",wholesale,Region D,2023-07-24,0.0,0.0,2926.31
+ENT-01204,business,"Daugherty, Mahoney and Sullivan 0154",wholesale,Region E,2021-09-23,0.0,0.0,2845.31
+ENT-01242,business,Reid Group 0192,wholesale,Region F,2021-11-26,0.0,0.0,3094.45
+ENT-01259,business,Young Group 0209,wholesale,Region A,2022-01-25,0.0,0.0,2085.39
+ENT-01265,business,"Campbell, Andrade and Mendoza 0215",wholesale,Region D,2024-09-21,0.0,0.0,5388.37
+ENT-01287,business,Calderon-Mendoza 0237,wholesale,Region E,2025-05-17,0.0,0.0,7032.21
+ENT-01311,business,Mclean-Taylor 0261,wholesale,Region A,2024-11-20,0.0,0.0,1328.89
+ENT-01316,business,Patterson LLC 0266,wholesale,Region F,2020-10-20,0.0,0.0,2104.97
+ENT-01356,business,Johnston and Sons 0306,wholesale,Region A,2021-01-03,0.0,0.0,4950.46
+ENT-01358,business,"Robertson, Gonzalez and Smith 0308",wholesale,Region C,2023-11-14,0.0,0.0,3273.64
+ENT-01374,business,Smith Group 0324,wholesale,Region B,2024-04-20,0.0,0.0,871.75
+ENT-01377,business,Hansen-Freeman 0327,wholesale,Region C,2023-02-02,0.0,0.0,1578.82
+ENT-01382,business,Burton LLC 0332,retail_cash_intensive,Region D,2025-04-24,0.0,0.0,2054.7
+ENT-01385,business,"Sims, Lewis and Anderson 0335",wholesale,Region A,2025-03-03,0.0,0.0,3560.08
+ENT-01391,business,Moore Ltd 0341,retail_cash_intensive,Region B,2024-10-24,0.0,0.0,2143.73
+ENT-01415,business,Herring LLC 0365,wholesale,Region B,2021-11-23,0.0,0.0,1503.72
+ENT-01416,business,Baker-Fry 0366,retail_cash_intensive,Region A,2022-02-15,0.0,0.0,2329.96
+ENT-01454,business,Owen Inc 0404,wholesale,Region B,2022-08-05,0.0,0.0,3387.4
+ENT-01462,business,Barnes Group 0412,wholesale,Region A,2023-01-31,0.0,0.0,4989.36
+ENT-01466,business,Johnson-English 0416,professional_services,Region B,2020-11-02,0.0,0.0,5875.4
+ENT-01467,business,Rice LLC 0417,wholesale,Region E,2025-01-18,0.0,0.0,691.7
+ENT-01474,business,Lopez Group 0424,retail_cash_intensive,Region C,2022-03-27,0.0,0.0,1634.68
+ENT-01479,business,Jones-Williams 0429,retail_cash_intensive,Region A,2025-02-10,0.0,0.0,2015.46
+ENT-00042,individual,Andre Little,self_employed,Region C,2024-02-10,2735.34,2675.0,241.42
+ENT-00418,individual,Douglas Nash,retired,Region A,2022-01-28,1526.32,1000.0,143.24
+ENT-00526,individual,James Flores,salaried,Region E,2020-11-26,2782.05,1000.0,188.56
+ENT-00675,individual,Rebecca Hall,gig,Region B,2024-02-16,1814.35,1900.0,154.93
+ENT-00677,individual,Elizabeth Jarvis,salaried,Region C,2025-04-16,1420.39,3000.0,485.74
+ENT-00689,individual,David Pennington,gig,Region D,2023-02-13,1313.45,2150.0,154.38
+ENT-00855,individual,Janet Reed,self_employed,Region E,2021-03-14,2316.23,1925.0,486.3
+ENT-00900,individual,Sandra Johnson,self_employed,Region A,2023-02-02,4028.22,2750.0,112.14
+ENT-00981,individual,Alec Smith,salaried,Region F,2024-06-20,1974.62,3000.0,141.56
+ENT-01053,business,Lopez-Simpson 0003,retail_cash_intensive,Region B,2021-06-23,0.0,0.0,9854.59
+ENT-01062,business,Frederick-Brock 0012,wholesale,Region A,2023-02-05,0.0,0.0,3093.94
+ENT-01064,business,Anderson-Smith 0014,retail_cash_intensive,Region D,2020-12-09,0.0,0.0,1480.27
+ENT-01072,business,Carpenter Inc 0022,retail_cash_intensive,Region B,2023-06-04,0.0,0.0,988.8
+ENT-01079,business,Zimmerman-Rowe 0029,wholesale,Region A,2025-01-02,0.0,0.0,3592.29
+ENT-01082,business,"Newman, Peterson and Andrade 0032",retail_cash_intensive,Region F,2023-09-28,0.0,0.0,4003.21
+ENT-01083,business,Vega-Jackson 0033,ecommerce,Region C,2021-04-14,0.0,0.0,1888.95
+ENT-01092,business,Vargas-Miller 0042,wholesale,Region C,2025-06-22,0.0,0.0,3897.54
+ENT-01093,business,Fisher-Kelly 0043,wholesale,Region E,2020-10-05,0.0,0.0,1816.02
+ENT-01094,business,"Watkins, Chapman and Thompson 0044",wholesale,Region F,2024-04-14,0.0,0.0,1664.32
+ENT-01095,business,Shaw-Murray 0045,retail_cash_intensive,Region D,2023-12-31,0.0,0.0,2257.17
+ENT-01097,business,Fleming-Castillo 0047,retail_cash_intensive,Region F,2023-04-10,0.0,0.0,6603.73
+ENT-01101,business,Wilson and Sons 0051,retail_cash_intensive,Region E,2025-01-19,0.0,0.0,1580.95
+ENT-01105,business,Marquez-Russell 0055,professional_services,Region D,2022-10-20,0.0,0.0,988.13
+ENT-01114,business,Turner-Diaz 0064,retail_cash_intensive,Region B,2021-02-04,0.0,0.0,541.52
+ENT-01115,business,Gates-Hernandez 0065,ecommerce,Region E,2024-02-15,0.0,0.0,1370.36
+ENT-01125,business,Gross-Murphy 0075,wholesale,Region A,2024-02-27,0.0,0.0,2074.58
+ENT-01131,business,"Davis, Fisher and Jacobs 0081",wholesale,Region D,2021-09-24,0.0,0.0,16705.72
+ENT-01137,business,Lee PLC 0087,wholesale,Region A,2023-02-25,0.0,0.0,2360.33
+ENT-01141,business,Murphy-Eaton 0091,wholesale,Region F,2024-12-09,0.0,0.0,5556.46
+ENT-01143,business,"Howard, Jones and Berry 0093",retail_cash_intensive,Region E,2024-10-12,0.0,0.0,3492.16
+ENT-01146,business,Herrera Inc 0096,wholesale,Region E,2021-08-19,0.0,0.0,1582.19
+ENT-01152,business,Byrd Ltd 0102,professional_services,Region A,2021-12-28,0.0,0.0,5865.77
+ENT-01155,business,Lee-Mclean 0105,professional_services,Region D,2020-10-15,0.0,0.0,2553.37
+ENT-01163,business,Jordan Inc 0113,retail_cash_intensive,Region A,2022-05-08,0.0,0.0,1739.33
+ENT-01173,business,Daugherty-Savage 0123,retail_cash_intensive,Region A,2024-04-19,0.0,0.0,2527.92
+ENT-01178,business,"Coffey, Hughes and Terry 0128",wholesale,Region F,2024-07-11,0.0,0.0,2219.78
+ENT-01179,business,"Smith, Brown and Barker 0129",professional_services,Region C,2021-08-26,0.0,0.0,402.53
+ENT-01180,business,"Boyle, Crosby and Foster 0130",retail_cash_intensive,Region E,2023-05-02,0.0,0.0,1631.37
+ENT-01191,business,Brown-Marsh 0141,professional_services,Region E,2022-11-09,0.0,0.0,4110.06
+ENT-01193,business,Lozano PLC 0143,retail_cash_intensive,Region A,2022-12-14,0.0,0.0,2093.92
+ENT-01194,business,"Gutierrez, Walker and Holland 0144",wholesale,Region C,2023-09-15,0.0,0.0,1976.18
+ENT-01196,business,Figueroa Inc 0146,wholesale,Region D,2024-01-03,0.0,0.0,1999.32
+ENT-01213,business,Barnes and Sons 0163,retail_cash_intensive,Region E,2023-06-08,0.0,0.0,5861.29
+ENT-01225,business,Beasley Ltd 0175,wholesale,Region E,2021-10-09,0.0,0.0,1281.38
+ENT-01232,business,Jones LLC 0182,ecommerce,Region A,2022-08-25,0.0,0.0,1428.45
+ENT-01233,business,"Gardner, Giles and Wong 0183",wholesale,Region E,2024-12-28,0.0,0.0,3762.07
+ENT-01236,business,King Ltd 0186,professional_services,Region E,2020-12-07,0.0,0.0,2276.31
+ENT-01245,business,Johnson-Macias 0195,wholesale,Region D,2023-12-29,0.0,0.0,1343.62
+ENT-01246,business,Perez LLC 0196,retail_cash_intensive,Region B,2021-04-09,0.0,0.0,2808.48
+ENT-01247,business,Fisher-White 0197,wholesale,Region F,2020-12-30,0.0,0.0,4507.58
+ENT-01250,business,"Perez, Franklin and Peters 0200",retail_cash_intensive,Region B,2025-04-11,0.0,0.0,5137.54
+ENT-01266,business,"Watkins, Gonzalez and Castillo 0216",professional_services,Region B,2024-12-04,0.0,0.0,1146.7
+ENT-01268,business,Bell LLC 0218,retail_cash_intensive,Region E,2022-07-25,0.0,0.0,1656.01
+ENT-01271,business,"Potter, Jennings and Jones 0221",retail_cash_intensive,Region B,2020-09-27,0.0,0.0,2695.19
+ENT-01276,business,Cole LLC 0226,retail_cash_intensive,Region E,2023-09-19,0.0,0.0,4169.58
+ENT-01277,business,Flynn and Sons 0227,wholesale,Region B,2024-08-04,0.0,0.0,3350.52
+ENT-01288,business,"Gutierrez, Moore and Schmidt 0238",retail_cash_intensive,Region D,2022-12-02,0.0,0.0,2255.07
+ENT-01290,business,Carey Inc 0240,retail_cash_intensive,Region F,2024-04-16,0.0,0.0,2780.23
+ENT-01312,business,Sexton PLC 0262,professional_services,Region D,2024-12-26,0.0,0.0,1819.38
+ENT-01323,business,Hardy Group 0273,ecommerce,Region C,2023-10-21,0.0,0.0,3334.64
+ENT-01324,business,"Perry, Kidd and Adkins 0274",professional_services,Region C,2023-03-12,0.0,0.0,1346.25
+ENT-01332,business,"Gaines, Webb and Coleman 0282",professional_services,Region B,2022-04-23,0.0,0.0,2609.25
+ENT-01339,business,Phillips-Sanchez 0289,professional_services,Region A,2022-03-12,0.0,0.0,3990.62
+ENT-01340,business,"Davis, Buchanan and Martinez 0290",ecommerce,Region D,2020-09-10,0.0,0.0,3064.69
+ENT-01341,business,Rogers-Hartman 0291,ecommerce,Region E,2022-03-23,0.0,0.0,3990.33
+ENT-01346,business,Aguilar and Sons 0296,wholesale,Region F,2024-11-19,0.0,0.0,1828.46
+ENT-01367,business,Gibson and Sons 0317,wholesale,Region F,2024-05-05,0.0,0.0,2754.48
+ENT-01399,business,"Michael, Bruce and Marshall 0349",retail_cash_intensive,Region C,2023-09-12,0.0,0.0,2485.53
+ENT-01401,business,Calderon PLC 0351,retail_cash_intensive,Region B,2023-07-17,0.0,0.0,2181.79
+ENT-01407,business,Rose-Johnson 0357,wholesale,Region F,2023-10-21,0.0,0.0,1381.13
+ENT-01417,business,Hill PLC 0367,retail_cash_intensive,Region F,2021-11-05,0.0,0.0,884.84
+ENT-01418,business,Farmer and Sons 0368,retail_cash_intensive,Region E,2024-08-15,0.0,0.0,4244.62
+ENT-01440,business,Soto-Richardson 0390,professional_services,Region E,2021-10-06,0.0,0.0,3942.9
+ENT-01446,business,Mooney Inc 0396,retail_cash_intensive,Region B,2020-11-28,0.0,0.0,2456.5
+ENT-01448,business,"Smith, Hall and White 0398",wholesale,Region C,2025-03-06,0.0,0.0,3501.16
+ENT-01450,business,Estes-Jones 0400,retail_cash_intensive,Region A,2024-07-03,0.0,0.0,3035.22
+ENT-01452,business,"West, Holmes and Nelson 0402",wholesale,Region F,2025-06-10,0.0,0.0,3450.91
+ENT-01455,business,"Arellano, Rodriguez and Miranda 0405",ecommerce,Region A,2020-12-01,0.0,0.0,1295.31
+ENT-01456,business,Olson-Jordan 0406,ecommerce,Region F,2022-08-08,0.0,0.0,2406.09
+ENT-01459,business,"Cole, Liu and Irwin 0409",wholesale,Region D,2023-06-13,0.0,0.0,5580.95
+ENT-01465,business,Greene-Stanton 0415,wholesale,Region A,2024-09-27,0.0,0.0,2680.9
+ENT-01471,business,Gonzalez Group 0421,wholesale,Region D,2021-02-22,0.0,0.0,4990.86
+ENT-01476,business,"Clements, George and Williams 0426",professional_services,Region F,2022-03-20,0.0,0.0,2123.14
+ENT-01477,business,Hernandez-Perez 0427,retail_cash_intensive,Region B,2021-12-06,0.0,0.0,2600.34
+ENT-01484,business,White-Patterson 0434,wholesale,Region F,2021-12-05,0.0,0.0,1391.08
+ENT-01486,business,Woodward-Hunter 0436,wholesale,Region F,2021-03-14,0.0,0.0,2353.46
+ENT-01492,business,Ayala and Sons 0442,wholesale,Region E,2024-05-19,0.0,0.0,1755.77
+ENT-01500,business,Harding Ltd 0450,ecommerce,Region D,2023-04-28,0.0,0.0,2495.02
+ENT-00036,individual,Jessica Gray,gig,Region C,2021-03-19,2675.04,2550.0,1246.9
+ENT-00246,individual,Joshua Ramsey,gig,Region E,2022-08-14,1864.92,2950.0,230.94
+ENT-00278,individual,Stephanie Miller,self_employed,Region B,2024-01-17,1846.69,3100.0,183.59
+ENT-00282,individual,Cheyenne King,gig,Region C,2020-09-16,2618.88,2450.0,472.74
+ENT-00296,individual,Kelsey Hansen,salaried,Region B,2020-10-12,2154.24,2000.0,376.54
+ENT-00368,individual,Angelica Fowler,self_employed,Region C,2023-08-16,1278.85,3175.0,206.7
+ENT-00424,individual,Jennifer Klein,self_employed,Region F,2021-01-10,1349.32,2075.0,122.97
+ENT-00471,individual,Cheyenne Rios,gig,Region D,2022-09-21,2328.01,1175.0,210.95
+ENT-00532,individual,Joseph Medina,retired,Region E,2025-06-18,994.43,3350.0,102.12
+ENT-00577,individual,Patrick Turner,gig,Region C,2023-01-20,1894.93,2550.0,328.28
+ENT-00731,individual,Manuel Frazier,self_employed,Region E,2024-04-24,3305.47,1850.0,71.84
+ENT-01005,individual,Cody Gonzales,salaried,Region B,2020-11-11,3889.76,3000.0,396.78
+ENT-01055,business,Henry-Anderson 0005,wholesale,Region C,2023-12-15,0.0,0.0,5945.96
+ENT-01057,business,Brennan-Smith 0007,professional_services,Region E,2022-06-28,0.0,0.0,6886.96
+ENT-01059,business,Moore-Miller 0009,wholesale,Region D,2021-06-25,0.0,0.0,4878.75
+ENT-01060,business,"Martin, Rasmussen and Miller 0010",wholesale,Region E,2024-01-23,0.0,0.0,6991.41
+ENT-01069,business,"Moore, Graham and Campbell 0019",wholesale,Region B,2021-03-10,0.0,0.0,756.89
+ENT-01090,business,Orr Inc 0040,retail_cash_intensive,Region B,2023-05-22,0.0,0.0,8132.92
+ENT-01096,business,Stout-Sheppard 0046,ecommerce,Region E,2024-10-05,0.0,0.0,4571.7
+ENT-01113,business,"Taylor, Young and Fowler 0063",professional_services,Region A,2023-03-14,0.0,0.0,4919.2
+ENT-01128,business,"Castillo, Malone and Bryan 0078",retail_cash_intensive,Region A,2023-06-16,0.0,0.0,1747.74
+ENT-01133,business,Mann-Young 0083,wholesale,Region B,2023-06-24,0.0,0.0,3150.65
+ENT-01136,business,"Ewing, Johns and David 0086",wholesale,Region E,2022-12-18,0.0,0.0,1228.59
+ENT-01138,business,Perry-Evans 0088,retail_cash_intensive,Region F,2020-09-07,0.0,0.0,1081.51
+ENT-01162,business,Roberts-White 0112,ecommerce,Region D,2023-03-18,0.0,0.0,635.48
+ENT-01177,business,Gibson-Watson 0127,ecommerce,Region B,2022-03-02,0.0,0.0,1316.7
+ENT-01186,business,"Dawson, Miller and Edwards 0136",professional_services,Region C,2025-04-15,0.0,0.0,4435.69
+ENT-01197,business,"Kline, Duke and Olson 0147",ecommerce,Region A,2023-01-11,0.0,0.0,2883.48
+ENT-01200,business,"Burch, Dunn and Woods 0150",wholesale,Region C,2024-02-20,0.0,0.0,2054.42
+ENT-01210,business,"Jones, Chase and Atkins 0160",retail_cash_intensive,Region F,2021-11-04,0.0,0.0,1439.85
+ENT-01211,business,Porter Group 0161,professional_services,Region C,2023-10-27,0.0,0.0,5542.57
+ENT-01220,business,Brown-Kennedy 0170,wholesale,Region D,2023-07-05,0.0,0.0,2464.58
+ENT-01222,business,Miller-Lane 0172,wholesale,Region C,2025-06-12,0.0,0.0,3442.97
+ENT-01226,business,Patel-Holmes 0176,wholesale,Region A,2021-01-24,0.0,0.0,5509.18
+ENT-01237,business,Fowler-Mcgrath 0187,wholesale,Region A,2024-11-06,0.0,0.0,1476.94
+ENT-01249,business,Rosario-Maldonado 0199,retail_cash_intensive,Region D,2022-04-28,0.0,0.0,956.15
+ENT-01273,business,Johnson-Carrillo 0223,retail_cash_intensive,Region C,2025-03-02,0.0,0.0,610.87
+ENT-01275,business,Hayes-Evans 0225,retail_cash_intensive,Region B,2025-02-26,0.0,0.0,1432.39
+ENT-01281,business,Davis-Lewis 0231,ecommerce,Region F,2022-09-16,0.0,0.0,4521.44
+ENT-01297,business,"Lin, Vincent and Fuentes 0247",professional_services,Region D,2024-09-11,0.0,0.0,1786.97
+ENT-01299,business,"Castillo, Sweeney and Russell 0249",professional_services,Region B,2022-01-08,0.0,0.0,2920.51
+ENT-01301,business,Salinas and Sons 0251,retail_cash_intensive,Region F,2023-05-30,0.0,0.0,2742.41
+ENT-01305,business,"Morgan, Payne and Walsh 0255",wholesale,Region A,2020-11-20,0.0,0.0,2702.54
+ENT-01313,business,Reynolds and Sons 0263,retail_cash_intensive,Region A,2022-06-04,0.0,0.0,857.99
+ENT-01320,business,Simpson LLC 0270,wholesale,Region E,2021-07-13,0.0,0.0,1630.87
+ENT-01326,business,"Lewis, Deleon and Banks 0276",retail_cash_intensive,Region E,2021-05-09,0.0,0.0,2159.34
+ENT-01333,business,Green Group 0283,professional_services,Region A,2023-10-19,0.0,0.0,2500.92
+ENT-01342,business,"Flores, Burns and Nicholson 0292",professional_services,Region E,2022-08-29,0.0,0.0,3241.5
+ENT-01344,business,Short Ltd 0294,retail_cash_intensive,Region C,2020-12-14,0.0,0.0,3917.19
+ENT-01345,business,Hall PLC 0295,wholesale,Region C,2024-11-23,0.0,0.0,1269.21
+ENT-01347,business,Barnes Ltd 0297,professional_services,Region D,2025-06-21,0.0,0.0,3564.82
+ENT-01348,business,Stewart PLC 0298,professional_services,Region E,2020-10-21,0.0,0.0,2556.35
+ENT-01353,business,Harmon-Dougherty 0303,wholesale,Region F,2024-07-15,0.0,0.0,10969.74
+ENT-01372,business,"Powell, Roman and Erickson 0322",professional_services,Region B,2020-10-19,0.0,0.0,1287.87
+ENT-01379,business,"Reeves, Larson and Lynch 0329",wholesale,Region D,2023-06-22,0.0,0.0,631.91
+ENT-01384,business,Gibbs-Welch 0334,retail_cash_intensive,Region B,2025-03-15,0.0,0.0,1320.59
+ENT-01388,business,Cook-Mack 0338,retail_cash_intensive,Region A,2021-05-21,0.0,0.0,1786.52
+ENT-01389,business,"Valencia, Wood and Douglas 0339",professional_services,Region D,2025-06-15,0.0,0.0,1436.34
+ENT-01411,business,Spencer-Rollins 0361,ecommerce,Region B,2023-04-30,0.0,0.0,571.77
+ENT-01421,business,Hill-Merritt 0371,retail_cash_intensive,Region B,2021-04-16,0.0,0.0,2781.26
+ENT-01425,business,Norman PLC 0375,ecommerce,Region B,2025-06-20,0.0,0.0,2654.73
+ENT-01427,business,Hill-French 0377,ecommerce,Region D,2023-09-14,0.0,0.0,2305.09
+ENT-01428,business,"Martinez, Hurley and Gates 0378",retail_cash_intensive,Region F,2021-08-21,0.0,0.0,1216.21
+ENT-01430,business,"Watson, Garcia and Atkinson 0380",retail_cash_intensive,Region C,2024-07-26,0.0,0.0,1452.01
+ENT-01432,business,Craig-Sharp 0382,professional_services,Region C,2024-01-21,0.0,0.0,1914.7
+ENT-01434,business,Barnes-Olson 0384,professional_services,Region F,2024-02-05,0.0,0.0,6657.27
+ENT-01441,business,Wilcox-Long 0391,wholesale,Region D,2021-01-06,0.0,0.0,4132.81
+ENT-01449,business,Fletcher-Smith 0399,professional_services,Region C,2025-03-04,0.0,0.0,4390.94
+ENT-01457,business,Torres-Terrell 0407,retail_cash_intensive,Region D,2024-09-24,0.0,0.0,4155.85
+ENT-01464,business,"Jimenez, Shah and Woodward 0414",retail_cash_intensive,Region D,2025-04-28,0.0,0.0,1619.83
+ENT-01472,business,Patel-Salinas 0422,wholesale,Region C,2025-03-07,0.0,0.0,5152.18
+ENT-01485,business,Austin-Garcia 0435,retail_cash_intensive,Region A,2022-04-21,0.0,0.0,4021.81
+ENT-01489,business,Kemp-Eaton 0439,retail_cash_intensive,Region F,2023-01-16,0.0,0.0,2159.44
+ENT-00081,individual,Michele Carrillo,self_employed,Region B,2024-06-10,1860.49,2550.0,253.15
+ENT-00474,individual,Kenneth Clark,retired,Region B,2023-07-19,1678.22,2500.0,245.37
+ENT-00549,individual,Jared Flores,salaried,Region B,2022-08-20,2094.8,3000.0,253.88
+ENT-00625,individual,Melissa Williams,salaried,Region A,2025-05-15,2165.6,1925.0,199.09
+ENT-00694,individual,Martin Zhang,salaried,Region D,2021-05-31,3940.43,1000.0,81.89
+ENT-00698,individual,Keith Lewis,salaried,Region F,2023-12-13,3579.42,3000.0,269.15
+ENT-00797,individual,Dr. Brian Summers,self_employed,Region D,2025-02-17,1212.56,3275.0,112.42
+ENT-00821,individual,Rachel Lopez,retired,Region E,2023-01-18,848.97,2750.0,113.56
+ENT-00852,individual,Bianca White,gig,Region B,2022-07-18,1546.77,3075.0,102.62
+ENT-00880,individual,Tiffany Jones,self_employed,Region B,2024-06-15,1545.04,1475.0,182.31
+ENT-00997,individual,Michael Robinson MD,retired,Region B,2023-04-08,1289.83,3225.0,337.22
+ENT-01010,individual,Ryan Conner,self_employed,Region F,2020-08-20,3584.79,2675.0,79.01
+ENT-01023,individual,Joshua Brown,gig,Region E,2025-03-23,2314.54,2325.0,367.16
+ENT-01042,individual,Kyle Rose,salaried,Region E,2021-08-01,1655.21,1175.0,355.85
+ENT-01051,business,Smith-Hardy 0001,wholesale,Region E,2024-10-21,0.0,0.0,6421.0
+ENT-01058,business,Thomas Ltd 0008,professional_services,Region C,2024-11-17,0.0,0.0,898.44
+ENT-01061,business,"Soto, Spence and Johnson 0011",professional_services,Region B,2020-08-19,0.0,0.0,10269.36
+ENT-01067,business,Parker-Pope 0017,wholesale,Region C,2021-11-01,0.0,0.0,1781.43
+ENT-01071,business,"Rodriguez, Morrison and Allen 0021",ecommerce,Region D,2023-09-13,0.0,0.0,1064.76
+ENT-01085,business,Reeves Group 0035,professional_services,Region E,2024-02-23,0.0,0.0,1620.98
+ENT-01088,business,Cole Inc 0038,ecommerce,Region B,2023-06-15,0.0,0.0,2247.12
+ENT-01124,business,Collins-Jenkins 0074,retail_cash_intensive,Region A,2021-11-25,0.0,0.0,1977.37
+ENT-01132,business,"Jones, Casey and Robinson 0082",wholesale,Region F,2022-02-21,0.0,0.0,3144.48
+ENT-01140,business,Gibson Group 0090,wholesale,Region D,2025-01-12,0.0,0.0,1845.69
+ENT-01142,business,Hill-Sanchez 0092,ecommerce,Region D,2023-06-14,0.0,0.0,4557.72
+ENT-01165,business,Villarreal LLC 0115,ecommerce,Region C,2020-09-18,0.0,0.0,1845.25
+ENT-01167,business,Velazquez Ltd 0117,professional_services,Region E,2023-03-03,0.0,0.0,3973.23
+ENT-01169,business,"Fuller, Johnson and Reid 0119",professional_services,Region F,2023-08-13,0.0,0.0,1859.05
+ENT-01171,business,"Munoz, Rogers and Brown 0121",professional_services,Region E,2022-07-04,0.0,0.0,1977.43
+ENT-01183,business,"Meadows, Ho and Peck 0133",professional_services,Region D,2022-02-11,0.0,0.0,2032.27
+ENT-01185,business,Knight LLC 0135,retail_cash_intensive,Region F,2023-01-26,0.0,0.0,3257.26
+ENT-01201,business,Copeland LLC 0151,wholesale,Region C,2022-03-19,0.0,0.0,2811.52
+ENT-01205,business,Ruiz Group 0155,professional_services,Region A,2024-03-23,0.0,0.0,4312.13
+ENT-01206,business,"Huang, Cochran and Jones 0156",ecommerce,Region A,2022-03-15,0.0,0.0,1999.24
+ENT-01207,business,Thomas Group 0157,retail_cash_intensive,Region A,2023-08-06,0.0,0.0,4043.35
+ENT-01212,business,"Williams, Edwards and Smith 0162",ecommerce,Region F,2021-02-07,0.0,0.0,1149.83
+ENT-01218,business,Juarez Group 0168,professional_services,Region C,2022-04-12,0.0,0.0,3490.43
+ENT-01224,business,Martinez Ltd 0174,professional_services,Region F,2021-11-25,0.0,0.0,1252.15
+ENT-01229,business,Sloan Group 0179,wholesale,Region B,2024-01-13,0.0,0.0,893.97
+ENT-01241,business,Barber PLC 0191,professional_services,Region A,2025-05-24,0.0,0.0,1623.27
+ENT-01260,business,Miller PLC 0210,wholesale,Region B,2023-03-17,0.0,0.0,1546.31
+ENT-01280,business,Stevens-Williams 0230,professional_services,Region D,2025-01-01,0.0,0.0,3095.86
+ENT-01282,business,Delgado-Peck 0232,ecommerce,Region B,2024-04-20,0.0,0.0,5024.43
+ENT-01293,business,Lane Inc 0243,ecommerce,Region E,2024-05-25,0.0,0.0,4814.22
+ENT-01319,business,Clark LLC 0269,professional_services,Region A,2022-05-31,0.0,0.0,3881.18
+ENT-01331,business,Mccoy PLC 0281,ecommerce,Region D,2024-04-17,0.0,0.0,2725.28
+ENT-01349,business,Gomez-Clarke 0299,professional_services,Region C,2021-05-30,0.0,0.0,1878.22
+ENT-01357,business,"Hunt, Lawrence and Becker 0307",retail_cash_intensive,Region B,2022-03-24,0.0,0.0,1843.81
+ENT-01360,business,Robinson and Sons 0310,professional_services,Region E,2024-07-15,0.0,0.0,10561.4
+ENT-01363,business,Pearson-Patel 0313,professional_services,Region B,2021-02-14,0.0,0.0,1845.32
+ENT-01371,business,Griffin-Sutton 0321,ecommerce,Region B,2022-05-24,0.0,0.0,1041.84
+ENT-01378,business,"James, Moon and Smith 0328",professional_services,Region E,2021-08-30,0.0,0.0,2577.67
+ENT-01380,business,Taylor Ltd 0330,ecommerce,Region A,2024-03-19,0.0,0.0,2236.7
+ENT-01381,business,"Mcintyre, Byrd and Krueger 0331",retail_cash_intensive,Region A,2024-03-03,0.0,0.0,4265.3
+ENT-01397,business,Thomas LLC 0347,professional_services,Region D,2021-10-28,0.0,0.0,3367.82
+ENT-01403,business,"Harris, Kramer and Washington 0353",wholesale,Region B,2022-12-20,0.0,0.0,2701.26
+ENT-01424,business,Scott-Moss 0374,wholesale,Region E,2023-10-21,0.0,0.0,635.64
+ENT-01453,business,"Schroeder, Robinson and Brown 0403",wholesale,Region E,2020-12-10,0.0,0.0,1585.03
+ENT-01497,business,"Smith, Bailey and Johnson 0447",ecommerce,Region C,2021-01-03,0.0,0.0,3072.18
+ENT-01498,business,Delacruz-Wilson 0448,ecommerce,Region D,2023-03-19,0.0,0.0,4734.84
+ENT-00079,individual,Allison Hicks,self_employed,Region B,2024-05-11,2149.32,1475.0,152.11
+ENT-00227,individual,Joseph Small,salaried,Region C,2024-09-09,2425.76,1000.0,154.13
+ENT-00430,individual,Matthew Daugherty,salaried,Region C,2025-02-04,3775.63,2950.0,103.05
+ENT-00447,individual,Shelby Scott,self_employed,Region B,2022-12-12,3338.48,3325.0,256.2
+ENT-00500,individual,Hunter Sanchez,self_employed,Region E,2024-02-07,2664.69,3400.0,433.45
+ENT-00505,individual,Stephanie Andrews,gig,Region E,2021-10-31,3423.38,3350.0,228.86
+ENT-00585,individual,Corey Pierce,self_employed,Region A,2021-12-28,1452.37,2450.0,425.84
+ENT-00966,individual,Laura Cross,gig,Region F,2023-07-03,2442.06,1250.0,182.47
+ENT-00969,individual,Katherine Jones,salaried,Region D,2024-10-29,2500.53,1950.0,144.59
+ENT-01153,business,"Novak, Powell and Smith 0103",ecommerce,Region B,2022-05-27,0.0,0.0,12939.24
+ENT-01217,business,Johnson-Higgins 0167,ecommerce,Region F,2024-08-29,0.0,0.0,2419.86
+ENT-01231,business,"Sawyer, Sanchez and Horn 0181",ecommerce,Region E,2024-09-03,0.0,0.0,5832.59
+ENT-01239,business,Rogers-Gonzalez 0189,ecommerce,Region A,2022-02-11,0.0,0.0,4813.75
+ENT-01255,business,Green-Love 0205,professional_services,Region E,2023-11-22,0.0,0.0,1219.8
+ENT-01257,business,"Hunt, Morris and Gibson 0207",wholesale,Region E,2024-05-14,0.0,0.0,2009.54
+ENT-01261,business,Burns PLC 0211,ecommerce,Region F,2021-05-27,0.0,0.0,1549.76
+ENT-01262,business,"Gilbert, Lopez and Schultz 0212",ecommerce,Region E,2024-05-09,0.0,0.0,2534.84
+ENT-01335,business,"Tran, Mendoza and Alexander 0285",professional_services,Region F,2021-04-09,0.0,0.0,1744.93
+ENT-01386,business,Vazquez-Freeman 0336,professional_services,Region F,2022-01-11,0.0,0.0,1599.83
+ENT-01395,business,Sloan-Rogers 0345,professional_services,Region A,2024-10-19,0.0,0.0,7996.42
+ENT-01410,business,Coleman-Sexton 0360,professional_services,Region C,2023-11-25,0.0,0.0,2464.14
+ENT-01458,business,"Barrera, Long and Alexander 0408",ecommerce,Region D,2020-08-22,0.0,0.0,2488.0
+ENT-01478,business,"Dickerson, Myers and Myers 0428",professional_services,Region A,2023-09-04,0.0,0.0,3572.43

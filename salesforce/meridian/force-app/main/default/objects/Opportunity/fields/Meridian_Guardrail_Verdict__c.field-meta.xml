@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Meridian_Guardrail_Verdict__c</fullName>
+    <label>Guardrail verdict</label>
+    <description>The worst line's position in its margin band (invoice margin).</description>
+    <inlineHelpText>The worst line's position in its margin band (invoice margin).</inlineHelpText>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>above_stretch</fullName>
+                <default>false</default>
+                <label>Above stretch</label>
+            </value>
+            <value>
+                <fullName>at_target</fullName>
+                <default>false</default>
+                <label>At target</label>
+            </value>
+            <value>
+                <fullName>below_target</fullName>
+                <default>false</default>
+                <label>Below target</label>
+            </value>
+            <value>
+                <fullName>below_floor</fullName>
+                <default>false</default>
+                <label>Below floor</label>
+            </value>
+            <value>
+                <fullName>loss_making</fullName>
+                <default>false</default>
+                <label>Loss-making</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

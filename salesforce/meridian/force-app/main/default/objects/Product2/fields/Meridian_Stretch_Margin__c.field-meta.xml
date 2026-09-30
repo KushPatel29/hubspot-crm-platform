@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Meridian_Stretch_Margin__c</fullName>
+    <label>Stretch margin</label>
+    <description>target + 8 points.</description>
+    <inlineHelpText>target + 8 points.</inlineHelpText>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>4</scale>
+    <type>Number</type>
+</CustomField>

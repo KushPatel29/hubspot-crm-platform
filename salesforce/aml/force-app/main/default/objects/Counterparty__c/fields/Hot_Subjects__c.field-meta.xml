@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Hot_Subjects__c</fullName>
+    <label>P0/P1 subjects transacting</label>
+    <description>How many subjects of P0 or P1 cases send money to or receive it from this counterparty.</description>
+    <inlineHelpText>How many subjects of P0 or P1 cases send money to or receive it from this counterparty.</inlineHelpText>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>4</scale>
+    <type>Number</type>
+</CustomField>

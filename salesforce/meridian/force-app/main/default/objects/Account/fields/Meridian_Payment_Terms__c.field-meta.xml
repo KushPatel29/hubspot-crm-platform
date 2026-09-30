@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Meridian_Payment_Terms__c</fullName>
+    <label>Payment terms</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>2_10_net_30</fullName>
+                <default>false</default>
+                <label>2/10 Net 30</label>
+            </value>
+            <value>
+                <fullName>net_15</fullName>
+                <default>false</default>
+                <label>Net 15</label>
+            </value>
+            <value>
+                <fullName>net_30</fullName>
+                <default>false</default>
+                <label>Net 30</label>
+            </value>
+            <value>
+                <fullName>net_45</fullName>
+                <default>false</default>
+                <label>Net 45</label>
+            </value>
+            <value>
+                <fullName>net_60</fullName>
+                <default>false</default>
+                <label>Net 60</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

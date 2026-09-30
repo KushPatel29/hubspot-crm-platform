@@ -1,0 +1,39 @@
+sku,protein,description,unit_cost,unit_price
+SKU-001,Beef,Striploin AAA,18.5,26.0
+SKU-002,Beef,Ribeye AAA,21.0,30.5
+SKU-003,Beef,Tenderloin,28.0,41.0
+SKU-004,Beef,Brisket,7.2,10.8
+SKU-005,Beef,Ground Chuck,5.1,7.6
+SKU-006,Beef,Short Ribs,9.8,14.5
+SKU-007,Beef,Flank Steak,11.0,16.2
+SKU-008,Beef,Beef Bones,2.1,3.6
+SKU-009,Pork,Berkshire Loin,6.8,10.4
+SKU-010,Pork,Belly Skin-On,5.9,9.2
+SKU-011,Pork,Shoulder Butt,4.2,6.5
+SKU-012,Pork,Back Ribs,6.1,9.5
+SKU-013,Pork,Prosciutto Leg,12.5,19.0
+SKU-014,Pork,Chorizo Sausage,6.4,10.1
+SKU-015,Poultry,Chicken Breast,5.6,8.4
+SKU-016,Poultry,Chicken Thigh BL,4.9,7.3
+SKU-017,Poultry,Whole Duck,8.7,13.5
+SKU-018,Poultry,Duck Breast,14.2,21.5
+SKU-019,Poultry,Turkey Breast Roast,7.8,11.9
+SKU-020,Poultry,Quail 4-Pack,9.5,15.0
+SKU-021,Seafood,Atlantic Salmon Fillet,13.5,20.5
+SKU-022,Seafood,Sablefish Fillet,19.8,29.5
+SKU-023,Seafood,Ahi Tuna Saku,22.0,33.5
+SKU-024,Seafood,Hamachi Loin,24.5,37.0
+SKU-025,Seafood,Scallops U10,26.0,39.5
+SKU-026,Seafood,Spot Prawns,18.9,28.5
+SKU-027,Seafood,Uni Tray,38.0,58.0
+SKU-028,Seafood,Octopus Tentacle,16.4,25.0
+SKU-029,Deli,Genoa Salami,8.9,13.8
+SKU-030,Deli,Smoked Speck,11.2,17.4
+SKU-031,Deli,Duck Rillette,9.9,15.6
+SKU-032,Deli,Pate de Campagne,7.4,11.8
+SKU-033,Deli,Coppa Sliced,12.8,19.9
+SKU-034,Deli,Bresaola,15.5,24.0
+SKU-035,Lamb,Lamb Rack Frenched,24.0,35.5
+SKU-036,Lamb,Lamb Leg BRT,11.5,17.4
+SKU-037,Lamb,Lamb Shank,8.4,12.9
+SKU-038,Lamb,Ground Lamb,7.9,12.0

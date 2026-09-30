@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Meridian_Floor_Margin__c</fullName>
+    <label>Floor margin</label>
+    <description>max(5%, target - 9 points): under it a deal needs a signature.</description>
+    <inlineHelpText>max(5%, target - 9 points): under it a deal needs a signature.</inlineHelpText>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>4</scale>
+    <type>Number</type>
+</CustomField>

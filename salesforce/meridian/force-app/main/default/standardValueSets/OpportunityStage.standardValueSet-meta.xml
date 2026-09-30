@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sorted>false</sorted>
+    <standardValue>
+        <fullName>Draft</fullName>
+        <default>false</default>
+        <label>Draft</label>
+        <closed>false</closed>
+        <won>false</won>
+        <probability>10</probability>
+        <forecastCategory>Pipeline</forecastCategory>
+    </standardValue>
+    <standardValue>
+        <fullName>Pricing review</fullName>
+        <default>false</default>
+        <label>Pricing review</label>
+        <closed>false</closed>
+        <won>false</won>
+        <probability>30</probability>
+        <forecastCategory>Pipeline</forecastCategory>
+    </standardValue>
+    <standardValue>
+        <fullName>Sent to customer</fullName>
+        <default>false</default>
+        <label>Sent to customer</label>
+        <closed>false</closed>
+        <won>false</won>
+        <probability>60</probability>
+        <forecastCategory>Pipeline</forecastCategory>
+    </standardValue>
+    <standardValue>
+        <fullName>Won</fullName>
+        <default>false</default>
+        <label>Won</label>
+        <closed>true</closed>
+        <won>true</won>
+        <probability>100</probability>
+        <forecastCategory>Closed</forecastCategory>
+    </standardValue>
+    <standardValue>
+        <fullName>Lost</fullName>
+        <default>false</default>
+        <label>Lost</label>
+        <closed>true</closed>
+        <won>false</won>
+        <probability>0</probability>
+        <forecastCategory>Omitted</forecastCategory>
+    </standardValue>
+</StandardValueSet>

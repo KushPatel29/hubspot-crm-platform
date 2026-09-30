@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Counterparty__c</fullName>
+    <label>Counterparty</label>
+    <referenceTo>Counterparty__c</referenceTo>
+    <relationshipLabel>Transacted with links</relationshipLabel>
+    <relationshipName>Transacted_With_Counterparty_Links</relationshipName>
+    <relationshipOrder>1</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

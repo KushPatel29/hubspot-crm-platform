@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Stage__c</fullName>
+    <description>Investigation pipeline. Closed stages: Closed: no further action, Closed: referred for a reporting decision.</description>
+    <label>Stage</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Open_Triage</fullName>
+                <default>true</default>
+                <label>Open triage</label>
+            </value>
+            <value>
+                <fullName>Evidence_Requested</fullName>
+                <default>false</default>
+                <label>Evidence requested</label>
+            </value>
+            <value>
+                <fullName>Second_Level_Review</fullName>
+                <default>false</default>
+                <label>Second-level review</label>
+            </value>
+            <value>
+                <fullName>Closed_No_Further_Action</fullName>
+                <default>false</default>
+                <label>Closed: no further action</label>
+            </value>
+            <value>
+                <fullName>Closed_Referred_For_A_Reporting_Decision</fullName>
+                <default>false</default>
+                <label>Closed: referred for a reporting decision</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

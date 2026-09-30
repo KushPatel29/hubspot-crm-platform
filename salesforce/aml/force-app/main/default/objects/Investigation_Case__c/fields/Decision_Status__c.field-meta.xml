@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Decision_Status__c</fullName>
+    <label>Decision</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>human_decision_required</fullName>
+                <default>false</default>
+                <label>HUMAN DECISION REQUIRED</label>
+            </value>
+            <value>
+                <fullName>no_further_action</fullName>
+                <default>false</default>
+                <label>NO FURTHER ACTION</label>
+            </value>
+            <value>
+                <fullName>referred_for_reporting_decision</fullName>
+                <default>false</default>
+                <label>REFERRED FOR REPORTING DECISION</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

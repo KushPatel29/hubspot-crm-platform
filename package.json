@@ -1,0 +1,13 @@
+{
+  "name": "hubspot-crm-platform",
+  "private": true,
+  "description": "HubSpot developer-platform apps and tooling for the CRM platform",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "hs": "hs"
+  },
+  "devDependencies": {
+    "@hubspot/cli": "8.15.0"
+  }
+}

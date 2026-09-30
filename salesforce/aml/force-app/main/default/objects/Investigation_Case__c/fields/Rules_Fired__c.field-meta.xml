@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Rules_Fired__c</fullName>
+    <label>Rules fired</label>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>r1_structuring</fullName>
+                <default>false</default>
+                <label>R1_STRUCTURING</label>
+            </value>
+            <value>
+                <fullName>r2_layering</fullName>
+                <default>false</default>
+                <label>R2_LAYERING</label>
+            </value>
+            <value>
+                <fullName>r3_smurfing</fullName>
+                <default>false</default>
+                <label>R3_SMURFING</label>
+            </value>
+            <value>
+                <fullName>r4_round_dollar</fullName>
+                <default>false</default>
+                <label>R4_ROUND_DOLLAR</label>
+            </value>
+            <value>
+                <fullName>r5_dormant</fullName>
+                <default>false</default>
+                <label>R5_DORMANT</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Crm_Platform_Key__c</fullName>
+    <label>CRM platform key</label>
+    <description>The source system's identifier. The CRM platform matches records by it; never edit it by hand.</description>
+    <inlineHelpText>The source system's identifier. The CRM platform matches records by it; never edit it by hand.</inlineHelpText>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+    <externalId>true</externalId>
+    <unique>false</unique>
+    <caseSensitive>false</caseSensitive>
+</CustomField>

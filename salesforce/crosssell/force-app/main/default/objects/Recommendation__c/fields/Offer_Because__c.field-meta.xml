@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Offer_Because__c</fullName>
+    <label>Because similar to</label>
+    <description>The account whose purchases put this product at the top.</description>
+    <inlineHelpText>The account whose purchases put this product at the top.</inlineHelpText>
+    <length>255</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>

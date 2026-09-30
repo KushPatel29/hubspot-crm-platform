@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Aml_Home_Region__c</fullName>
+    <label>Home region</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>region_a</fullName>
+                <default>false</default>
+                <label>Region A</label>
+            </value>
+            <value>
+                <fullName>region_b</fullName>
+                <default>false</default>
+                <label>Region B</label>
+            </value>
+            <value>
+                <fullName>region_c</fullName>
+                <default>false</default>
+                <label>Region C</label>
+            </value>
+            <value>
+                <fullName>region_d</fullName>
+                <default>false</default>
+                <label>Region D</label>
+            </value>
+            <value>
+                <fullName>region_e</fullName>
+                <default>false</default>
+                <label>Region E</label>
+            </value>
+            <value>
+                <fullName>region_f</fullName>
+                <default>false</default>
+                <label>Region F</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

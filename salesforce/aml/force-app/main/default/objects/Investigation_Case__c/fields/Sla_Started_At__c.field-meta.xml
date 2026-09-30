@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sla_Started_At__c</fullName>
+    <label>SLA clock started</label>
+    <description>When the case reached the portal; the deadline is this plus the hours to first action.</description>
+    <inlineHelpText>When the case reached the portal; the deadline is this plus the hours to first action.</inlineHelpText>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

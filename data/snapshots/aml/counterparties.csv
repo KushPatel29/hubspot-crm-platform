@@ -1,0 +1,287 @@
+counterparty_id,counterparty_type,display_name,home_region,hot_subjects
+CPT-00016,employer,"King, Holmes and Harvey 00016",Region E,6
+CPT-00031,employer,Nguyen and Sons 00031,Region C,3
+CPT-00039,employer,Rowe Ltd 00039,Region E,3
+CPT-00088,employer,Wilson Group 00088,Region D,2
+CPT-00103,employer,Barnes-Robinson 00103,Region F,2
+CPT-00119,employer,Skinner-Bailey 00119,Region F,3
+CPT-00226,landlord,"Parker, Salinas and Klein 00226",Region D,2
+CPT-00360,landlord,"Long, Smith and Preston 00360",Region B,5
+CPT-00473,landlord,"Morales, Reeves and Trevino 00473",Region E,2
+CPT-00496,landlord,"Jackson, Fleming and Rodgers 00496",Region C,2
+CPT-00678,merchant,Ward-Lewis 00678,Region F,2
+CPT-00689,merchant,Austin-Noble 00689,Region F,2
+CPT-00713,merchant,"Martinez, Baker and Clark 00713",Region B,3
+CPT-00735,merchant,Hoover PLC 00735,Region E,5
+CPT-00770,merchant,Robbins-Li 00770,Region F,2
+CPT-00800,merchant,Duarte and Sons 00800,Region B,2
+CPT-00826,merchant,Mosley LLC 00826,Region B,2
+CPT-00829,merchant,"Williams, Dunlap and Briggs 00829",Region D,3
+CPT-00830,merchant,Butler-Brown 00830,Region C,2
+CPT-00860,merchant,Thompson-Baker 00860,Region F,4
+CPT-00897,merchant,Baker-Butler 00897,Region B,2
+CPT-00932,merchant,"Brewer, Porter and Delacruz 00932",Region E,4
+CPT-00939,merchant,Mitchell-Murphy 00939,Region E,3
+CPT-00997,merchant,Edwards LLC 00997,Region B,2
+CPT-01020,merchant,Burton-Waters 01020,Region F,3
+CPT-01047,merchant,Meyer Inc 01047,Region E,3
+CPT-01061,merchant,Gomez Group 01061,Region D,3
+CPT-01074,merchant,Andrade PLC 01074,Region F,3
+CPT-01079,merchant,Hughes and Sons 01079,Region F,2
+CPT-01096,merchant,"Juarez, Bryant and Williams 01096",Region C,4
+CPT-01106,merchant,Torres Ltd 01106,Region D,2
+CPT-01112,merchant,Thomas Ltd 01112,Region B,12
+CPT-01149,merchant,Gonzalez-Smith 01149,Region A,2
+CPT-01205,merchant,Davidson PLC 01205,Region C,2
+CPT-01206,merchant,Little PLC 01206,Region F,2
+CPT-01223,merchant,Wells-Lane 01223,Region F,2
+CPT-01241,merchant,Schmitt-Romero 01241,Region E,2
+CPT-01253,merchant,"Mathis, Roberts and Horton 01253",Region B,2
+CPT-01285,merchant,"Brandt, Roberts and Nelson 01285",Region C,5
+CPT-01293,merchant,"Freeman, Cox and Jimenez 01293",Region D,2
+CPT-01296,merchant,"Little, Stark and Simon 01296",Region F,4
+CPT-01383,merchant,"Boyle, Goodwin and Anderson 01383",Region F,2
+CPT-01386,merchant,Jones PLC 01386,Region E,2
+CPT-01431,merchant,Tran-Torres 01431,Region B,7
+CPT-01440,merchant,"Fleming, Clayton and Foster 01440",Region B,6
+CPT-01441,merchant,"Huang, Stewart and White 01441",Region E,2
+CPT-01449,merchant,Williams LLC 01449,Region F,3
+CPT-01465,merchant,"Duarte, Howell and Payne 01465",Region E,2
+CPT-01486,merchant,"Hall, Decker and Harris 01486",Region B,2
+CPT-01487,merchant,Butler-Reed 01487,Region C,3
+CPT-01514,merchant,Kelley-Williams 01514,Region A,3
+CPT-01522,merchant,Burgess-Hill 01522,Region E,2
+CPT-01548,merchant,Contreras LLC 01548,Region C,2
+CPT-01552,merchant,"Bailey, Anderson and Hill 01552",Region F,3
+CPT-01579,merchant,Singh Inc 01579,Region A,2
+CPT-01607,merchant,Walker Ltd 01607,Region A,2
+CPT-01630,merchant,"King, Yang and Cook 01630",Region A,2
+CPT-01643,merchant,Tucker-Collins 01643,Region A,2
+CPT-01682,merchant,Bird Inc 01682,Region F,2
+CPT-01683,merchant,Swanson-Oneill 01683,Region D,2
+CPT-01696,merchant,Goodwin-Chavez 01696,Region A,2
+CPT-01698,merchant,Kelly-Obrien 01698,Region E,2
+CPT-01717,merchant,Torres and Sons 01717,Region F,2
+CPT-01723,merchant,Bailey-Rhodes 01723,Region A,2
+CPT-01727,merchant,Miller Inc 01727,Region E,7
+CPT-01734,merchant,Moss Ltd 01734,Region D,2
+CPT-01742,merchant,"Thomas, Baker and Wheeler 01742",Region A,8
+CPT-01754,merchant,"Li, Johnson and Smith 01754",Region F,2
+CPT-01772,merchant,Sheppard and Sons 01772,Region F,2
+CPT-01787,merchant,Martin-Morales 01787,Region C,2
+CPT-01838,merchant,Williams-Anderson 01838,Region E,5
+CPT-01901,merchant,Snyder-Roberts 01901,Region D,2
+CPT-01905,merchant,Taylor-Abbott 01905,Region C,6
+CPT-01924,merchant,Lopez-Burch 01924,Region D,2
+CPT-01927,merchant,"Lambert, Hunter and Lewis 01927",Region A,8
+CPT-01944,merchant,Hernandez and Sons 01944,Region D,2
+CPT-01954,merchant,Smith-Moss 01954,Region F,2
+CPT-02034,merchant,Wood-Stewart 02034,Region D,2
+CPT-02059,merchant,"Griffin, Whitehead and Garcia 02059",Region A,3
+CPT-02069,merchant,"Allison, Herrera and Clark 02069",Region D,2
+CPT-02081,merchant,"Lane, Bowman and Daniels 02081",Region C,2
+CPT-02136,merchant,James Inc 02136,Region D,2
+CPT-02161,merchant,Sharp and Sons 02161,Region A,5
+CPT-02181,merchant,Ortega PLC 02181,Region F,5
+CPT-02202,merchant,King LLC 02202,Region E,3
+CPT-02227,merchant,Williams-Johnson 02227,Region A,2
+CPT-02248,merchant,Sandoval-Perez 02248,Region B,2
+CPT-02272,merchant,"Garcia, Tran and Palmer 02272",Region C,2
+CPT-02286,merchant,"Martin, James and Hunt 02286",Region A,4
+CPT-02312,merchant,"Kelly, Price and Martin 02312",Region E,2
+CPT-02385,merchant,"Oliver, Ellis and Waller 02385",Region E,2
+CPT-02394,supplier,Payne-Jackson 02394,Region F,3
+CPT-02399,supplier,"Klein, Ross and Jones 02399",Region F,2
+CPT-02414,supplier,Thompson-Murphy 02414,Region E,6
+CPT-02418,supplier,Rivera and Sons 02418,Region C,6
+CPT-02431,supplier,Diaz Ltd 02431,Region A,5
+CPT-02486,supplier,Bell-Pena 02486,Region E,2
+CPT-02493,supplier,Johnston-Wilson 02493,Region D,16
+CPT-02498,supplier,Bailey Inc 02498,Region C,8
+CPT-02500,supplier,Smith-Wise 02500,Region E,11
+CPT-02530,supplier,"Jackson, Brown and Young 02530",Region A,3
+CPT-02555,supplier,"Gray, Black and Garrett 02555",Region F,2
+CPT-02595,supplier,Zimmerman-Terry 02595,Region B,2
+CPT-02623,supplier,Wright Group 02623,Region E,2
+CPT-02630,supplier,"Rivera, Gray and Allen 02630",Region B,3
+CPT-02652,supplier,Farmer Ltd 02652,Region B,2
+CPT-02674,supplier,Mendoza-Johnson 02674,Region B,3
+CPT-02678,supplier,Kemp-Patterson 02678,Region B,2
+CPT-02692,supplier,Hernandez Group 02692,Region A,5
+CPT-02695,supplier,Sparks and Sons 02695,Region F,30
+CPT-02715,supplier,Robinson Inc 02715,Region D,5
+CPT-02743,supplier,Callahan Inc 02743,Region A,2
+CPT-02748,supplier,Pena PLC 02748,Region F,2
+CPT-02756,supplier,"Duncan, Roberts and Price 02756",Region F,5
+CPT-02758,supplier,"Flores, Smith and Sutton 02758",Region D,3
+CPT-02766,supplier,"Davidson, Brown and Arroyo 02766",Region D,2
+CPT-02771,supplier,Jimenez PLC 02771,Region E,4
+CPT-02772,supplier,"Cummings, Campbell and Schneider 02772",Region B,2
+CPT-02784,supplier,Johnson Inc 02784,Region A,5
+CPT-02787,supplier,Hale-Reed 02787,Region E,9
+CPT-02821,supplier,Hernandez-Green 02821,Region E,4
+CPT-02852,supplier,Hess-Barnes 02852,Region E,3
+CPT-02864,supplier,Rivas Inc 02864,Region F,4
+CPT-02870,supplier,King-Henson 02870,Region D,7
+CPT-02878,supplier,Weber-White 02878,Region D,2
+CPT-02887,supplier,"Franklin, Kelly and Wallace 02887",Region C,3
+CPT-02889,supplier,Nelson Ltd 02889,Region D,3
+CPT-02899,supplier,Murphy Group 02899,Region E,3
+CPT-02908,supplier,Carroll and Sons 02908,Region F,2
+CPT-02923,supplier,"Long, Blake and Ford 02923",Region A,2
+CPT-02925,supplier,Hinton Group 02925,Region B,2
+CPT-02929,supplier,West Group 02929,Region C,4
+CPT-02965,supplier,Bailey Inc 02965,Region C,2
+CPT-03006,supplier,Walker Inc 03006,Region E,3
+CPT-03026,supplier,"Romero, Weber and Colon 03026",Region F,2
+CPT-03037,supplier,Young-Nielsen 03037,Region D,2
+CPT-03068,supplier,"Nunez, Sandoval and Griffith 03068",Region F,3
+CPT-03085,supplier,Harris-Hall 03085,Region C,2
+CPT-03106,supplier,Cox-Brock 03106,Region B,2
+CPT-03113,supplier,"Gordon, Dawson and Wilson 03113",Region C,3
+CPT-03116,supplier,Collins-Roberts 03116,Region D,5
+CPT-03119,supplier,Williams and Sons 03119,Region D,2
+CPT-03197,supplier,Price-Smith 03197,Region B,7
+CPT-03200,supplier,Wright and Sons 03200,Region D,2
+CPT-03204,supplier,"Johnson, Cox and Bradley 03204",Region A,2
+CPT-03206,supplier,Mcmillan-Erickson 03206,Region F,7
+CPT-03214,supplier,"Greer, Anderson and Shelton 03214",Region F,2
+CPT-03242,supplier,"Krause, Watkins and Sanchez 03242",Region F,7
+CPT-03245,supplier,West and Sons 03245,Region D,2
+CPT-03246,supplier,Williams-Crawford 03246,Region F,2
+CPT-03248,supplier,Mcclure PLC 03248,Region C,2
+CPT-03258,supplier,Johnson LLC 03258,Region A,3
+CPT-03283,supplier,Roberts-Huber 03283,Region F,2
+CPT-03293,supplier,Morgan Ltd 03293,Region D,2
+CPT-03297,supplier,"Deleon, Robinson and Rangel 03297",Region C,21
+CPT-03307,supplier,"Terrell, Boyd and Owens 03307",Region C,3
+CPT-03325,supplier,Smith-Murphy 03325,Region E,2
+CPT-03330,supplier,Sullivan Group 03330,Region B,11
+CPT-03342,supplier,Sanchez-Martin 03342,Region F,2
+CPT-03376,supplier,Pitts Ltd 03376,Region E,3
+CPT-03414,supplier,Cole-Harvey 03414,Region C,4
+CPT-03448,supplier,"Singh, Nielsen and Jones 03448",Region A,4
+CPT-03459,supplier,"Acevedo, Noble and Atkins 03459",Region E,2
+CPT-03461,supplier,"Lozano, Wallace and Taylor 03461",Region D,2
+CPT-03477,supplier,Dillon Ltd 03477,Region D,2
+CPT-03521,supplier,Rogers-Kennedy 03521,Region F,3
+CPT-03534,supplier,"Marshall, Lane and Fletcher 03534",Region C,3
+CPT-03558,supplier,Mathis LLC 03558,Region C,2
+CPT-03574,supplier,"Wagner, Cordova and Morrow 03574",Region B,2
+CPT-03584,supplier,Martinez PLC 03584,Region D,2
+CPT-03613,individual,Philip Bradley,Region B,2
+CPT-03634,individual,Amanda Duran,Region A,2
+CPT-03637,individual,Paul Raymond DDS,Region D,2
+CPT-03692,individual,Valerie Martin,Region F,2
+CPT-03693,individual,Kyle Jones DVM,Region E,2
+CPT-03695,individual,Kevin Martinez,Region F,2
+CPT-03728,individual,Robert Soto,Region F,2
+CPT-03729,individual,Alicia Lang,Region B,16
+CPT-03731,individual,Jeffrey Patton,Region E,4
+CPT-03742,individual,Michelle Velazquez,Region B,2
+CPT-03795,individual,Keith Cunningham,Region E,4
+CPT-03817,individual,Donna Williams,Region F,2
+CPT-03818,individual,Zachary Roberts,Region F,2
+CPT-03889,individual,James Wright,Region E,2
+CPT-03892,individual,Kristen Cortez,Region F,2
+CPT-03933,individual,Julie Schmidt,Region F,3
+CPT-03941,individual,Tina Jimenez,Region E,2
+CPT-03980,individual,Robert Cannon,Region E,10
+CPT-03981,individual,Joseph Baird,Region C,35
+CPT-03983,individual,Michelle Davis,Region C,7
+CPT-03989,individual,Sean Allen,Region E,3
+CPT-03993,individual,Peter Obrien,Region F,2
+CPT-04004,individual,Faith Walton,Region D,2
+CPT-04028,individual,Angela Owens,Region D,2
+CPT-04033,individual,Lauren Walker,Region B,3
+CPT-04114,individual,Theodore Stone,Region F,6
+CPT-04116,individual,Dr. Nicholas Bell,Region D,2
+CPT-04153,individual,Tina Wilson,Region C,2
+CPT-04162,individual,Cynthia Parks,Region F,2
+CPT-04214,individual,Amy Martinez,Region D,2
+CPT-04280,individual,Jonathan Campbell,Region B,2
+CPT-04288,individual,Eric Wong,Region C,2
+CPT-04299,individual,Grace Lewis,Region A,8
+CPT-04303,individual,Andres Knight,Region D,3
+CPT-04324,individual,William Robinson,Region F,18
+CPT-04337,individual,Mary Bryant,Region F,2
+CPT-04350,individual,Mary Holmes,Region C,3
+CPT-04371,individual,Joseph Martin,Region B,2
+CPT-04373,individual,Christine Bryant,Region C,2
+CPT-04375,individual,Emily Castro,Region D,2
+CPT-04400,individual,Kevin Smith,Region E,2
+CPT-04402,individual,Dr. Michael Hansen,Region D,2
+CPT-04419,individual,Christopher Davis,Region B,3
+CPT-04425,individual,Bryan Ramos MD,Region B,3
+CPT-04428,individual,Evan Bell,Region B,2
+CPT-04479,individual,Joshua Arellano,Region F,2
+CPT-04506,individual,Nancy Freeman,Region E,2
+CPT-04527,individual,Danny Rodriguez,Region C,2
+CPT-04532,individual,Christina Kelley,Region E,2
+CPT-04589,individual,Eric Blair,Region C,3
+CPT-04592,individual,Matthew Kelly,Region A,3
+CPT-04661,individual,Michael Miller,Region C,4
+CPT-04672,individual,Taylor Villarreal,Region C,3
+CPT-04678,individual,Micheal Spencer,Region B,3
+CPT-04707,individual,Ann Wilson,Region B,2
+CPT-04727,individual,Lawrence Bell,Region C,2
+CPT-04745,individual,Shannon Ballard,Region B,2
+CPT-04790,individual,Sara Thomas,Region F,2
+CPT-04808,individual,Michael Carrillo,Region C,2
+CPT-04830,individual,Elizabeth Miller,Region A,2
+CPT-04832,individual,Erika Smith,Region C,6
+CPT-04855,individual,Elizabeth Benjamin,Region C,5
+CPT-04891,individual,Keith Myers,Region E,4
+CPT-04907,individual,Alexander Jackson,Region C,2
+CPT-04922,individual,Ellen Flores,Region B,2
+CPT-04931,individual,Steven Miller,Region B,2
+CPT-04942,individual,Shelby Fernandez,Region A,8
+CPT-04945,individual,Colleen Dennis,Region B,4
+CPT-04960,individual,Lindsay Melendez,Region E,3
+CPT-04963,individual,Robert Case,Region F,2
+CPT-04964,individual,Vanessa Rojas,Region D,2
+CPT-04971,individual,Maria Rodriguez,Region C,2
+CPT-04990,individual,Tiffany Rodriguez,Region E,2
+CPT-05007,individual,Latasha Foster,Region B,2
+CPT-05017,individual,Joseph Thomas,Region A,13
+CPT-05045,individual,Jacqueline Perez,Region E,2
+CPT-05072,individual,Jordan Cooper,Region B,6
+CPT-05078,individual,Dan Lopez,Region D,5
+CPT-05086,individual,Michelle Morales,Region A,5
+CPT-05107,individual,Courtney Perez,Region F,2
+CPT-05118,individual,Amy Singh,Region D,2
+CPT-05130,individual,Robert Payne,Region A,2
+CPT-05179,individual,Bryan Jordan,Region F,3
+CPT-05198,individual,Connie Thomas,Region D,2
+CPT-05237,individual,Thomas Allen,Region C,2
+CPT-05240,individual,Steven Nelson,Region F,2
+CPT-05254,individual,Alejandro Smith,Region D,4
+CPT-05259,individual,Melissa Cortez,Region D,3
+CPT-05357,individual,Cheryl Ballard,Region A,3
+CPT-05362,individual,John Kim,Region C,2
+CPT-05370,individual,David Davis,Region A,2
+CPT-05398,individual,Kaitlyn Lopez,Region C,2
+CPT-05405,individual,Ashley Cox,Region C,2
+CPT-05414,individual,Suzanne Quinn,Region D,3
+CPT-05450,individual,Michael Mcknight,Region F,6
+CPT-05455,individual,Christopher Everett,Region E,3
+CPT-05509,individual,Stephanie Clark,Region D,3
+CPT-05613,individual,Brandon Ewing,Region B,2
+CPT-05618,individual,Brian Miller,Region D,2
+CPT-05620,individual,Shelley Wilson,Region E,2
+CPT-05635,individual,Anne Wilson,Region A,2
+CPT-05636,individual,Tina Townsend,Region C,2
+CPT-05639,individual,Mary Munoz,Region C,2
+CPT-05642,individual,Samuel Brown,Region F,3
+CPT-05664,individual,Monica Lee,Region F,2
+CPT-05691,individual,Robert Oneal,Region D,2
+CPT-05706,individual,Michael Powers,Region C,3
+CPT-05752,individual,Anthony Rivera,Region C,2
+CPT-05766,individual,Shannon Colon,Region B,3
+CPT-05778,individual,Jennifer Cuevas,Region D,2
+CPT-05783,individual,Jeffrey Woodard,Region B,2
+CPT-05805,individual,Faith Ruiz,Region C,3
+CPT-05824,individual,Robert Rogers,Region F,3
+CPT-05830,individual,Bethany Scott,Region B,3
+CPT-05944,individual,Steven Fitzpatrick,Region D,2
+CPT-05958,individual,Miss Catherine Copeland,Region A,2
