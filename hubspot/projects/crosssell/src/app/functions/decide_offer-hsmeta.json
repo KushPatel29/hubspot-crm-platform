@@ -1,0 +1,8 @@
+{
+  "uid": "decide_offer",
+  "type": "app-function",
+  "config": {
+    "entrypoint": "/app/functions/decide_offer.js",
+    "secretKeys": []
+  }
+}

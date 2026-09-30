@@ -14,6 +14,7 @@
         <members>Counterparty__c.Crm_Platform_Key__c</members>
         <members>Counterparty__c.Hot_Subjects__c</members>
         <members>Investigation_Case__c.Amount_Involved_Cad__c</members>
+        <members>Investigation_Case__c.Case_Activity_Log__c</members>
         <members>Investigation_Case__c.Case_Priority__c</members>
         <members>Investigation_Case__c.Counterparty_Summary__c</members>
         <members>Investigation_Case__c.Crm_Platform_Key__c</members>

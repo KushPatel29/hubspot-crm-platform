@@ -1,0 +1,13 @@
+{
+  "uid": "deal_margin_card",
+  "type": "card",
+  "config": {
+    "name": "Deal margin guardrail",
+    "description": "Each line against its floor and target margin, the verdict and the approver needed.",
+    "location": "crm.record.tab",
+    "entrypoint": "/app/cards/DealMarginCardEntry.tsx",
+    "objectTypes": [
+      "deals"
+    ]
+  }
+}

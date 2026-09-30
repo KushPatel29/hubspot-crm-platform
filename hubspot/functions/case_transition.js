@@ -1,0 +1,29 @@
+// Private function: an investigator moves a case to its next stage from the "Case evidence" card.
+// Only the transitions in shared/cases.js are allowed, a note is required, closing sets the decision, and every
+// move is appended to the case's activity log (HubSpot's property history records the same change natively).
+import { client } from '../shared/hubspot-api.js';
+import { checkTransition, logEntry } from '../shared/cases.js';
+
+export async function main(context, { api = client(), now = Date.now() } = {}) {
+  const caseId = context.propertiesToSend?.hs_object_id ?? context.parameters?.caseId;
+  const { toStage, note } = context.parameters ?? {};
+  if (!caseId || !toStage) return { ok: false, error: 'needs a case and a target stage' };
+  const caseType = await api.customType('investigation_case');
+  const [record] = await api.batchRead(caseType, [caseId], ['hs_pipeline', 'hs_pipeline_stage', 'case_activity_log']);
+  const pipelines = await api.get(`/crm/v3/pipelines/${caseType}`);
+  const pipeline = pipelines.results.find((p) => p.id === record.properties.hs_pipeline);
+  if (!pipeline) return { ok: false, error: 'the case is not in a known pipeline' };
+  const current = pipeline.stages.find((s) => s.id === record.properties.hs_pipeline_stage);
+  const target = pipeline.stages.find((s) => s.label === toStage);
+  if (!current || !target) return { ok: false, error: `unknown stage "${toStage}"` };
+  const check = checkTransition(current.label, target.label, note);
+  if (!check.ok) return { ok: false, error: check.reason };
+  const who = context.userEmail ?? `user ${context.userId ?? 'unknown'}`;
+  const properties = {
+    hs_pipeline_stage: target.id,
+    case_activity_log: logEntry(record.properties.case_activity_log, now, who, current.label, target.label, note),
+  };
+  if (check.decision) properties.decision_status = check.decision;
+  await api.patch(`/crm/v3/objects/${caseType}/${caseId}`, { properties });
+  return { ok: true, from: current.label, to: target.label, decision: check.decision };
+}

@@ -1,0 +1,8 @@
+{
+  "uid": "deal_margin",
+  "type": "app-function",
+  "config": {
+    "entrypoint": "/app/functions/deal_margin.js",
+    "secretKeys": []
+  }
+}

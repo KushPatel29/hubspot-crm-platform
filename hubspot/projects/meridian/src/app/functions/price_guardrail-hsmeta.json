@@ -1,0 +1,17 @@
+{
+  "uid": "price_guardrail",
+  "type": "app-function",
+  "config": {
+    "entrypoint": "/app/functions/price_guardrail.js",
+    "secretKeys": [
+      "HUBSPOT_CLIENT_SECRET",
+      "ENDPOINT_BASE_URL"
+    ],
+    "endpoint": {
+      "path": "/price-guardrail",
+      "methods": [
+        "POST"
+      ]
+    }
+  }
+}

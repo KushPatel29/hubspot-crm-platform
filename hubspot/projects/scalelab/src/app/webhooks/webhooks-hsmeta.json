@@ -1,0 +1,47 @@
+{
+  "uid": "webhooks",
+  "type": "webhooks",
+  "config": {
+    "settings": {
+      "targetUrl": "${ENDPOINT_BASE_URL}/webhooks",
+      "maxConcurrentRequests": 10
+    },
+    "subscriptions": {
+      "crmObjects": [
+        {
+          "subscriptionType": "object.creation",
+          "objectType": "contact",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "contact",
+          "propertyName": "lifecyclestage",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.propertyChange",
+          "objectType": "contact",
+          "propertyName": "growthops_renewal_risk",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.deletion",
+          "objectType": "contact",
+          "active": true
+        },
+        {
+          "subscriptionType": "object.merge",
+          "objectType": "contact",
+          "active": true
+        }
+      ],
+      "hubEvents": [
+        {
+          "subscriptionType": "contact.privacyDeletion",
+          "active": true
+        }
+      ]
+    }
+  }
+}

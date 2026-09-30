@@ -1,0 +1,8 @@
+{
+  "uid": "case_transition",
+  "type": "app-function",
+  "config": {
+    "entrypoint": "/app/functions/case_transition.js",
+    "secretKeys": []
+  }
+}

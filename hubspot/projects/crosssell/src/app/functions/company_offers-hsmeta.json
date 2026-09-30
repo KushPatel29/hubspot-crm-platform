@@ -1,0 +1,8 @@
+{
+  "uid": "company_offers",
+  "type": "app-function",
+  "config": {
+    "entrypoint": "/app/functions/company_offers.js",
+    "secretKeys": []
+  }
+}

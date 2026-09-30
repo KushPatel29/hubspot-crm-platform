@@ -1,0 +1,21 @@
+{
+  "name": "crm-platform-hubspot-apps",
+  "private": true,
+  "type": "module",
+  "description": "Source, tests and generator for the per-business HubSpot apps (projects/ is generated)",
+  "license": "MIT",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "node build.mjs",
+    "check": "node build.mjs --check"
+  },
+  "devDependencies": {
+    "@hubspot/ui-extensions": "0.17.0",
+    "@types/react": "18.3.31",
+    "esbuild": "0.28.2",
+    "react": "18.3.1",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3"
+  }
+}

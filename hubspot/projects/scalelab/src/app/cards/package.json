@@ -1,0 +1,10 @@
+{
+  "name": "crm-platform-scalelab-cards",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@hubspot/ui-extensions": "0.17.0",
+    "react": "18.3.1"
+  }
+}

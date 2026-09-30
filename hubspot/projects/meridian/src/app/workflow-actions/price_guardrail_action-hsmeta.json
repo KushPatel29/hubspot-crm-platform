@@ -1,0 +1,119 @@
+{
+  "uid": "price_guardrail_action",
+  "type": "workflow-action",
+  "config": {
+    "actionUrl": "${ENDPOINT_BASE_URL}/price-guardrail",
+    "isPublished": true,
+    "supportedClients": [
+      {
+        "client": "WORKFLOWS"
+      }
+    ],
+    "inputFields": [],
+    "outputFields": [
+      {
+        "typeDefinition": {
+          "name": "verdict",
+          "type": "enumeration",
+          "fieldType": "select",
+          "options": [
+            {
+              "value": "above_stretch",
+              "label": "Above stretch"
+            },
+            {
+              "value": "at_target",
+              "label": "At target"
+            },
+            {
+              "value": "below_target",
+              "label": "Below target"
+            },
+            {
+              "value": "below_floor",
+              "label": "Below floor"
+            },
+            {
+              "value": "loss_making",
+              "label": "Loss-making"
+            },
+            {
+              "value": "no_lines",
+              "label": "No priced lines"
+            }
+          ]
+        }
+      },
+      {
+        "typeDefinition": {
+          "name": "approver",
+          "type": "enumeration",
+          "fieldType": "select",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "rep",
+              "label": "Rep"
+            },
+            {
+              "value": "sales_manager",
+              "label": "Sales manager"
+            },
+            {
+              "value": "commercial_director",
+              "label": "Commercial director"
+            },
+            {
+              "value": "vp_finance",
+              "label": "VP Finance"
+            }
+          ]
+        }
+      },
+      {
+        "typeDefinition": {
+          "name": "needs_approval",
+          "type": "enumeration",
+          "fieldType": "select",
+          "options": [
+            {
+              "value": "true",
+              "label": "Yes"
+            },
+            {
+              "value": "false",
+              "label": "No"
+            }
+          ]
+        }
+      },
+      {
+        "typeDefinition": {
+          "name": "blended_margin",
+          "type": "number",
+          "fieldType": "number"
+        }
+      }
+    ],
+    "labels": {
+      "en": {
+        "actionName": "Check the price guardrail",
+        "actionDescription": "Scores every line against its product's margin band (floor = target - 9 points), writes the verdict to the deal and returns who has to approve it.",
+        "actionCardContent": "Check the price guardrail",
+        "inputFieldLabels": {},
+        "outputFieldLabels": {
+          "verdict": "Verdict",
+          "approver": "Approver",
+          "needs_approval": "Needs approval",
+          "blended_margin": "Blended margin"
+        }
+      }
+    },
+    "objectTypes": [
+      "DEAL"
+    ]
+  }
+}

@@ -91,6 +91,8 @@ def model() -> TenantModel:
             Property("evidence_references", "Evidence", "string", "textarea"),
             Property("recommended_next_step", "Next step", "string", "textarea"),
             Property("counterparty_summary", "Largest shared counterparties", "string", "textarea"),
+            Property("case_activity_log", "Activity log", "string", "textarea",
+                     "Every stage change made from the case card: when, who, from, to and why."),
             enum("decision_status", "Decision", ["HUMAN DECISION REQUIRED", "NO FURTHER ACTION",
                                                  "REFERRED FOR REPORTING DECISION"]),
             enum("filing_status", "Reporting status", ["NOT ASSESSED OR FILED"],

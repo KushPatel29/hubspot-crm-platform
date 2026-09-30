@@ -1,0 +1,6 @@
+{
+  "accountId": 0,
+  "variables": {
+    "ENDPOINT_BASE_URL": "https://example.invalid"
+  }
+}

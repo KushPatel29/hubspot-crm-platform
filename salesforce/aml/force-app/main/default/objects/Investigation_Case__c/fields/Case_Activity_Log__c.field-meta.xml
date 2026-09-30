@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Case_Activity_Log__c</fullName>
+    <label>Activity log</label>
+    <description>Every stage change made from the case card: when, who, from, to and why.</description>
+    <inlineHelpText>Every stage change made from the case card: when, who, from, to and why.</inlineHelpText>
+    <length>32768</length>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

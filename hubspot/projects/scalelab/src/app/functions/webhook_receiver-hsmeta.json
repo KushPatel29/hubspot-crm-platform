@@ -1,0 +1,17 @@
+{
+  "uid": "webhook_receiver",
+  "type": "app-function",
+  "config": {
+    "entrypoint": "/app/functions/webhook_receiver.js",
+    "secretKeys": [
+      "HUBSPOT_CLIENT_SECRET",
+      "ENDPOINT_BASE_URL"
+    ],
+    "endpoint": {
+      "path": "/webhooks",
+      "methods": [
+        "POST"
+      ]
+    }
+  }
+}

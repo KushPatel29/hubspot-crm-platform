@@ -1,0 +1,8 @@
+{
+  "uid": "case_network",
+  "type": "app-function",
+  "config": {
+    "entrypoint": "/app/functions/case_network.js",
+    "secretKeys": []
+  }
+}

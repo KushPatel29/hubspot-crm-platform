@@ -1,0 +1,107 @@
+{
+  "uid": "advance_lifecycle_action",
+  "type": "workflow-action",
+  "config": {
+    "actionUrl": "${ENDPOINT_BASE_URL}/advance-lifecycle",
+    "isPublished": true,
+    "supportedClients": [
+      {
+        "client": "WORKFLOWS"
+      }
+    ],
+    "inputFields": [
+      {
+        "typeDefinition": {
+          "name": "target_stage",
+          "type": "enumeration",
+          "fieldType": "select",
+          "options": [
+            {
+              "value": "lead",
+              "label": "Lead"
+            },
+            {
+              "value": "marketingqualifiedlead",
+              "label": "Marketing qualified lead"
+            },
+            {
+              "value": "salesqualifiedlead",
+              "label": "Sales qualified lead"
+            },
+            {
+              "value": "opportunity",
+              "label": "Opportunity"
+            },
+            {
+              "value": "customer",
+              "label": "Customer"
+            },
+            {
+              "value": "evangelist",
+              "label": "Evangelist"
+            }
+          ]
+        },
+        "supportedValueTypes": [
+          "STATIC_VALUE"
+        ],
+        "isRequired": true
+      }
+    ],
+    "outputFields": [
+      {
+        "typeDefinition": {
+          "name": "outcome",
+          "type": "enumeration",
+          "fieldType": "select",
+          "options": [
+            {
+              "value": "moved",
+              "label": "Moved"
+            },
+            {
+              "value": "kept",
+              "label": "Kept"
+            },
+            {
+              "value": "rejected",
+              "label": "Rejected"
+            }
+          ]
+        }
+      },
+      {
+        "typeDefinition": {
+          "name": "from_stage",
+          "type": "string",
+          "fieldType": "text"
+        }
+      },
+      {
+        "typeDefinition": {
+          "name": "reason",
+          "type": "string",
+          "fieldType": "text"
+        }
+      }
+    ],
+    "labels": {
+      "en": {
+        "actionName": "Advance lifecycle stage (never backwards)",
+        "actionDescription": "Moves the contact to the chosen lifecycle stage only if that is forward. GrowthOps' field contract: lifecycle stage is shared and moves forward only.",
+        "actionCardContent": "Advance lifecycle to {{target_stage}}",
+        "inputFieldLabels": {
+          "target_stage": "Target stage"
+        },
+        "outputFieldLabels": {
+          "outcome": "Outcome",
+          "from_stage": "Previous stage",
+          "reason": "Reason"
+        }
+      }
+    },
+    "objectTypes": [
+      "CONTACT"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "uid": "revenue_truth_card",
+  "type": "card",
+  "config": {
+    "name": "Revenue truth (GrowthOps)",
+    "description": "Collected cash, the campaign each attribution model credits, and renewal risk.",
+    "location": "crm.record.tab",
+    "entrypoint": "/app/cards/RevenueTruthCardEntry.tsx",
+    "objectTypes": [
+      "contacts"
+    ]
+  }
+}

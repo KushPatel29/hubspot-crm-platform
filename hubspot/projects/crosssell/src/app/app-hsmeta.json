@@ -1,0 +1,35 @@
+{
+  "uid": "crm_platform_crosssell",
+  "type": "app",
+  "config": {
+    "name": "Cross-sell next best offer",
+    "description": "The recommendation engine's next-best offers on every account, turned into deals in one click.",
+    "distribution": "private",
+    "auth": {
+      "type": "static",
+      "redirectUrls": [],
+      "requiredScopes": [
+        "crm.objects.companies.read",
+        "crm.objects.contacts.read",
+        "crm.objects.deals.read",
+        "crm.objects.deals.write",
+        "crm.objects.line_items.read",
+        "crm.objects.line_items.write",
+        "crm.objects.products.read",
+        "crm.objects.custom.read",
+        "crm.objects.custom.write",
+        "crm.schemas.custom.read"
+      ],
+      "optionalScopes": [],
+      "conditionallyRequiredScopes": []
+    },
+    "permittedUrls": {
+      "fetch": [],
+      "iframe": [],
+      "img": []
+    },
+    "support": {
+      "documentationUrl": "https://github.com/KushPatel29/hubspot-crm-platform"
+    }
+  }
+}
