@@ -74,6 +74,19 @@ def render() -> str:
                      f"{action['result']['lifecyclestage_before']} → {action['result']['lifecyclestage_after']} |")
         for call in action["hubspot_monitoring_2026-10-01_EDT"]["endpoint_functions"]:
             lines.append(f"| `{call['endpoint']}` at {call['time']} EDT | {call['result']}: {call['meaning']} |")
+    accept = _load("crosssell", "idempotent_accept")
+    if accept:
+        deal = accept["deal"]
+        linked = ", ".join(f"{k} {len(v)}" for k, v in accept["associations_read_back"].items())
+        lines += ["", "## A unique key against duplicate deals", "",
+                  (f"The cross-sell portal's deals carry `{accept['schema_change']['property']}`, unique, added in "
+                   f"{accept['schema_change']['writes']} schema writes (verify afterwards: "
+                   f"{accept['schema_change']['verify_writes_after']} writes). Accepting an offer from the card "
+                   f"created deal {deal['id']} with key `{deal['crm_platform_key']}`, already linked ({linked}); "
+                   f"the offer has {accept['deals_for_the_offer']} deal. A second create with the same key was then "
+                   f"sent on purpose: HubSpot answered {accept['duplicate_probe']['answer']} and the offer still has "
+                   f"{accept['duplicate_probe']['deals_with_the_key_after']} deal, so a racing request finds the "
+                   "first one by its key and carries on with it.")]
     lines += ["", "## Cards on real records", "",
               "Each card was added to its object's record view and used on a loaded record:", "",
               "| Card | Record | What it showed |", "|---|---|---|",

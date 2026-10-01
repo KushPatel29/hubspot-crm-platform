@@ -17,7 +17,8 @@ export const PROPERTIES = [
   'growthops_renewal_risk', 'lifecyclestage',
 ];
 // What was bought lives on the deals (GrowthOps writes growthops_product there), read through the association.
-export const DEAL_PROPERTIES = ['dealname', 'growthops_product', 'growthops_net_cash'];
+// Only won deals count as bought: an open renewal or a lost deal names a product the contact does not have.
+export const DEAL_PROPERTIES = ['dealname', 'growthops_product', 'growthops_net_cash', 'hs_is_closed_won'];
 
 // GrowthOps' tracking statuses that mean the campaign credit below cannot be trusted ("complete" and "direct" are
 // fine: direct traffic legitimately has no campaign).
@@ -76,7 +77,8 @@ export function RevenueTruthCard() {
         <DescriptionListItem label="Booked a call">{day(p.growthops_call_booked_date)}</DescriptionListItem>
         <DescriptionListItem label="Bought">
           {p.growthops_has_closed_won === 'true'
-            ? [...new Set(deals.map((d) => label(d.properties.growthops_product)).filter((v) => v !== '—'))].join(', ')
+            ? [...new Set(deals.filter((d) => d.properties.hs_is_closed_won === 'true')
+              .map((d) => label(d.properties.growthops_product)).filter((v) => v !== '—'))].join(', ')
               || 'Yes'
             : 'Not yet'}
         </DescriptionListItem>

@@ -16,6 +16,7 @@
         <members>Account.Xsell_Rfm_Segment__c</members>
         <members>Account.Xsell_Total_Revenue__c</members>
         <members>Contact.Crm_Platform_Key__c</members>
+        <members>Opportunity.Crm_Platform_Key__c</members>
         <members>Product2.Crm_Platform_Key__c</members>
         <members>Product2.Xsell_Protein__c</members>
         <members>Recommendation__c.Converted_To_Deal__c</members>

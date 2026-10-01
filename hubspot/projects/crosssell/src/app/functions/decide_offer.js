@@ -21,6 +21,8 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // functions/decide_offer.js
 var decide_offer_exports = {};
 __export(decide_offer_exports, {
+  KEY_PROPERTY: () => KEY_PROPERTY,
+  dealKey: () => dealKey,
   main: () => main
 });
 module.exports = __toCommonJS(decide_offer_exports);
@@ -82,6 +84,19 @@ function client({
       } while (after);
       return ids;
     },
+    // Associated IDs for many records in one call per hundred (v4 batch read): { fromId: [{ id, types }] }.
+    async associatedBatch(fromType, ids, toType) {
+      const out = Object.fromEntries(ids.map((id) => [String(id), []]));
+      for (let i = 0; i < ids.length; i += 100) {
+        const page = await request("POST", `/crm/v4/associations/${fromType}/${toType}/batch/read`, {
+          inputs: ids.slice(i, i + 100).map((id) => ({ id: String(id) }))
+        });
+        for (const row of page.results ?? []) {
+          out[String(row.from.id)] = (row.to ?? []).map((t) => ({ id: String(t.toObjectId), types: t.associationTypes ?? [] }));
+        }
+      }
+      return out;
+    },
     async batchRead(objectType, ids, properties) {
       const out = [];
       for (let i = 0; i < ids.length; i += 100) {
@@ -125,52 +140,74 @@ function respond(statusCode, body) {
 }
 
 // functions/decide_offer.js
-async function ensureDeal(api, offerType, offerId, offer, company) {
-  const existing = await api.associated(offerType, offerId, "deals");
-  if (existing.length) return { dealId: existing[0].id, resumed: true };
-  const products = await api.post("/crm/v3/objects/products/search", {
-    filterGroups: [{ filters: [{ propertyName: "hs_sku", operator: "EQ", value: offer.offer_sku }] }],
-    properties: ["name", "price"],
-    limit: 1
-  });
-  const product = products.results?.[0];
-  if (!product) throw new Error(`no product with SKU ${offer.offer_sku}`);
-  const price = Number(product.properties.price);
-  const quantity = Math.max(1, Math.round(Number(offer.offer_revenue_opportunity) / price));
-  const pipelines = await api.get("/crm/v3/pipelines/deals");
-  const pipeline = pipelines.results.find((p) => p.id === "default") ?? pipelines.results[0];
-  const stage = [...pipeline.stages].sort((a, b) => a.displayOrder - b.displayOrder)[0];
-  const deal = await api.post("/crm/v3/objects/deals", { properties: {
-    dealname: `${company.name} \xB7 ${product.properties.name} (cross-sell)`,
-    amount: (quantity * price).toFixed(2),
-    pipeline: pipeline.id,
-    dealstage: stage.id
-  } });
-  const converted = await api.labelType(offerType, "deals", "Converted to deal");
-  await api.put(`/crm/v4/objects/${offerType}/${offerId}/associations/deals/${deal.id}`, [converted]);
-  return { dealId: deal.id, resumed: false, product, quantity, price };
-}
-async function ensureLineItem(api, dealId, sku) {
-  if ((await api.associated("deals", dealId, "line_items")).length) return;
+var KEY_PROPERTY = "crm_platform_key";
+var dealKey = (offerId) => `offer-deal:${offerId}`;
+async function productFor(api, sku) {
   const products = await api.post("/crm/v3/objects/products/search", {
     filterGroups: [{ filters: [{ propertyName: "hs_sku", operator: "EQ", value: sku }] }],
     properties: ["name", "price"],
     limit: 1
   });
-  const product = products.results[0];
+  const product = products.results?.[0];
+  if (!product) throw new Error(`no product with SKU ${sku}`);
+  return product;
+}
+var link = (id, type) => ({ to: { id: String(id) }, types: [type] });
+async function dealByKey(api, key) {
+  try {
+    return await api.get(`/crm/v3/objects/deals/${encodeURIComponent(key)}?idProperty=${KEY_PROPERTY}&properties=amount`);
+  } catch (error) {
+    if (error.status === 404) return null;
+    throw error;
+  }
+}
+async function ensureDeal(api, offerType, offerId, offer, company, buyerId) {
+  const existing = await api.associated(offerType, offerId, "deals");
+  if (existing.length) return { dealId: existing[0].id, how: "resumed" };
+  const key = dealKey(offerId);
+  const product = await productFor(api, offer.offer_sku);
+  const price = Number(product.properties.price);
+  const quantity = Math.max(1, Math.round(Number(offer.offer_revenue_opportunity) / price));
+  const pipelines = await api.get("/crm/v3/pipelines/deals");
+  const pipeline = pipelines.results.find((p) => p.id === "default") ?? pipelines.results[0];
+  const stage = [...pipeline.stages].sort((a, b) => a.displayOrder - b.displayOrder)[0];
+  const toOffer = await api.labelType("deals", offerType, "Source recommendation");
+  const associations = [link(offerId, toOffer), link(company.id, await api.labelType("deals", "companies", null))];
+  if (buyerId) associations.push(link(buyerId, await api.labelType("deals", "contacts", null)));
+  try {
+    const deal = await api.post("/crm/v3/objects/deals", {
+      properties: {
+        dealname: `${company.name} \xB7 ${product.properties.name} (cross-sell)`,
+        amount: (quantity * price).toFixed(2),
+        pipeline: pipeline.id,
+        dealstage: stage.id,
+        [KEY_PROPERTY]: key
+      },
+      associations
+    });
+    return { dealId: String(deal.id), how: "created" };
+  } catch (error) {
+    const winner = error.status >= 400 && error.status < 500 ? await dealByKey(api, key) : null;
+    if (!winner) throw error;
+    await api.put(`/crm/v4/objects/deals/${winner.id}/associations/${offerType}/${offerId}`, [toOffer]);
+    return { dealId: String(winner.id), how: "raced" };
+  }
+}
+async function ensureLineItem(api, dealId, sku) {
+  if ((await api.associated("deals", dealId, "line_items")).length) return;
+  const product = await productFor(api, sku);
   const [deal] = await api.batchRead("deals", [dealId], ["amount"]);
   const price = Number(product.properties.price);
   const quantity = Math.max(1, Math.round(Number(deal.properties.amount) / price));
-  const line = await api.post("/crm/v3/objects/line_items", { properties: {
-    hs_product_id: product.id,
-    quantity: String(quantity),
-    price: price.toFixed(2),
-    name: product.properties.name
-  } });
-  await api.put(
-    `/crm/v4/objects/line_items/${line.id}/associations/deals/${dealId}`,
-    [await api.labelType("line_items", "deals", null)]
-  );
+  await api.post("/crm/v3/objects/line_items", {
+    properties: {
+      hs_product_id: product.id,
+      quantity: String(quantity),
+      price: price.toFixed(2),
+      name: product.properties.name
+    },
+    associations: [link(dealId, await api.labelType("line_items", "deals", null))]
+  });
 }
 async function main(context, { api = appClient(context), now = Date.now() } = {}) {
   const { offerId, decision, note = "" } = context.parameters ?? {};
@@ -188,7 +225,7 @@ async function main(context, { api = appClient(context), now = Date.now() } = {}
     "offer_status",
     "offer_revenue_opportunity"
   ]);
-  if (!record) return respond(400, { ok: false, error: "offer not found" });
+  if (!record) return respond(404, { ok: false, error: "offer not found" });
   const offer = record.properties;
   const decided = {
     offer_decided_at: new Date(now).toISOString(),
@@ -196,34 +233,48 @@ async function main(context, { api = appClient(context), now = Date.now() } = {}
   };
   if (decision === "dismiss") {
     if (offer.offer_status !== "open") {
-      return respond(400, { ok: false, error: `offer is already ${offer.offer_status}` });
+      return respond(409, { ok: false, error: `offer is already ${offer.offer_status}` });
     }
     await api.patch(`/crm/v3/objects/${offerType}/${offerId}`, { properties: { offer_status: "dismissed", ...decided } });
     return respond(200, { ok: true, dismissed: true });
   }
-  if (offer.offer_status === "dismissed") return respond(400, { ok: false, error: "offer was dismissed" });
+  if (offer.offer_status === "dismissed") return respond(409, { ok: false, error: "offer was dismissed" });
   const [companyLink] = await api.associated(offerType, offerId, "companies");
   if (!companyLink) return respond(400, { ok: false, error: "offer has no company" });
   const [company] = await api.batchRead("companies", [companyLink.id], ["name"]);
-  const deal = await ensureDeal(api, offerType, offerId, offer, { id: company.id, name: company.properties.name });
-  await api.put(
-    `/crm/v4/objects/deals/${deal.dealId}/associations/companies/${company.id}`,
-    [await api.labelType("deals", "companies", null)]
+  const [buyer] = await api.associated("companies", company.id, "contacts");
+  const deal = await ensureDeal(
+    api,
+    offerType,
+    offerId,
+    offer,
+    { id: company.id, name: company.properties.name },
+    buyer?.id
   );
-  const buyers = await api.associated("companies", company.id, "contacts");
-  if (buyers.length) {
+  if (deal.how === "raced") {
+    return respond(200, { ok: true, dealId: deal.dealId, resumed: true, inProgress: true });
+  }
+  if (deal.how === "resumed") {
     await api.put(
-      `/crm/v4/objects/deals/${deal.dealId}/associations/contacts/${buyers[0].id}`,
-      [await api.labelType("deals", "contacts", null)]
+      `/crm/v4/objects/deals/${deal.dealId}/associations/companies/${company.id}`,
+      [await api.labelType("deals", "companies", null)]
     );
+    if (buyer) {
+      await api.put(
+        `/crm/v4/objects/deals/${deal.dealId}/associations/contacts/${buyer.id}`,
+        [await api.labelType("deals", "contacts", null)]
+      );
+    }
   }
   await ensureLineItem(api, deal.dealId, offer.offer_sku);
   if (offer.offer_status !== "accepted") {
     await api.patch(`/crm/v3/objects/${offerType}/${offerId}`, { properties: { offer_status: "accepted", ...decided } });
   }
-  return respond(200, { ok: true, dealId: deal.dealId, resumed: deal.resumed });
+  return respond(200, { ok: true, dealId: deal.dealId, resumed: deal.how === "resumed" });
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  KEY_PROPERTY,
+  dealKey,
   main
 });

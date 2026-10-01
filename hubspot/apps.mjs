@@ -118,8 +118,10 @@ export const APPS = {
   crosssell: {
     name: 'Cross-sell next best offer',
     description: 'The recommendation engine\'s next-best offers on every account, turned into deals in one click.',
+    // crm.schemas.deals.write: the loader adds the deal idempotency key (crm_platform_key) the decide_offer function
+    // writes, so a second deal for the same offer is refused by HubSpot itself.
     scopes: unique(['oauth', 'e-commerce'], crud('contacts', 'companies', 'deals', 'products', 'line_items', 'custom'),
-      schemas('contacts', 'companies', 'custom')),
+      schemas('contacts', 'companies', 'deals', 'custom')),
     cards: [{ component: 'NextBestOfferCard', uid: 'next_best_offer_card', name: 'Next best offer',
       description: 'Eligible offers with the reason and the value, accepted into deals or dismissed with a reason.',
       objectTypes: ['companies'], needs: ['run', 'portalId', 'actor'] }],

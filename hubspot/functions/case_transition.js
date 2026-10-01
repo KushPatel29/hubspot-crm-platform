@@ -10,6 +10,7 @@ export async function main(context, { api = appClient(context), now = Date.now()
   if (!caseId || !toStage) return respond(400, { ok: false, error: 'needs a case and a target stage' });
   const caseType = await api.customType('investigation_case');
   const [record] = await api.batchRead(caseType, [caseId], ['hs_pipeline', 'hs_pipeline_stage', 'case_activity_log']);
+  if (!record) return respond(404, { ok: false, error: 'case not found' });
   const pipelines = await api.get(`/crm/v3/pipelines/${caseType}`);
   const pipeline = pipelines.results.find((p) => p.id === record.properties.hs_pipeline);
   if (!pipeline) return respond(400, { ok: false, error: 'the case is not in a known pipeline' });

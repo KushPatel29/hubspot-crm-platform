@@ -16,8 +16,9 @@ def test_every_cited_test_exists():
     python = {name for path in (ROOT / "tests").glob("test_*.py")
               for name in re.findall(r"^def (test_\w+)", path.read_text(encoding="utf-8"), re.MULTILINE)}
     javascript = "\n".join(p.read_text(encoding="utf-8") for p in (ROOT / "hubspot" / "tests").glob("*.test.*"))
+    in_js = lambda name: f"it('{name}'" in javascript or f'it("{name}"' in javascript  # noqa: E731
     missing = [name for name in cited if not (
-        name in python if name.startswith("test_") else name.startswith("npm ") or f"it('{name}'" in javascript)]
+        name in python if name.startswith("test_") else name.startswith("npm ") or in_js(name))]
     assert cited and not missing, missing
 
 

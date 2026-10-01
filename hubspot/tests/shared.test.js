@@ -123,6 +123,17 @@ describe('function API client', () => {
     await expect(failing.get('/y')).rejects.not.toThrow(/jane@example.com/);
   });
 
+  it('reads associations for many records in one batch call', async () => {
+    const sent = [];
+    const api = client({ token: 't', fetchImpl: async (url, init) => {
+      sent.push([url, JSON.parse(init.body)]);
+      return response(200, { results: [{ from: { id: '1' }, to: [{ toObjectId: 9, associationTypes: [{ typeId: 3 }] }] }] });
+    } });
+    expect(await api.associatedBatch('2-1', ['1', '2'], 'deals')).toEqual({ 1: [{ id: '9', types: [{ typeId: 3 }] }], 2: [] });
+    expect(sent).toEqual([['https://api.hubapi.com/crm/v4/associations/2-1/deals/batch/read',
+      { inputs: [{ id: '1' }, { id: '2' }] }]]);
+  });
+
   it('refuses to run without a token', () => {
     expect(() => client({ token: '' })).toThrow(/PRIVATE_APP_ACCESS_TOKEN/);
   });

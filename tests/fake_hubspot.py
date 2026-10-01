@@ -301,7 +301,8 @@ class FakeHubSpot:
             return None, stage_error
         if record is None:
             record_id = self._id()
-            record = {"id": record_id, "properties": {}, "archived": False}
+            record = {"id": record_id, "properties": {}, "archived": False,
+                      "createdAt": f"2026-10-01T00:00:00.{len(self.objects[tid]):06d}Z"}
             self.objects[tid][record_id] = record
         record["properties"] = props
         record["properties"]["hs_object_id"] = record["id"]
@@ -342,7 +343,7 @@ class FakeHubSpot:
 
     def _view(self, record: dict, wanted: list[str]) -> dict:
         return {"id": record["id"], "properties": {k: record["properties"].get(k) for k in wanted},
-                "archived": False}
+                "archived": False, "createdAt": record.get("createdAt")}
 
     def list_objects(self, body: Any, query: dict, object_type: str) -> tuple[int, Any]:
         tid = self.tid(object_type)

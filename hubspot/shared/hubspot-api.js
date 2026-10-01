@@ -62,6 +62,20 @@ export function client({ token = process.env.PRIVATE_APP_ACCESS_TOKEN, fetchImpl
       return ids;
     },
 
+    // Associated IDs for many records in one call per hundred (v4 batch read): { fromId: [{ id, types }] }.
+    async associatedBatch(fromType, ids, toType) {
+      const out = Object.fromEntries(ids.map((id) => [String(id), []]));
+      for (let i = 0; i < ids.length; i += 100) {
+        const page = await request('POST', `/crm/v4/associations/${fromType}/${toType}/batch/read`, {
+          inputs: ids.slice(i, i + 100).map((id) => ({ id: String(id) })),
+        });
+        for (const row of page.results ?? []) {
+          out[String(row.from.id)] = (row.to ?? []).map((t) => ({ id: String(t.toObjectId), types: t.associationTypes ?? [] }));
+        }
+      }
+      return out;
+    },
+
     async batchRead(objectType, ids, properties) {
       const out = [];
       for (let i = 0; i < ids.length; i += 100) {

@@ -1,53 +1,57 @@
 {
-  "at": "2026-10-01T09:57:02Z",
+  "at": "2026-10-01T12:53:27Z",
   "load": {
     "failures": [],
     "links": {
       "contacts->companies": {
-        "create": 240,
-        "present": 0,
+        "create": 0,
+        "present": 240,
         "unresolved": 0
       },
       "recommendation->companies": {
-        "create": 302,
-        "present": 0,
+        "create": 0,
+        "present": 302,
         "unresolved": 0
       }
     },
     "objects": {
       "companies": {
-        "create": 120,
+        "create": 0,
         "desired": 120,
+        "duplicates": 0,
         "fields_changed": [],
         "orphans": 0,
-        "unchanged": 0,
+        "unchanged": 120,
         "unmanaged": 0,
         "update": 0
       },
       "contacts": {
-        "create": 120,
+        "create": 0,
         "desired": 120,
+        "duplicates": 0,
         "fields_changed": [],
         "orphans": 0,
-        "unchanged": 0,
+        "unchanged": 120,
         "unmanaged": 2,
         "update": 0
       },
       "products": {
-        "create": 38,
+        "create": 0,
         "desired": 38,
+        "duplicates": 0,
         "fields_changed": [],
         "orphans": 0,
-        "unchanged": 0,
+        "unchanged": 38,
         "unmanaged": 0,
         "update": 0
       },
       "recommendation": {
-        "create": 302,
+        "create": 0,
         "desired": 302,
+        "duplicates": 0,
         "fields_changed": [],
         "orphans": 0,
-        "unchanged": 0,
+        "unchanged": 302,
         "unmanaged": 0,
         "update": 0
       }
@@ -59,18 +63,11 @@
     "portal_id": "247574104",
     "time_zone": "US/Eastern"
   },
-  "requests": 114,
+  "requests": 106,
   "schema_apply": {
     "applied": [
-      "create_group recommendation recommendation_details",
-      "create_properties recommendation 9 properties",
-      "update_property recommendation offer_title (groupName)",
-      "update_property recommendation offer_sku (groupName)",
-      "update_property recommendation offer_revenue_opportunity (groupName)",
-      "update_property recommendation offer_status (groupName)",
-      "create_label contacts companies:Buyer",
-      "create_label recommendation companies:Recommended for",
-      "create_label recommendation deals:Converted to deal"
+      "create_group deals cross_sell",
+      "create_properties deals 1 properties"
     ],
     "conflicts": [],
     "converged": true,
@@ -98,6 +95,7 @@
         "companies": {
           "create": 0,
           "desired": 120,
+          "duplicates": 0,
           "fields_changed": [],
           "orphans": 0,
           "unchanged": 120,
@@ -107,6 +105,7 @@
         "contacts": {
           "create": 0,
           "desired": 120,
+          "duplicates": 0,
           "fields_changed": [],
           "orphans": 0,
           "unchanged": 120,
@@ -116,6 +115,7 @@
         "products": {
           "create": 0,
           "desired": 38,
+          "duplicates": 0,
           "fields_changed": [],
           "orphans": 0,
           "unchanged": 38,
@@ -125,6 +125,7 @@
         "recommendation": {
           "create": 0,
           "desired": 302,
+          "duplicates": 0,
           "fields_changed": [],
           "orphans": 0,
           "unchanged": 302,
@@ -142,5 +143,5 @@
     },
     "writes": 0
   },
-  "writes": 25
+  "writes": 2
 }

@@ -23,8 +23,9 @@ describe('Revenue truth card', () => {
       growthops_has_closed_won: 'true', growthops_renewal_risk: 'high', growthops_renewal_due_date: '2026-10-05',
     }));
     mocks.useAssociations.willCall(() => ({ results: [
-      { toObjectId: 1, associationTypes: [], properties: { growthops_product: 'accelerator' } },
-      { toObjectId: 2, associationTypes: [], properties: { growthops_product: 'community' } }],
+      { toObjectId: 1, associationTypes: [], properties: { growthops_product: 'accelerator', hs_is_closed_won: 'true' } },
+      { toObjectId: 2, associationTypes: [], properties: { growthops_product: 'community', hs_is_closed_won: 'true' } },
+      { toObjectId: 3, associationTypes: [], properties: { growthops_product: 'mastermind', hs_is_closed_won: 'false' } }],
     error: null, isLoading: false, isRefetching: false, refetch: async () => {},
     pagination: { hasNextPage: false, hasPreviousPage: false, currentPage: 1, pageSize: 10, nextPage: () => {},
       previousPage: () => {}, reset: () => {} } }) as never);
@@ -32,7 +33,7 @@ describe('Revenue truth card', () => {
     expect(find(StatisticsItem, { label: 'Net cash collected' }).props.number).toBe('$1,500');
     expect(findAll(Text).some((t) => t.text?.includes('models disagree'))).toBe(true);
     expect(find(StatusTag).text).toBe('High risk');
-    expect(find(DescriptionListItem, { label: 'Bought' }).text).toBe('Accelerator, Community');
+    expect(find(DescriptionListItem, { label: 'Bought' }).text).toBe('Accelerator, Community');  // not the open deal
     expect(findAll(Alert)).toHaveLength(0);  // "complete" tracking raises no warning
   });
 
@@ -110,6 +111,20 @@ describe('Next best offer card', () => {
     find(TextArea).trigger('onInput', 'not stocked in BC' as never);
     await waitFor(() => expect(find(Button, { variant: 'destructive' }).props.disabled).toBe(false));
   });
+
+  it('reports a refused decision above the offers and keeps the list usable', async () => {
+    const run = vi.fn(async (name: string) => (name === 'company_offers' ? { ok: true, offers }
+      : { statusCode: 409, body: { ok: false, error: 'offer was dismissed' } }));
+    const { render, mocks, find, maybeFind, waitFor } = createRenderer('crm.record.tab');
+    mocks.useCrmProperties.willCall(() => loaded({ xsell_churn_risk: 'low' }));
+    render(<NextBestOfferCard run={run} portalId={42} />);
+    await waitFor(() => expect(find(Button, { variant: 'primary' }).text).toBe('Create deal'));
+    find(Button, { variant: 'primary' }).trigger('onClick');
+    await waitFor(() => expect(find(Alert).props.title).toBe('Not saved'));
+    expect(find(Alert).text).toBe('offer was dismissed');
+    expect(maybeFind(ErrorState)).toBeNull();
+    await waitFor(() => expect(find(Button, { variant: 'primary' }).props.disabled).toBe(false));
+  });
 });
 
 describe('Case evidence card', () => {
@@ -133,6 +148,7 @@ describe('Case evidence card', () => {
       ['Evidence requested', 'Second-level review', 'Closed: no further action']));
     expect(findAll(StatusTag).map((t) => t.text)).toEqual(['P0', '30 min left']);
     expect(find(Alert).text).toContain('Wholesale settlement');
+    expect(find(DescriptionListItem, { label: 'Amount involved' }).text).toBe('CA$293,914');
   });
 
   it('asks for a reason before moving a case, and offers nothing on a closed one', async () => {

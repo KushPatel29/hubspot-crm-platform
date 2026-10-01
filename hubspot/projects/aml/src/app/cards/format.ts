@@ -16,9 +16,10 @@ export function num(value: string | null | undefined): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-export function money(value: number | null, digits = 0): string {
+// currency: what the amount is in. CAD is shown as CA$ so it is never read as US dollars.
+export function money(value: number | null, digits = 0, currency = 'USD'): string {
   if (value === null) return '—';
-  return value.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: digits,
+  return value.toLocaleString('en-US', { style: 'currency', currency, maximumFractionDigits: digits,
     minimumFractionDigits: digits });
 }
 

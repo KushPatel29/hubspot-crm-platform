@@ -83,6 +83,19 @@ function client({
       } while (after);
       return ids;
     },
+    // Associated IDs for many records in one call per hundred (v4 batch read): { fromId: [{ id, types }] }.
+    async associatedBatch(fromType, ids, toType) {
+      const out = Object.fromEntries(ids.map((id) => [String(id), []]));
+      for (let i = 0; i < ids.length; i += 100) {
+        const page = await request("POST", `/crm/v4/associations/${fromType}/${toType}/batch/read`, {
+          inputs: ids.slice(i, i + 100).map((id) => ({ id: String(id) }))
+        });
+        for (const row of page.results ?? []) {
+          out[String(row.from.id)] = (row.to ?? []).map((t) => ({ id: String(t.toObjectId), types: t.associationTypes ?? [] }));
+        }
+      }
+      return out;
+    },
     async batchRead(objectType, ids, properties) {
       const out = [];
       for (let i = 0; i < ids.length; i += 100) {
@@ -145,10 +158,12 @@ async function main(context, { api = appClient(context) } = {}) {
   const offerType = await api.customType("recommendation");
   const links = await api.associated("companies", companyId, offerType);
   const offers = await api.batchRead(offerType, links.map((l) => l.id), OFFER_PROPERTIES);
+  const accepted = offers.filter((o) => o.properties.offer_status === "accepted").map((o) => o.id);
+  const dealsByOffer = accepted.length ? await api.associatedBatch(offerType, accepted, "deals") : {};
   const result = [];
   for (const offer of offers) {
     const p = offer.properties;
-    const deals = p.offer_status === "accepted" ? await api.associated(offerType, offer.id, "deals") : [];
+    const deals = dealsByOffer[offer.id] ?? [];
     result.push({
       id: offer.id,
       title: p.offer_title,

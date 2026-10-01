@@ -26,6 +26,10 @@ The AML row's second run is the idempotency check against the real API: all 1,01
 | `webhooks` at 5:50 AM EDT | 200: the first webhook delivery |
 | `webhooks` at 4:16-4:54 AM EDT | 401: unsigned probes made while the endpoints were being found; refused |
 
+## A unique key against duplicate deals
+
+The cross-sell portal's deals carry `crm_platform_key`, unique, added in 2 schema writes (verify afterwards: 0 writes). Accepting an offer from the card created deal 351824422649 with key `offer-deal:338315136700`, already linked (line_items 1, companies 1, contacts 1); the offer has 1 deal. A second create with the same key was then sent on purpose: HubSpot answered HTTP 400 VALIDATION_ERROR and the offer still has 1 deal, so a racing request finds the first one by its key and carries on with it.
+
 ## Cards on real records
 
 Each card was added to its object's record view and used on a loaded record:

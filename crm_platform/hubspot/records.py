@@ -3,7 +3,10 @@
 For each object the loader reads every record the portal holds, matches them to the desired records by
 ``crm_platform_key``, and plans three things: records to create, fields to update on records that exist, and
 associations to add. Nothing is ever deleted or unlinked; a keyed record the source no longer has is reported as an
-orphan, and a record without a key (HubSpot's own sample contacts) is left alone and counted.
+orphan, and a record without a key (HubSpot's own sample contacts) is left alone and counted. Two records with the
+same key (possible on products and line items, where HubSpot cannot make the key unique) are reported as duplicates:
+the oldest is the one the loader keeps in step, and the portal does not count as converged until a person merges or
+removes the others.
 
 Values are compared the way HubSpot stores them, so a rerun plans nothing: numbers as numbers (``"12.50"`` is
 ``"12.5"``), a date property against HubSpot's midnight-UTC datetime, emails case-blind, multi-select values as sets.
@@ -37,6 +40,7 @@ class ObjectPlan:
     unchanged: int = 0
     unmanaged: int = 0
     orphans: list[str] = field(default_factory=list)
+    duplicates: dict[str, list[str]] = field(default_factory=dict)  # key -> the extra record IDs
 
 
 @dataclass
@@ -88,13 +92,21 @@ class Resolver:
         kind, _, rest = value[1:].partition(":")
         if kind == "record":
             object_name, _, key = rest.partition(":")
-            return self.ids[object_name][key]
+            found = self.ids.get(object_name, {}).get(key)
+            if found is None:
+                raise ValueError(f"{value}: no {object_name} record with that key in the portal or this load")
+            return found
         object_name, _, rest = rest.partition(":")
         pipeline_label, _, stage_label = rest.partition(":")
-        pipeline = next(p for p in self.state.pipelines[object_name] if p["label"] == pipeline_label)
+        pipeline = next((p for p in self.state.pipelines.get(object_name, []) if p["label"] == pipeline_label), None)
+        if pipeline is None:
+            raise ValueError(f"{value}: the portal has no {object_name} pipeline labelled {pipeline_label!r}")
         if kind == "pipeline":
             return str(pipeline["id"])
-        return str(next(s for s in pipeline["stages"] if s["label"] == stage_label)["id"])
+        stage = next((s for s in pipeline["stages"] if s["label"] == stage_label), None)
+        if stage is None:
+            raise ValueError(f"{value}: pipeline {pipeline_label!r} has no stage labelled {stage_label!r}")
+        return str(stage["id"])
 
 
 def read_records(client: HubSpotClient, state: PortalState, object_name: str, names: Iterable[str]) -> list[dict]:
@@ -103,16 +115,24 @@ def read_records(client: HubSpotClient, state: PortalState, object_name: str, na
     return list(client.pages(f"/crm/v3/objects/{object_type}?limit=100&archived=false&properties={wanted}"))
 
 
+def _oldest_first(item: dict) -> tuple[str, int]:
+    """Sort key by HubSpot's createdAt, then ID: record IDs are not issued in creation order (seen live)."""
+    record_id = str(item["id"])
+    return str(item.get("createdAt") or ""), int(record_id) if record_id.isdigit() else 0
+
+
 def plan_object(object_name: str, desired: list[Record], existing: list[dict],
                 resolve: Callable[[str], str]) -> ObjectPlan:
     result = ObjectPlan(object_name)
     by_key: dict[str, dict] = {}
-    for item in existing:
+    for item in sorted(existing, key=_oldest_first):
         key = (item.get("properties") or {}).get(KEY_PROPERTY)
-        if key:
-            by_key[key] = item
-        else:
+        if not key:
             result.unmanaged += 1
+        elif key in by_key:  # the oldest record keeps the key; the others are for a person to merge
+            result.duplicates.setdefault(key, []).append(str(item["id"]))
+        else:
+            by_key[key] = item
     wanted = {r.key for r in desired}
     result.orphans = sorted(set(by_key) - wanted)
     for record in desired:
@@ -209,14 +229,15 @@ def load(client: HubSpotClient, model: TenantModel, records: list[Record], *, wr
         desired = by_object[name]
         names = {n for r in desired for n in r.properties}
         existing = read_records(client, state, name, names)
+        result = plan_object(name, desired, existing, resolve)
         for item in existing:
             key = (item.get("properties") or {}).get(KEY_PROPERTY)
-            if key:
+            if key and str(item["id"]) not in result.duplicates.get(key, ()):
                 ids[name][key] = str(item["id"])
-        result = plan_object(name, desired, existing, resolve)
         report["objects"][name] = {"desired": len(desired), "create": len(result.creates),
                                    "update": len(result.updates), "unchanged": result.unchanged,
                                    "unmanaged": result.unmanaged, "orphans": len(result.orphans),
+                                   "duplicates": sum(len(extra) for extra in result.duplicates.values()),
                                    "fields_changed": sorted({f for _, _, c in result.updates for f in c})}
         if not write:
             continue
@@ -252,7 +273,7 @@ def load(client: HubSpotClient, model: TenantModel, records: list[Record], *, wr
 
 
 def converged(report: dict) -> bool:
-    """A load report that has nothing left to create, update or associate, and nothing it could not resolve."""
-    return (all(o["create"] == 0 and o["update"] == 0 for o in report["objects"].values())
+    """A load report with nothing left to create, update or associate, nothing unresolved and no duplicate keys."""
+    return (all(o["create"] == 0 and o["update"] == 0 and not o.get("duplicates") for o in report["objects"].values())
             and all(link["create"] == 0 and link["unresolved"] == 0 for link in report["links"].values())
             and not report["failures"])

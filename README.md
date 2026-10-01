@@ -1,6 +1,6 @@
 # HubSpot CRM Platform
 
-![Tests](https://img.shields.io/badge/tests-129%20passing-3B8C6E)
+![Tests](https://img.shields.io/badge/tests-138%20passing-3B8C6E)
 ![HubSpot developer platform 2026.09](https://img.shields.io/badge/HubSpot%20projects-2026.09-FF7A59)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
@@ -95,7 +95,8 @@ drifts from its sources.
 | Overwriting people's decisions | Create-only fields: an accepted offer or a moved case is never reverted | `test_a_value_a_rep_changed_on_a_create_only_field_is_not_put_back` |
 | Wrong portal | Test accounts only, and each business bound to one portal; the AML cases cannot land in ScaleLab | `test_a_tenant_bound_elsewhere_is_refused`, `test_only_test_accounts_are_written_unless_named` |
 | Partial failures | HubSpot 207 batch errors recorded per record with HubSpot's category | `test_a_partial_batch_failure_is_reported_with_its_category` |
-| Double clicks and retries | Accepting an offer is resumable: one deal, one line item, however many times it runs or fails part way | `turns an offer into one complete deal, even when clicked twice`, `resumes after a failure part way through instead of creating a second deal` |
+| Double clicks, races and retries | Accepting an offer writes a unique idempotency key on the deal (`offer-deal:<offer id>`), so HubSpot itself refuses a second deal; the deal and its line item are created already linked. One deal, one line item, whether two requests race, one runs twice or one fails part way (checked live: the duplicate is refused) | `makes one deal when two requests accept the same offer at once`, `turns an offer into one complete deal, even when clicked twice`, `resumes after a failure part way through instead of creating a second deal`, `adopts a deal that already carries the offer's key instead of creating another` |
+| Duplicate records | Two records with one source key (products and line items cannot be unique) are reported, the oldest by `createdAt` is kept in step, and the portal does not count as converged until a person merges them | `test_two_records_with_one_key_are_reported_and_block_convergence` |
 | Forged workflow calls and webhooks | HubSpot v3 signatures verified (method, URI, body, timestamp; five-minute window) before anything is read | `refuses an unsigned or forged workflow request before touching the deal`, `accepts signed deliveries and logs a summary, never the payload values` |
 | Two copies of a business rule | The guardrail runs in Python (loader) and JavaScript (HubSpot); a test runs both over all 359 Meridian deals | `test_python_and_javascript_score_every_meridian_deal_identically` |
 | Lifecycle moving backwards | The workflow action moves a contact forward only (GrowthOps' field contract) | `moves forward, keeps backwards moves out, and says which` |
@@ -114,6 +115,10 @@ drifts from its sources.
 * A card's property hook hands datetimes over formatted for display, so arithmetic on them (a case deadline) uses the
   API's raw values instead; private functions get no user identity, so the card passes the signed-in user.
 * Offset paging on CRM search skips records edited mid-scan (from GrowthOps' sync): the loader reads by key.
+* A duplicate unique value is refused with 400 `VALIDATION_ERROR`, not 409, so the idempotent create treats any
+  refusal as "look it up by the key" rather than trusting one status code.
+* Record IDs are not issued in creation order (a deal created today has a lower ID than yesterday's), so "oldest"
+  means `createdAt`.
 
 ## Salesforce-ready
 
@@ -151,6 +156,13 @@ The full sequence, from creating a test account to watching webhook deliveries, 
 * The apps are private, static-auth apps, one per portal (the agency pattern). A marketplace app with OAuth installs
   across portals is a different distribution, not built here.
 * The Salesforce metadata is generated and validated, not deployed to an org.
+* Who made a decision: HubSpot gives private app functions no user identity, so the cards pass the signed-in
+  user's email, and a user with the browser console could pass someone else's. HubSpot's own property history
+  records the change (made by the app), but the "who" in a case log is the card's word for it. Signed
+  `hubspot.fetch` requests, which carry a verified user ID, would close this and need each app's client secret.
+* The provision function's signed envelope is valid for five minutes, so a captured request could be replayed
+  within that window over TLS; every call it allows is idempotent at the loader level (creates are keyed), and it
+  never deletes.
 
 ## Data and honesty
 

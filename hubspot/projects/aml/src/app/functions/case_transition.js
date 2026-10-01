@@ -82,6 +82,19 @@ function client({
       } while (after);
       return ids;
     },
+    // Associated IDs for many records in one call per hundred (v4 batch read): { fromId: [{ id, types }] }.
+    async associatedBatch(fromType, ids, toType) {
+      const out = Object.fromEntries(ids.map((id) => [String(id), []]));
+      for (let i = 0; i < ids.length; i += 100) {
+        const page = await request("POST", `/crm/v4/associations/${fromType}/${toType}/batch/read`, {
+          inputs: ids.slice(i, i + 100).map((id) => ({ id: String(id) }))
+        });
+        for (const row of page.results ?? []) {
+          out[String(row.from.id)] = (row.to ?? []).map((t) => ({ id: String(t.toObjectId), types: t.associationTypes ?? [] }));
+        }
+      }
+      return out;
+    },
     async batchRead(objectType, ids, properties) {
       const out = [];
       for (let i = 0; i < ids.length; i += 100) {
@@ -162,6 +175,7 @@ async function main(context, { api = appClient(context), now = Date.now() } = {}
   if (!caseId || !toStage) return respond(400, { ok: false, error: "needs a case and a target stage" });
   const caseType = await api.customType("investigation_case");
   const [record] = await api.batchRead(caseType, [caseId], ["hs_pipeline", "hs_pipeline_stage", "case_activity_log"]);
+  if (!record) return respond(404, { ok: false, error: "case not found" });
   const pipelines = await api.get(`/crm/v3/pipelines/${caseType}`);
   const pipeline = pipelines.results.find((p) => p.id === record.properties.hs_pipeline);
   if (!pipeline) return respond(400, { ok: false, error: "the case is not in a known pipeline" });

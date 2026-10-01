@@ -27,6 +27,7 @@ export function CaseEvidenceCard({ run, actor, now = Date.now() }: { run: Runner
   const [moving, setMoving] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const load = useCallback(() => {
     call(run, 'case_network', { propertiesToSend: ['hs_object_id'] }).then(setNetwork)
@@ -42,7 +43,8 @@ export function CaseEvidenceCard({ run, actor, now = Date.now() }: { run: Runner
   const closed = stage?.startsWith('Closed');
 
   const move = () => {
-    if (!moving) return;
+    if (!moving || saving) return;
+    setSaving(true);
     call(run, 'case_transition', { propertiesToSend: ['hs_object_id'], parameters: { toStage: moving, note, actor } })
       .then((r) => {
         setMessage(r.ok ? { ok: true, text: `Moved to ${r.to}.` } : { ok: false, text: r.error });
@@ -53,7 +55,8 @@ export function CaseEvidenceCard({ run, actor, now = Date.now() }: { run: Runner
           load();
         }
       })
-      .catch((e: Error) => setMessage({ ok: false, text: e.message }));
+      .catch((e: Error) => setMessage({ ok: false, text: e.message }))
+      .finally(() => setSaving(false));
   };
 
   return (
@@ -64,7 +67,7 @@ export function CaseEvidenceCard({ run, actor, now = Date.now() }: { run: Runner
         {!closed && <StatusTag variant={DEADLINE[clock.state] ?? 'default'}>{describeRemaining(clock.remainingMs)}</StatusTag>}
       </Flex>
       <DescriptionList direction="row">
-        <DescriptionListItem label="Amount involved">{money(num(p.amount_involved_cad))}</DescriptionListItem>
+        <DescriptionListItem label="Amount involved">{money(num(p.amount_involved_cad), 0, 'CAD')}</DescriptionListItem>
         <DescriptionListItem label="Subject">{network.subjects.map((s) => s.name).join(', ') || '—'}</DescriptionListItem>
         <DescriptionListItem label="Decision">{label(p.decision_status)}</DescriptionListItem>
       </DescriptionList>
@@ -114,7 +117,9 @@ export function CaseEvidenceCard({ run, actor, now = Date.now() }: { run: Runner
           <TextArea label={`Why move this case to "${moving}"?`} name="transition-note" value={note} onInput={setNote} onChange={setNote}
             required description="Saved to the case's activity log with your name and the time." />
           <ButtonRow>
-            <Button variant="primary" disabled={note.trim().length < 10} onClick={move}>Move case</Button>
+            <Button variant="primary" disabled={note.trim().length < 10 || saving} onClick={move}>
+              {saving ? 'Moving…' : 'Move case'}
+            </Button>
             <Button variant="transparent" onClick={() => setMoving(null)}>Cancel</Button>
           </ButtonRow>
         </Flex>

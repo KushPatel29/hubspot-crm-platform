@@ -1,0 +1,40 @@
+{
+  "what": "Accepting an offer from the Next best offer card after the 2026-10-01 fix: the deal is created with its idempotency key and its associations in one call.",
+  "at": "2026-10-01T13:05Z",
+  "portal_id": "247574104",
+  "schema_change": {
+    "writes": 2,
+    "operations": [
+      "create_group deals cross_sell",
+      "create_properties deals 1 properties"
+    ],
+    "property": "crm_platform_key",
+    "unique": true,
+    "verify_writes_after": 0
+  },
+  "accepted_offer": "338315136700",
+  "deal": {
+    "id": "351824422649",
+    "crm_platform_key": "offer-deal:338315136700",
+    "amount": "100.80"
+  },
+  "associations_read_back": {
+    "line_items": [
+      "347387169501"
+    ],
+    "companies": [
+      "349879341759"
+    ],
+    "contacts": [
+      "562169151177"
+    ]
+  },
+  "deals_for_the_offer": 1,
+  "duplicate_probe": {
+    "at": "2026-10-01T13:10Z",
+    "request": "POST /crm/v3/objects/deals/batch/create with the same crm_platform_key",
+    "answer": "HTTP 400 VALIDATION_ERROR",
+    "correlation": "01a0f790-0946-7b7f-83d1-727e938f9da8",
+    "deals_with_the_key_after": 1
+  }
+}

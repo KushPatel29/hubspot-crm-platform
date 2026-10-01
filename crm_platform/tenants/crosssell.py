@@ -13,6 +13,10 @@ Source: KushPatel29/Customer-Recommendation-Engine (``data/snapshots/crosssell``
 Reps work the offers from the "Next best offer" card on the company record: accepting one creates a deal with the
 product as a line item and associates it with the offer as "Converted to deal". ``offer_status`` is set only when an
 offer is created, so rerunning the load never reopens an offer a rep accepted or dismissed.
+
+**Deals** get only the platform key here, and no records: the card's function writes it on the deal an offer
+becomes (``offer-deal:<offer id>``). It is unique, so HubSpot itself refuses a second deal for the same offer when
+two reps, or a double click, accept it at once.
 """
 
 from __future__ import annotations
@@ -70,6 +74,7 @@ def model() -> TenantModel:
         num("xsell_days_overdue", "Days overdue", "Days past the usual reorder interval."),
     ))
     contacts = ObjectModel("contacts", GROUP, "Cross-sell analytics", (key_property("contacts"),))
+    deals = ObjectModel("deals", GROUP, "Cross-sell analytics", (key_property("deals"),))
     products = ObjectModel("products", GROUP, "Cross-sell analytics", (
         key_property("products"), enum("xsell_protein", "Protein", _distinct(catalog, "protein")),
     ))
@@ -96,7 +101,7 @@ def model() -> TenantModel:
     )
     return TenantModel(
         KEY, NAME, "Account analytics and next-best offers from the cross-sell engine, worked from the company record.",
-        objects=(companies, contacts, products, recommendation),
+        objects=(companies, contacts, products, deals, recommendation),
         associations=(
             AssociationLabel("contacts", "companies", "buyer", "Buyer", "Buyer"),
             AssociationLabel("recommendation", "companies", "recommended_for", "Recommended for", "Recommendation"),

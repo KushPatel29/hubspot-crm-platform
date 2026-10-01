@@ -1,5 +1,10 @@
 // An in-memory stand-in for the `api` object the functions receive (shared/hubspot-api.js), with the behaviour the
-// functions rely on: associations with labels, batch reads, custom object types, pipelines, and idempotent PUTs.
+// functions rely on: associations with labels, batch reads, custom object types, pipelines, idempotent PUTs, records
+// created with their associations in one call, and HubSpot refusing a second record with the same unique key
+// (crm_platform_key), which can then be read back by that key.
+const UNIQUE = 'crm_platform_key';
+const failure = (status, message) => Object.assign(new Error(message), { status });
+
 export function fakeApi({ schemas = {}, pipelines = {}, labels = {} } = {}) {
   let next = 100;
   const objects = {};
@@ -26,15 +31,25 @@ export function fakeApi({ schemas = {}, pipelines = {}, labels = {} } = {}) {
     }
   };
 
+  const linked = (fromType, id, toType) => {
+    const seen = new Map();
+    for (const l of links) {
+      if (l.fromType === fromType && l.fromId === String(id) && l.toType === toType) seen.set(l.toId, l);
+      if (l.toType === fromType && l.toId === String(id) && l.fromType === toType) seen.set(l.fromId, l);
+    }
+    return [...seen.keys()].map((toId) => ({ id: toId, types: [] }));
+  };
+
   const api = {
     async associated(fromType, id, toType) {
       guard(`associated ${fromType}->${toType}`);
-      const seen = new Map();
-      for (const l of links) {
-        if (l.fromType === fromType && l.fromId === String(id) && l.toType === toType) seen.set(l.toId, l);
-        if (l.toType === fromType && l.toId === String(id) && l.fromType === toType) seen.set(l.fromId, l);
-      }
-      return [...seen.keys()].map((toId) => ({ id: toId, types: [] }));
+      return linked(fromType, id, toType);
+    },
+    async associatedBatch(fromType, ids, toType) {
+      guard(`associatedBatch ${fromType}->${toType}`);
+      const out = {};
+      for (const id of ids) out[String(id)] = linked(fromType, id, toType);
+      return out;
     },
     async batchRead(type, ids, properties) {
       guard(`batchRead ${type}`);
@@ -54,6 +69,13 @@ export function fakeApi({ schemas = {}, pipelines = {}, labels = {} } = {}) {
       guard(`GET ${path.split('?')[0]}`);
       const pipelineMatch = path.match(/^\/crm\/v3\/pipelines\/([^/?]+)$/);
       if (pipelineMatch) return { results: pipelines[pipelineMatch[1]] ?? [] };
+      const byKey = path.match(/^\/crm\/v3\/objects\/([^/]+)\/([^/?]+)\?idProperty=([a-z_]+)/);
+      if (byKey) {
+        const found = Object.values(objects[byKey[1]] ?? {})
+          .find((r) => r.properties[byKey[3]] === decodeURIComponent(byKey[2]));
+        if (!found) throw failure(404, 'not found');
+        return found;
+      }
       const objectMatch = path.match(/^\/crm\/v3\/objects\/([^/]+)\/(\d+)\?properties=(.*)$/);
       if (objectMatch) {
         const r = record(objectMatch[1], objectMatch[2]);
@@ -69,7 +91,19 @@ export function fakeApi({ schemas = {}, pipelines = {}, labels = {} } = {}) {
         return { results: Object.values(objects[search[1]] ?? {}).filter((r) => r.properties[filter.propertyName] === filter.value) };
       }
       const create = path.match(/^\/crm\/v3\/objects\/([^/]+)$/);
-      if (create) return add(create[1], body.properties);
+      if (create) {
+        const key = body.properties?.[UNIQUE];
+        if (key && Object.values(objects[create[1]] ?? {}).some((r) => r.properties[UNIQUE] === key)) {
+          // HubSpot answers a duplicate unique value with 400 VALIDATION_ERROR, not 409 (checked live).
+          throw Object.assign(failure(400, `a ${create[1]} record already has ${UNIQUE}=${key}`),
+            { category: 'VALIDATION_ERROR' });
+        }
+        const made = add(create[1], body.properties);
+        for (const a of body.associations ?? []) {
+          for (const t of a.types) link(create[1], made.id, t.toType ?? 'unknown', a.to.id, t.label ?? null);
+        }
+        return made;
+      }
       throw new Error(`fake api: no POST ${path}`);
     },
     async patch(path, body) {

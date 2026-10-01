@@ -109,3 +109,35 @@ def test_a_partial_batch_failure_is_reported_with_its_category(client, fake):
 ])
 def test_values_compare_the_way_hubspot_stores_them(name, desired, actual, equal):
     assert same(name, desired, actual) is equal
+
+
+def test_two_records_with_one_key_are_reported_and_block_convergence(client, fake):
+    model, recs, _ = _load(client, "meridian")
+    original = fake.by_key("products", recs[next(i for i, r in enumerate(recs) if r.object_name == "products")].key)
+    imported = {k: v for k, v in original["properties"].items() if k != "hs_object_id"}
+    copy, _ = fake._write("0-7", None, imported)  # a duplicate someone imported by hand
+    # HubSpot does not issue IDs in creation order: give the newer copy the smaller ID
+    store = fake.objects["0-7"]
+    store.pop(copy["id"])
+    copy["id"] = copy["properties"]["hs_object_id"] = "1"
+    store["1"] = copy
+    report = records.load(client, model, recs)
+    assert report["objects"]["products"]["duplicates"] == 1
+    assert report["objects"]["products"]["create"] == 0 and report["objects"]["products"]["update"] == 0
+    assert not records.converged(report)
+    assert fake.by_key("products", original["properties"]["crm_platform_key"])["id"] == original["id"]
+    assert any(r["id"] == copy["id"] for r in fake.records("products"))  # reported, never deleted
+    state = schema.read_state(client, model)
+    existing = records.read_records(client, state, "products", {"name"})
+    plan = records.plan_object("products", [], existing, lambda v: v)
+    assert plan.duplicates == {original["properties"]["crm_platform_key"]: ["1"]}  # the older record is kept
+
+
+def test_a_reference_that_does_not_resolve_says_which_and_why(client, fake):
+    model = TENANTS["meridian"].model()
+    state = schema.read_state(client, model)
+    resolve = records.Resolver(state, {"products": {}}, "now")
+    with pytest.raises(ValueError, match="no products record with that key"):
+        resolve("@record:products:NOPE")
+    with pytest.raises(ValueError, match="no deals pipeline labelled 'Nowhere'"):
+        resolve("@stage:deals:Nowhere:Won")

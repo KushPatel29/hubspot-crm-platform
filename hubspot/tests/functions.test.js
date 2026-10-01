@@ -139,6 +139,17 @@ describe('next best offer', () => {
     expect(result.offers.map((o) => [o.rank, o.status])).toEqual([[2, 'open'], [1, 'dismissed']]);
   });
 
+  it("shows the deal an accepted offer became, read in one batch", async () => {
+    const { fake, company, offers } = crossSell();
+    const accepted = (await decideOffer({ parameters: { offerId: offers[0].id, decision: 'accept' } },
+      { api: fake.api, now: NOW })).body;
+    fake.state.calls.length = 0;
+    const { body: result } = await companyOffers({ propertiesToSend: { hs_object_id: company.id } }, { api: fake.api });
+    expect(result.offers.find((o) => o.id === offers[0].id)).toMatchObject({ status: 'accepted', dealId: accepted.dealId });
+    expect(fake.state.calls.filter((c) => c.startsWith('associated 2-9->deals'))).toEqual([]);
+    expect(fake.state.calls.filter((c) => c.startsWith('associatedBatch'))).toHaveLength(1);
+  });
+
   it('turns an offer into one complete deal, even when clicked twice', async () => {
     const { fake, offers } = crossSell();
     const context = { parameters: { offerId: offers[0].id, decision: 'accept' }, userEmail: 'rep@example.com' };
@@ -151,8 +162,47 @@ describe('next best offer', () => {
     expect(deal).toMatchObject({ amount: '524.50', dealstage: 'appointmentscheduled' });
     expect(Object.keys(fake.state.objects.line_items)).toHaveLength(1);
     expect(fake.state.objects['2-9'][offers[0].id].properties.offer_status).toBe('accepted');
-    const labels = fake.state.links.filter((l) => l.fromType === '2-9' && l.toType === 'deals').map((l) => l.label);
-    expect(labels).toEqual(['Converted to deal']);
+    const offerLinks = fake.state.links.filter((l) => l.fromType === 'deals' && l.toType === '2-9');
+    expect(offerLinks.map((l) => l.label)).toEqual(['Source recommendation']);
+    expect(deal.crm_platform_key).toBe(`offer-deal:${offers[0].id}`);
+    const lineLinks = fake.state.links.filter((l) => l.fromType === 'line_items' && l.toType === 'deals');
+    expect(lineLinks.map((l) => l.toId)).toEqual([first.dealId]);
+  });
+
+  it('makes one deal when two requests accept the same offer at once', async () => {
+    const { fake, offers } = crossSell();
+    const context = { parameters: { offerId: offers[0].id, decision: 'accept' }, userEmail: 'rep@example.com' };
+    const [a, b] = await Promise.all([decideOffer(context, { api: fake.api, now: NOW }),
+      decideOffer({ ...context, userEmail: 'other@example.com' }, { api: fake.api, now: NOW })]);
+    expect([a.body.ok, b.body.ok]).toEqual([true, true]);
+    expect(a.body.dealId).toBe(b.body.dealId);
+    expect(Object.keys(fake.state.objects.deals)).toHaveLength(1);
+    expect(Object.keys(fake.state.objects.line_items)).toHaveLength(1);
+    expect([a.body.inProgress, b.body.inProgress].filter(Boolean)).toHaveLength(1);
+    expect(fake.state.objects['2-9'][offers[0].id].properties.offer_status).toBe('accepted');
+  });
+
+  it("adopts a deal that already carries the offer's key instead of creating another", async () => {
+    const { fake, offers } = crossSell();
+    const orphan = fake.add('deals', { dealname: 'lost link', amount: '524.50', crm_platform_key: `offer-deal:${offers[0].id}` });
+    const context = { parameters: { offerId: offers[0].id, decision: 'accept' } };
+    const first = (await decideOffer(context, { api: fake.api, now: NOW })).body;
+    expect(first).toMatchObject({ ok: true, dealId: orphan.id, inProgress: true });
+    const second = (await decideOffer(context, { api: fake.api, now: NOW })).body;
+    expect(second).toMatchObject({ ok: true, dealId: orphan.id, resumed: true });
+    expect(Object.keys(fake.state.objects.deals)).toHaveLength(1);
+    expect(Object.keys(fake.state.objects.line_items)).toHaveLength(1);
+    expect(fake.state.objects['2-9'][offers[0].id].properties.offer_status).toBe('accepted');
+  });
+
+  it('answers 404 for an offer that does not exist and 409 for one already decided', async () => {
+    const { fake, offers } = crossSell();
+    const missing = await decideOffer({ parameters: { offerId: '999', decision: 'accept' } }, { api: fake.api });
+    expect(missing.statusCode).toBe(404);
+    fake.state.objects['2-9'][offers[1].id].properties.offer_status = 'accepted';
+    const again = await decideOffer({ parameters: { offerId: offers[1].id, decision: 'dismiss', note: 'no stock' } },
+      { api: fake.api });
+    expect([again.statusCode, again.body.error]).toEqual([409, 'offer is already accepted']);
   });
 
   it('resumes after a failure part way through instead of creating a second deal', async () => {
@@ -215,5 +265,12 @@ describe('investigation cases', () => {
     const props = fake.state.objects['2-1'][record.id].properties;
     expect(props.hs_pipeline_stage).toBe('s1');
     expect(props.case_activity_log).toContain('inv@example.com: Open triage → Evidence requested. need the supplier');
+  });
+
+  it('answers 404 for a case that does not exist instead of failing', async () => {
+    const { fake } = amlCase();
+    const missing = await caseTransition({ parameters: { caseId: '999', toStage: 'Evidence requested',
+      note: 'need the supplier invoices' } }, { api: fake.api, now: NOW });
+    expect([missing.statusCode, missing.body.error]).toEqual([404, 'case not found']);
   });
 });

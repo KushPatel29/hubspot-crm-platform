@@ -12,10 +12,13 @@ export async function main(context, { api = appClient(context) } = {}) {
   const offerType = await api.customType('recommendation');
   const links = await api.associated('companies', companyId, offerType);
   const offers = await api.batchRead(offerType, links.map((l) => l.id), OFFER_PROPERTIES);
+  // One batch read for every accepted offer's deal, not a call per offer: app functions have 15 seconds.
+  const accepted = offers.filter((o) => o.properties.offer_status === 'accepted').map((o) => o.id);
+  const dealsByOffer = accepted.length ? await api.associatedBatch(offerType, accepted, 'deals') : {};
   const result = [];
   for (const offer of offers) {
     const p = offer.properties;
-    const deals = p.offer_status === 'accepted' ? await api.associated(offerType, offer.id, 'deals') : [];
+    const deals = dealsByOffer[offer.id] ?? [];
     result.push({
       id: offer.id,
       title: p.offer_title,

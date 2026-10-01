@@ -20,6 +20,8 @@ export function NextBestOfferCard({ run, portalId, actor }: { run: Runner; porta
   const [dismissing, setDismissing] = useState<string | null>(null);
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
+  // A failed accept or dismiss is reported above the offers; the list stays usable (a load failure is different).
+  const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
 
   const load = useCallback(() => {
     call(run, 'company_offers', { propertiesToSend: ['hs_object_id'] })
@@ -30,14 +32,19 @@ export function NextBestOfferCard({ run, portalId, actor }: { run: Runner; porta
 
   const decide = (offerId: string, decision: 'accept' | 'dismiss', note = '') => {
     setBusy(offerId);
+    setNotice(null);
     call(run, 'decide_offer', { parameters: { offerId, decision, note, actor } })
       .then((r) => {
-        if (!r.ok) setFailure(r.error);
+        if (!r.ok) {
+          setNotice({ ok: false, text: r.error ?? 'the offer was not updated' });
+          return;
+        }
+        if (r.inProgress) setNotice({ ok: true, text: 'Someone else is converting this offer; its deal is on the way.' });
         setDismissing(null);
         setReason('');
         load();
       })
-      .catch((e: Error) => setFailure(e.message))
+      .catch((e: Error) => setNotice({ ok: false, text: e.message }))
       .finally(() => setBusy(null));
   };
 
@@ -51,6 +58,9 @@ export function NextBestOfferCard({ run, portalId, actor }: { run: Runner; porta
           {label(account.xsell_rfm_segment)}{overdue && overdue > 0 ? `, ${overdue} days past the usual reorder` : ''}.
           Lead with the reorder before the cross-sell.
         </Alert>
+      )}
+      {notice && (
+        <Alert title={notice.ok ? 'In progress' : 'Not saved'} variant={notice.ok ? 'info' : 'error'}>{notice.text}</Alert>
       )}
       {offers.length === 0 && <Text>No offer passed the engine's eligibility checks for this account.</Text>}
       {offers.map((offer) => (
