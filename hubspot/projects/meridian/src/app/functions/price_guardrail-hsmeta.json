@@ -8,7 +8,7 @@
       "ENDPOINT_BASE_URL"
     ],
     "endpoint": {
-      "path": "/price-guardrail",
+      "path": "price-guardrail",
       "methods": [
         "POST"
       ]

@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { fakeApi } from './fake-api.js';
 import { sign } from '../shared/signature.js';
 import { main as dealMargin } from '../functions/deal_margin.js';
-import { main as priceGuardrail } from '../functions/price_guardrail.js';
-import { main as advanceLifecycle } from '../functions/advance_lifecycle.js';
-import { main as webhookReceiver, summarise } from '../functions/webhook_receiver.js';
+import { main as priceGuardrail, PATH as GUARDRAIL } from '../functions/price_guardrail.js';
+import { main as advanceLifecycle, PATH as LIFECYCLE } from '../functions/advance_lifecycle.js';
+import { main as webhookReceiver, summarise, PATH as WEBHOOKS } from '../functions/webhook_receiver.js';
 import { main as companyOffers } from '../functions/company_offers.js';
 import { main as decideOffer } from '../functions/decide_offer.js';
 import { main as caseNetwork } from '../functions/case_network.js';
@@ -51,7 +51,7 @@ describe('deal margin and the price guardrail', () => {
 
   it('refuses an unsigned or forged workflow request before touching the deal', async () => {
     const { fake, deal } = meridianDeal();
-    const request = signed('/price-guardrail', { object: { objectId: deal.id } });
+    const request = signed(GUARDRAIL, { object: { objectId: deal.id } });
     request.body = request.body.replace(deal.id, '999');
     const response = await priceGuardrail(request, { api: fake.api, now: NOW, secret: SECRET });
     expect(response.statusCode).toBe(401);
@@ -60,7 +60,7 @@ describe('deal margin and the price guardrail', () => {
 
   it('writes the verdict to the deal and returns fields a workflow can branch on', async () => {
     const { fake, deal } = meridianDeal();
-    const response = await priceGuardrail(signed('/price-guardrail', { object: { objectId: deal.id } }),
+    const response = await priceGuardrail(signed(GUARDRAIL, { object: { objectId: deal.id } }),
       { api: fake.api, now: NOW, secret: SECRET });
     expect(response.statusCode).toBe(200);
     expect(output(response).outputFields).toMatchObject({ verdict: 'below_target', approver: 'sales_manager',
@@ -74,11 +74,11 @@ describe('advance lifecycle', () => {
   it('moves forward, keeps backwards moves out, and says which', async () => {
     const fake = fakeApi();
     const contact = fake.add('contacts', { lifecyclestage: 'customer' });
-    const back = await advanceLifecycle(signed('/advance-lifecycle', { object: { objectId: contact.id },
+    const back = await advanceLifecycle(signed(LIFECYCLE, { object: { objectId: contact.id },
       inputFields: { target_stage: 'lead' } }), { api: fake.api, now: NOW, secret: SECRET });
     expect(output(back).outputFields.outcome).toBe('kept');
     expect(fake.state.objects.contacts[contact.id].properties.lifecyclestage).toBe('customer');
-    const forward = await advanceLifecycle(signed('/advance-lifecycle', { object: { objectId: contact.id },
+    const forward = await advanceLifecycle(signed(LIFECYCLE, { object: { objectId: contact.id },
       inputFields: { target_stage: 'evangelist' } }), { api: fake.api, now: NOW, secret: SECRET });
     expect(output(forward).outputFields).toMatchObject({ outcome: 'moved', from_stage: 'customer' });
   });
@@ -89,13 +89,13 @@ describe('webhook receiver', () => {
     const lines = [];
     const events = [{ eventId: 1, subscriptionType: 'contact.propertyChange', objectId: 7, propertyValue: 'x@y.com' },
       { eventId: 2, subscriptionType: 'contact.privacyDeletion', objectId: 8, attemptNumber: 1 }];
-    const response = await webhookReceiver(signed('/webhooks', events), { now: NOW, secret: SECRET,
+    const response = await webhookReceiver(signed(WEBHOOKS, events), { now: NOW, secret: SECRET,
       log: (line) => lines.push(line) });
     expect(response.statusCode).toBe(200);
     expect(lines[0]).not.toContain('x@y.com');
     expect(JSON.parse(lines[0])).toMatchObject({ webhook: 'accepted', events: 2, attempts: 1 });
     expect(summarise(events).byType).toEqual({ 'contact.propertyChange': 1, 'contact.privacyDeletion': 1 });
-    const forged = await webhookReceiver({ ...signed('/webhooks', events), body: '[]' }, { now: NOW, secret: SECRET,
+    const forged = await webhookReceiver({ ...signed(WEBHOOKS, events), body: '[]' }, { now: NOW, secret: SECRET,
       log: () => {} });
     expect(forged.statusCode).toBe(401);
   });

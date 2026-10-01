@@ -7,15 +7,14 @@
     "distribution": "private",
     "auth": {
       "type": "static",
-      "redirectUrls": [],
       "requiredScopes": [
+        "oauth",
         "crm.objects.deals.read",
         "crm.objects.deals.write",
         "crm.objects.line_items.read",
         "crm.objects.products.read"
       ],
-      "optionalScopes": [],
-      "conditionallyRequiredScopes": []
+      "optionalScopes": []
     },
     "permittedUrls": {
       "fetch": [],

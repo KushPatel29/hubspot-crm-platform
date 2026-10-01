@@ -7,13 +7,13 @@
     "distribution": "private",
     "auth": {
       "type": "static",
-      "redirectUrls": [],
       "requiredScopes": [
+        "oauth",
         "crm.objects.contacts.read",
-        "crm.objects.contacts.write"
+        "crm.objects.contacts.write",
+        "crm.objects.deals.read"
       ],
-      "optionalScopes": [],
-      "conditionallyRequiredScopes": []
+      "optionalScopes": []
     },
     "permittedUrls": {
       "fetch": [],

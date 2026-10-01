@@ -5,7 +5,8 @@
 // Per project: hsproject.json (platform 2026.09); src/app/app-hsmeta.json (a private static-auth app with only the
 // scopes its parts use); cards with their shared modules copied beside them; each function bundled with esbuild
 // into one CommonJS file (app functions load `exports.main`); workflow actions and webhooks pointing at the
-// function endpoints; and src/hsprofile.live.json, whose account ID and endpoint base URL come from
+// function endpoints (a public app function is served at https://<portal domain>/_hcms/api/<path>); and
+// src/hsprofile.live.json, whose account ID and endpoint base URL come from
 // ../evidence/<tenant>/deploy.json once a portal exists.
 import { build } from 'esbuild';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync }
@@ -103,8 +104,7 @@ async function project(tenant, app, out) {
     variables: { ENDPOINT_BASE_URL: deploy.endpointBaseUrl } }));
   write(join(src, 'app', 'app-hsmeta.json'), json({ uid: `crm_platform_${tenant}`, type: 'app', config: {
     name: app.name, description: app.description, distribution: 'private',
-    auth: { type: 'static', redirectUrls: [], requiredScopes: app.scopes, optionalScopes: [],
-      conditionallyRequiredScopes: [] },
+    auth: { type: 'static', requiredScopes: app.scopes, optionalScopes: [] },
     permittedUrls: { fetch: [], iframe: [], img: [] },
     support: { documentationUrl: 'https://github.com/KushPatel29/hubspot-crm-platform' },
   } }));
@@ -142,7 +142,7 @@ async function project(tenant, app, out) {
     const fn = app.functions.find((f) => f.name === action.function);
     write(join(src, 'app', 'workflow-actions', `${action.uid}-hsmeta.json`), json({ uid: action.uid,
       type: 'workflow-action', config: {
-        actionUrl: `\${ENDPOINT_BASE_URL}${fn.endpoint}`, isPublished: true,
+        actionUrl: `\${ENDPOINT_BASE_URL}/_hcms/api/${fn.endpoint}`, isPublished: true,
         supportedClients: [{ client: 'WORKFLOWS' }], inputFields: action.inputFields,
         outputFields: action.outputFields, labels: { en: action.labels }, objectTypes: action.objectTypes,
       } }));
@@ -150,7 +150,7 @@ async function project(tenant, app, out) {
   if (app.webhooks) {
     const fn = app.functions.find((f) => f.name === app.webhooks.function);
     write(join(src, 'app', 'webhooks', 'webhooks-hsmeta.json'), json({ uid: 'webhooks', type: 'webhooks', config: {
-      settings: { targetUrl: `\${ENDPOINT_BASE_URL}${fn.endpoint}`, maxConcurrentRequests: 10 },
+      settings: { targetUrl: `\${ENDPOINT_BASE_URL}/_hcms/api/${fn.endpoint}`, maxConcurrentRequests: 10 },
       subscriptions: {
         crmObjects: app.webhooks.crmObjects.map((s) => ({ ...s, active: true })),
         hubEvents: app.webhooks.hubEvents.map((s) => ({ ...s, active: true })),
@@ -189,7 +189,12 @@ if (check) {
   console.log('HubSpot projects match their sources');
 } else {
   const out = join(HERE, 'projects');
-  rmSync(out, { recursive: true, force: true });
+  // Empty each project folder rather than deleting it: on Windows a folder that is some shell's working directory
+  // cannot be removed, and a deploy is usually run from inside one.
+  for (const tenant of existsSync(out) ? readdirSync(out) : []) {
+    for (const entry of readdirSync(join(out, tenant))) rmSync(join(out, tenant, entry), { recursive: true, force: true });
+    if (!(tenant in APPS)) rmSync(join(out, tenant), { recursive: true, force: true });
+  }
   await buildAll(out);
   console.log(`built ${Object.keys(APPS).length} HubSpot projects: ${Object.keys(APPS).join(', ')}`);
 }

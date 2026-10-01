@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Any
 
 from crm_platform.hubspot import records, schema
-from crm_platform.hubspot.client import BridgeTransport, HubSpotClient, Transport, token_transport
+from crm_platform.hubspot.client import BridgeTransport, HubSpotClient, HubSpotError, Transport, token_transport
 from crm_platform.tenants import get
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,6 +70,29 @@ def guard(client: HubSpotClient, tenant: str, *, allow_portal: str | None = None
             "data_hosting": info.get("dataHostingLocation")}
 
 
+def endpoint_base_url(client: HubSpotClient, portal_id: str) -> str | None:
+    """The portal's system domain, where its public app functions are served (``/_hcms/api/<path>``)."""
+    try:
+        domains = client.get("/cms/v3/domains").get("results", [])
+    except HubSpotError:
+        return None
+    system = sorted(d["domain"] for d in domains if d.get("domain", "").startswith(f"{portal_id}.hs-sites"))
+    return f"https://{system[0]}" if system else None
+
+
+SECRETS = "/cms/v3/functions/secrets"
+
+
+def ensure_endpoint_secret(client: HubSpotClient, base: str) -> dict[str, bool]:
+    """Set ENDPOINT_BASE_URL (a public URL, not a credential) for the portal's app functions, and report whether
+    HUBSPOT_CLIENT_SECRET exists. That one is a credential: a person adds it with ``npx hs secret add``; this
+    never reads or writes its value."""
+    names = set(client.get(SECRETS).get("results", []))
+    body = {"key": "ENDPOINT_BASE_URL", "secret": base}
+    client.request("PUT" if "ENDPOINT_BASE_URL" in names else "POST", SECRETS, body)
+    return {"ENDPOINT_BASE_URL": True, "HUBSPOT_CLIENT_SECRET": "HUBSPOT_CLIENT_SECRET" in names}
+
+
 def write_evidence(tenant: str, name: str, payload: dict) -> Path:
     path = EVIDENCE / tenant / f"{name}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -91,6 +114,10 @@ def run(command: str, tenant_key: str, transport: Transport, *, allow_portal: st
         path = deploy_file(tenant.key)
         existing = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
         payload = {**existing, "accountId": int(portal["portal_id"]), "tenant": tenant.key, "boundAt": _now()}
+        base = endpoint_base_url(client, portal["portal_id"])
+        if base:
+            payload["endpointBaseUrl"] = base
+            payload["secrets"] = ensure_endpoint_secret(client, base)
         write_evidence(tenant.key, "deploy", payload)
         return {"bound": payload}
 

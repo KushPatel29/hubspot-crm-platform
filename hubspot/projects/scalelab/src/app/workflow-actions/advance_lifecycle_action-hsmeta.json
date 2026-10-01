@@ -2,7 +2,7 @@
   "uid": "advance_lifecycle_action",
   "type": "workflow-action",
   "config": {
-    "actionUrl": "${ENDPOINT_BASE_URL}/advance-lifecycle",
+    "actionUrl": "${ENDPOINT_BASE_URL}/_hcms/api/advance-lifecycle",
     "isPublished": true,
     "supportedClients": [
       {
@@ -92,6 +92,9 @@
         "actionCardContent": "Advance lifecycle to {{target_stage}}",
         "inputFieldLabels": {
           "target_stage": "Target stage"
+        },
+        "inputFieldDescriptions": {
+          "target_stage": "The stage to move the contact to. A move backwards is refused, not made."
         },
         "outputFieldLabels": {
           "outcome": "Outcome",

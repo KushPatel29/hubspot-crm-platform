@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import {
-  Alert, Button, ErrorState, StatisticsItem, StatusTag, TableRow, Text, TextArea,
+  Alert, Button, DescriptionListItem, ErrorState, StatisticsItem, StatusTag, TableRow, Text, TextArea,
 } from '@hubspot/ui-extensions';
 import { createRenderer } from '@hubspot/ui-extensions/testing';
 import { RevenueTruthCard } from '../cards/RevenueTruthCard.tsx';
@@ -20,13 +20,19 @@ describe('Revenue truth card', () => {
       growthops_contact_id: 'c-1', growthops_net_cash: '1500', lifecyclestage: 'customer',
       growthops_first_touch_campaign: 'meta_broad_v17', growthops_lead_creation_campaign: 'webinar_q3',
       growthops_last_non_direct_campaign: 'webinar_q3', growthops_tracking_status: 'tracked',
-      growthops_has_closed_won: 'true', growthops_product: 'accelerator', growthops_renewal_risk: 'high',
-      growthops_renewal_due_date: '2026-10-05',
+      growthops_has_closed_won: 'true', growthops_renewal_risk: 'high', growthops_renewal_due_date: '2026-10-05',
     }));
+    mocks.useAssociations.willCall(() => ({ results: [
+      { toObjectId: 1, associationTypes: [], properties: { growthops_product: 'accelerator' } },
+      { toObjectId: 2, associationTypes: [], properties: { growthops_product: 'community' } }],
+    error: null, isLoading: false, isRefetching: false, refetch: async () => {},
+    pagination: { hasNextPage: false, hasPreviousPage: false, currentPage: 1, pageSize: 10, nextPage: () => {},
+      previousPage: () => {}, reset: () => {} } }) as never);
     render(<RevenueTruthCard />);
     expect(find(StatisticsItem, { label: 'Net cash collected' }).props.number).toBe('$1,500');
     expect(findAll(Text).some((t) => t.text?.includes('models disagree'))).toBe(true);
     expect(find(StatusTag).text).toBe('High risk');
+    expect(find(DescriptionListItem, { label: 'Bought' }).text).toBe('Accelerator, Community');
   });
 
   it('says so instead of showing zeros for a contact GrowthOps did not create', () => {

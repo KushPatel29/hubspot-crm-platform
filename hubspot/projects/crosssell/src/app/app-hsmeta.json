@@ -7,8 +7,8 @@
     "distribution": "private",
     "auth": {
       "type": "static",
-      "redirectUrls": [],
       "requiredScopes": [
+        "oauth",
         "crm.objects.companies.read",
         "crm.objects.contacts.read",
         "crm.objects.deals.read",
@@ -20,8 +20,7 @@
         "crm.objects.custom.write",
         "crm.schemas.custom.read"
       ],
-      "optionalScopes": [],
-      "conditionallyRequiredScopes": []
+      "optionalScopes": []
     },
     "permittedUrls": {
       "fetch": [],

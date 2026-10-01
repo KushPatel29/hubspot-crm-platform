@@ -8,7 +8,7 @@
       "ENDPOINT_BASE_URL"
     ],
     "endpoint": {
-      "path": "/webhooks",
+      "path": "webhooks",
       "methods": [
         "POST"
       ]

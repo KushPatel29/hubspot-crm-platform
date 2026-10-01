@@ -2,7 +2,7 @@
   "uid": "price_guardrail_action",
   "type": "workflow-action",
   "config": {
-    "actionUrl": "${ENDPOINT_BASE_URL}/price-guardrail",
+    "actionUrl": "${ENDPOINT_BASE_URL}/_hcms/api/price-guardrail",
     "isPublished": true,
     "supportedClients": [
       {
@@ -104,6 +104,7 @@
         "actionDescription": "Scores every line against its product's margin band (floor = target - 9 points), writes the verdict to the deal and returns who has to approve it.",
         "actionCardContent": "Check the price guardrail",
         "inputFieldLabels": {},
+        "inputFieldDescriptions": {},
         "outputFieldLabels": {
           "verdict": "Verdict",
           "approver": "Approver",

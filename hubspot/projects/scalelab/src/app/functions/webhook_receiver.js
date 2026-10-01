@@ -99,7 +99,7 @@ function respond(statusCode, body) {
 }
 
 // functions/webhook_receiver.js
-var PATH = "/webhooks";
+var PATH = "/_hcms/api/webhooks";
 function summarise(events) {
   const byType = {};
   for (const event of events) byType[event.subscriptionType] = (byType[event.subscriptionType] ?? 0) + 1;

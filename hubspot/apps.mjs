@@ -24,13 +24,13 @@ export const APPS = {
     name: 'ScaleLab CRM platform',
     description: 'Revenue truth on every GrowthOps contact, a lifecycle action that never moves a contact backwards, '
       + 'and signed webhook deliveries.',
-    scopes: ['crm.objects.contacts.read', 'crm.objects.contacts.write'],
+    scopes: ['oauth', 'crm.objects.contacts.read', 'crm.objects.contacts.write', 'crm.objects.deals.read'],
     cards: [{ component: 'RevenueTruthCard', uid: 'revenue_truth_card', name: 'Revenue truth (GrowthOps)',
       description: 'Collected cash, the campaign each attribution model credits, and renewal risk.',
       objectTypes: ['contacts'], needs: [] }],
     functions: [
-      { name: 'advance_lifecycle', endpoint: '/advance-lifecycle', secrets: SIGNED_ENDPOINT_SECRETS },
-      { name: 'webhook_receiver', endpoint: '/webhooks', secrets: SIGNED_ENDPOINT_SECRETS },
+      { name: 'advance_lifecycle', endpoint: 'advance-lifecycle', secrets: SIGNED_ENDPOINT_SECRETS },
+      { name: 'webhook_receiver', endpoint: 'webhooks', secrets: SIGNED_ENDPOINT_SECRETS },
     ],
     workflowActions: [{
       uid: 'advance_lifecycle_action',
@@ -50,6 +50,7 @@ export const APPS = {
           + 'field contract: lifecycle stage is shared and moves forward only.',
         actionCardContent: 'Advance lifecycle to {{target_stage}}',
         inputFieldLabels: { target_stage: 'Target stage' },
+        inputFieldDescriptions: { target_stage: 'The stage to move the contact to. A move backwards is refused, not made.' },
         outputFieldLabels: { outcome: 'Outcome', from_stage: 'Previous stage', reason: 'Reason' },
       },
     }],
@@ -70,14 +71,14 @@ export const APPS = {
     name: 'Meridian Supply pricing guardrail',
     description: 'Line-by-line deal margin against each product\'s guardrail band, and a workflow action that '
       + 'decides who has to sign.',
-    scopes: ['crm.objects.deals.read', 'crm.objects.deals.write', 'crm.objects.line_items.read',
+    scopes: ['oauth', 'crm.objects.deals.read', 'crm.objects.deals.write', 'crm.objects.line_items.read',
       'crm.objects.products.read'],
     cards: [{ component: 'DealMarginCard', uid: 'deal_margin_card', name: 'Deal margin guardrail',
       description: 'Each line against its floor and target margin, the verdict and the approver needed.',
       objectTypes: ['deals'], needs: ['run'] }],
     functions: [
       { name: 'deal_margin' },
-      { name: 'price_guardrail', endpoint: '/price-guardrail', secrets: SIGNED_ENDPOINT_SECRETS },
+      { name: 'price_guardrail', endpoint: 'price-guardrail', secrets: SIGNED_ENDPOINT_SECRETS },
     ],
     workflowActions: [{
       uid: 'price_guardrail_action',
@@ -99,6 +100,7 @@ export const APPS = {
           + 'writes the verdict to the deal and returns who has to approve it.',
         actionCardContent: 'Check the price guardrail',
         inputFieldLabels: {},
+        inputFieldDescriptions: {},
         outputFieldLabels: { verdict: 'Verdict', approver: 'Approver', needs_approval: 'Needs approval',
           blended_margin: 'Blended margin' },
       },
@@ -108,7 +110,7 @@ export const APPS = {
   crosssell: {
     name: 'Cross-sell next best offer',
     description: 'The recommendation engine\'s next-best offers on every account, turned into deals in one click.',
-    scopes: ['crm.objects.companies.read', 'crm.objects.contacts.read', 'crm.objects.deals.read',
+    scopes: ['oauth', 'crm.objects.companies.read', 'crm.objects.contacts.read', 'crm.objects.deals.read',
       'crm.objects.deals.write', 'crm.objects.line_items.read', 'crm.objects.line_items.write',
       'crm.objects.products.read', 'crm.objects.custom.read', 'crm.objects.custom.write', 'crm.schemas.custom.read'],
     cards: [{ component: 'NextBestOfferCard', uid: 'next_best_offer_card', name: 'Next best offer',
@@ -121,7 +123,7 @@ export const APPS = {
     name: 'Investigation case desk',
     description: 'Case evidence, deadline and shared counterparties on every investigation case, with audited '
       + 'stage moves. Synthetic data; an educational simulation, not a compliance tool.',
-    scopes: ['crm.objects.contacts.read', 'crm.objects.companies.read', 'crm.objects.custom.read',
+    scopes: ['oauth', 'crm.objects.contacts.read', 'crm.objects.companies.read', 'crm.objects.custom.read',
       'crm.objects.custom.write', 'crm.schemas.custom.read'],
     cards: [{ component: 'CaseEvidenceCard', uid: 'case_evidence_card', name: 'Case evidence',
       description: 'Deadline, typology hypothesis against its lawful lookalike, shared counterparties, next moves.',

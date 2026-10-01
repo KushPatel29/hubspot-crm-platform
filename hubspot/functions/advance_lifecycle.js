@@ -5,7 +5,7 @@ import { client } from '../shared/hubspot-api.js';
 import { decide } from '../shared/lifecycle.js';
 import { authenticate, parsedBody, respond } from '../shared/endpoint.js';
 
-export const PATH = '/advance-lifecycle';
+export const PATH = '/_hcms/api/advance-lifecycle';
 
 export async function main(context, { api, now = Date.now(), secret } = {}) {
   const auth = authenticate(context, PATH, { secret, now });

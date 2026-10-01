@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-01T07:12:45Z",
+  "load": {
+    "failures": [],
+    "links": {},
+    "objects": {}
+  },
+  "portal": {
+    "account_type": "DEVELOPER_TEST",
+    "data_hosting": "na2",
+    "portal_id": "247549241",
+    "time_zone": "US/Eastern"
+  },
+  "requests": 9,
+  "schema_apply": {
+    "applied": [],
+    "conflicts": [],
+    "converged": true,
+    "drift": [],
+    "summary": {}
+  },
+  "tenant": "scalelab",
+  "verify": {
+    "converged": true,
+    "schema": {
+      "conflicts": [],
+      "converged": true,
+      "drift": [],
+      "missing_requirements": [],
+      "operations": []
+    },
+    "writes": 0
+  },
+  "writes": 0
+}
