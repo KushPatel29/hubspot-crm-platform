@@ -5,7 +5,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "hs": "hs"
+    "hs": "hs",
+    "set-secret": "node scripts/set_secret.mjs"
   },
   "devDependencies": {
     "@hubspot/cli": "8.15.0"
