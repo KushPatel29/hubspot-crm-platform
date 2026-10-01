@@ -174,7 +174,7 @@ async function ensureLineItem(api, dealId, sku) {
 }
 async function main(context, { api = appClient(context), now = Date.now() } = {}) {
   const { offerId, decision, note = "" } = context.parameters ?? {};
-  const who = context.userEmail ?? `user ${context.userId ?? "unknown"}`;
+  const who = context.userEmail ?? context.parameters?.actor ?? `user ${context.userId ?? "unknown"}`;
   if (!offerId || !["accept", "dismiss"].includes(decision)) {
     return respond(400, { ok: false, error: "needs offerId and decision" });
   }

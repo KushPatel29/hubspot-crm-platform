@@ -94,11 +94,11 @@ describe('Next best offer card', () => {
     expect(find(Alert).props.title).toBe('High churn risk');
     find(Button, { variant: 'primary' }).trigger('onClick');
     await waitFor(() => expect(run).toHaveBeenCalledWith('decide_offer',
-      { parameters: { offerId: '11', decision: 'accept', note: '' } }));
+      { parameters: { offerId: '11', decision: 'accept', note: '', actor: undefined } }));
     await waitFor(() => expect(find(Button, { variant: 'secondary' }).props.disabled).toBe(false));
     find(Button, { variant: 'secondary' }).trigger('onClick');
     await waitFor(() => expect(find(Button, { variant: 'destructive' }).props.disabled).toBe(true));
-    find(TextArea).trigger('onChange', 'not stocked in BC' as never);
+    find(TextArea).trigger('onInput', 'not stocked in BC' as never);
     await waitFor(() => expect(find(Button, { variant: 'destructive' }).props.disabled).toBe(false));
   });
 });
@@ -111,7 +111,8 @@ describe('Case evidence card', () => {
     recommended_next_step: 'Validate source of funds.', amount_involved_cad: '293913.58',
     decision_status: 'human_decision_required', hs_pipeline_stage: 's0',
   };
-  const network = (stage: string) => ({ ok: true, stage, subjects: [{ id: '1', name: 'Becky Horton',
+  const network = (stage: string) => ({ ok: true, stage, clock: { startedAt: '2026-10-01T10:00:00Z', dueHours: 4 },
+    subjects: [{ id: '1', name: 'Becky Horton',
     objectType: 'contacts' }], counterparties: [{ id: '5', name: 'Big hub (CPT-1)', type: 'supplier', hotSubjects: 30 }] });
 
   it('shows the deadline, the hypothesis against its lawful lookalike, and only the allowed moves', async () => {
@@ -130,15 +131,15 @@ describe('Case evidence card', () => {
       to: 'Evidence requested' }));
     const { render, mocks, find, waitFor } = createRenderer('crm.record.tab');
     mocks.useCrmProperties.willCall(() => loaded(properties));
-    render(<CaseEvidenceCard run={run} now={Date.parse('2026-10-01T11:00:00Z')} />);
+    render(<CaseEvidenceCard run={run} actor="inv@example.com" now={Date.parse('2026-10-01T11:00:00Z')} />);
     await waitFor(() => expect(find(Button, { variant: 'primary' }).text).toBe('Evidence requested'));
     find(Button, { variant: 'primary' }).trigger('onClick');
     await waitFor(() => expect(find(Button, { variant: 'primary' }).props.disabled).toBe(true));
-    find(TextArea).trigger('onChange', 'need the supplier invoices' as never);
+    find(TextArea).trigger('onInput', 'need the supplier invoices' as never);
     await waitFor(() => expect(find(Button, { variant: 'primary' }).props.disabled).toBe(false));
     find(Button, { variant: 'primary' }).trigger('onClick');
     await waitFor(() => expect(run).toHaveBeenCalledWith('case_transition', { propertiesToSend: ['hs_object_id'],
-      parameters: { toStage: 'Evidence requested', note: 'need the supplier invoices' } }));
+      parameters: { toStage: 'Evidence requested', note: 'need the supplier invoices', actor: 'inv@example.com' } }));
 
     const closed = createRenderer('crm.record.tab');
     closed.mocks.useCrmProperties.willCall(() => loaded(properties));

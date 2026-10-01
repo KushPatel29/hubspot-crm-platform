@@ -3,4 +3,4 @@ import React from 'react';
 import { hubspot } from '@hubspot/ui-extensions';
 import { CaseEvidenceCard } from './CaseEvidenceCard.tsx';
 
-hubspot.extend<'crm.record.tab'>(() => <CaseEvidenceCard run={(name, options) => hubspot.serverless(name, options)} />);
+hubspot.extend<'crm.record.tab'>(({ context }) => <CaseEvidenceCard run={(name, options) => hubspot.serverless(name, options)} actor={context.user.email} />);

@@ -170,7 +170,7 @@ async function main(context, { api = appClient(context), now = Date.now() } = {}
   if (!current || !target) return respond(400, { ok: false, error: `unknown stage "${toStage}"` });
   const check = checkTransition(current.label, target.label, note);
   if (!check.ok) return respond(400, { ok: false, error: check.reason });
-  const who = context.userEmail ?? `user ${context.userId ?? "unknown"}`;
+  const who = context.userEmail ?? context.parameters?.actor ?? `user ${context.userId ?? "unknown"}`;
   const properties = {
     hs_pipeline_stage: target.id,
     case_activity_log: logEntry(record.properties.case_activity_log, now, who, current.label, target.label, note)

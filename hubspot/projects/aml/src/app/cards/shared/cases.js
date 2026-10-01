@@ -39,9 +39,16 @@ export function checkTransition(from, to, note) {
 
 const HOUR = 3600 * 1000;
 
-// startedAt: ISO string or epoch ms; dueHours: number; now: epoch ms
+// startedAt: ISO string, epoch ms, or epoch ms as a string (how a card's CRM property hook passes a datetime, found
+// live: the card read "no deadline" until this was handled); dueHours: number; now: epoch ms
+export function toEpoch(value) {
+  if (typeof value === 'number') return value;
+  const text = String(value ?? '').trim();
+  return /^\d+$/.test(text) ? Number(text) : Date.parse(text);
+}
+
 export function deadline(startedAt, dueHours, now) {
-  const start = typeof startedAt === 'number' ? startedAt : Date.parse(startedAt);
+  const start = toEpoch(startedAt);
   if (!Number.isFinite(start) || !Number.isFinite(Number(dueHours))) {
     return { state: 'unknown', dueAt: null, remainingMs: null };
   }

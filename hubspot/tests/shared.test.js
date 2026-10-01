@@ -73,6 +73,7 @@ describe('investigation cases', () => {
     expect(deadline('2026-10-01T10:00:00Z', 4, start + 5 * 60 * 60 * 1000).state).toBe('overdue');
     expect(describeRemaining(-90 * 60 * 1000)).toBe('90 min overdue');
     expect(deadline('not a date', 4, start).state).toBe('unknown');
+    expect(deadline(String(start), 4, start + 60 * 60 * 1000).state).toBe('on_time');  // epoch ms as a string
   });
 
   it('appends to the activity log', () => {

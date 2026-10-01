@@ -182,7 +182,8 @@ function amlCase() {
     'Closed: referred for a reporting decision'].map((label, i) => ({ id: `s${i}`, label, displayOrder: i }));
   const fake = fakeApi({ schemas: { investigation_case: '2-1', counterparty: '2-2' },
     pipelines: { '2-1': [{ id: 'p1', stages }] } });
-  const record = fake.add('2-1', { hs_pipeline: 'p1', hs_pipeline_stage: 's0', case_activity_log: '' });
+  const record = fake.add('2-1', { hs_pipeline: 'p1', hs_pipeline_stage: 's0', case_activity_log: '',
+    sla_started_at: '2026-10-01T10:00:00Z', due_hours: '4' });
   const subject = fake.add('contacts', { firstname: 'Becky', lastname: 'Horton' });
   fake.link('2-1', record.id, 'contacts', subject.id, 'Subject');
   for (const [name, hot] of [['Small hub', '2'], ['Big hub', '30']]) {
@@ -198,6 +199,7 @@ describe('investigation cases', () => {
     const { body: result } = await caseNetwork({ propertiesToSend: { hs_object_id: record.id } }, { api: fake.api });
     expect(result.subjects.map((s) => s.name)).toEqual(['Becky Horton']);
     expect(result.counterparties.map((c) => c.name)).toEqual(['Big hub', 'Small hub']);
+    expect(result.clock).toEqual({ startedAt: '2026-10-01T10:00:00Z', dueHours: 4 });
   });
 
   it('moves a case only along allowed transitions, and logs who moved it and why', async () => {
@@ -206,8 +208,9 @@ describe('investigation cases', () => {
       parameters: { toStage: 'Closed: referred for a reporting decision', note: 'looks bad to me' } },
     { api: fake.api, now: NOW });
     expect(refused.ok).toBe(false);
-    const { body: moved } = await caseTransition({ propertiesToSend: { hs_object_id: record.id }, userEmail: 'inv@example.com',
-      parameters: { toStage: 'Evidence requested', note: 'need the supplier invoices' } }, { api: fake.api, now: NOW });
+    const { body: moved } = await caseTransition({ propertiesToSend: { hs_object_id: record.id },
+      parameters: { toStage: 'Evidence requested', note: 'need the supplier invoices', actor: 'inv@example.com' } },
+    { api: fake.api, now: NOW });
     expect(moved).toMatchObject({ ok: true, from: 'Open triage', to: 'Evidence requested' });
     const props = fake.state.objects['2-1'][record.id].properties;
     expect(props.hs_pipeline_stage).toBe('s1');

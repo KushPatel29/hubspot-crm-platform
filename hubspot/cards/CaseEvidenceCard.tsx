@@ -14,13 +14,14 @@ import { label, money, num, call, type Runner } from './format.ts';
 export const PROPERTIES = ['case_name', 'case_priority', 'due_hours', 'sla_started_at', 'typology_hypothesis',
   'evidence_references', 'recommended_next_step', 'amount_involved_cad', 'decision_status', 'hs_pipeline_stage'];
 
-type Network = { ok: boolean; error?: string; stage?: string | null; subjects: { id: string; name: string; objectType: string }[];
+type Network = { ok: boolean; error?: string; stage?: string | null;
+  clock?: { startedAt: string | null; dueHours: number }; subjects: { id: string; name: string; objectType: string }[];
   counterparties: { id: string; name: string; type: string; hotSubjects: number }[] };
 const DEADLINE: Record<string, 'danger' | 'warning' | 'success' | 'default'> = {
   overdue: 'danger', due_soon: 'warning', on_time: 'success', unknown: 'default',
 };
 
-export function CaseEvidenceCard({ run, now = Date.now() }: { run: Runner; now?: number }) {
+export function CaseEvidenceCard({ run, actor, now = Date.now() }: { run: Runner; actor?: string; now?: number }) {
   const { properties: p, isLoading, refetch } = useCrmProperties(PROPERTIES);
   const [network, setNetwork] = useState<Network | null>(null);
   const [moving, setMoving] = useState<string | null>(null);
@@ -35,14 +36,14 @@ export function CaseEvidenceCard({ run, now = Date.now() }: { run: Runner; now?:
 
   if (isLoading || !network) return <LoadingSpinner label="Loading the case" />;
   if (!network.ok) return <ErrorState title="The case network could not be loaded"><Text>{network.error}</Text></ErrorState>;
-  const clock = deadline(p.sla_started_at ?? '', num(p.due_hours) ?? NaN, now);
+  const clock = deadline(network.clock?.startedAt ?? '', network.clock?.dueHours ?? NaN, now);
   const typology = TYPOLOGIES[(p.typology_hypothesis ?? '').toUpperCase().replace(/_/g, '-')];
   const stage = network.stage ?? null;
   const closed = stage?.startsWith('Closed');
 
   const move = () => {
     if (!moving) return;
-    call(run, 'case_transition', { propertiesToSend: ['hs_object_id'], parameters: { toStage: moving, note } })
+    call(run, 'case_transition', { propertiesToSend: ['hs_object_id'], parameters: { toStage: moving, note, actor } })
       .then((r) => {
         setMessage(r.ok ? { ok: true, text: `Moved to ${r.to}.` } : { ok: false, text: r.error });
         if (r.ok) {
@@ -110,7 +111,7 @@ export function CaseEvidenceCard({ run, now = Date.now() }: { run: Runner; now?:
       )}
       {moving && (
         <Flex direction="column" gap="xs">
-          <TextArea label={`Why move this case to "${moving}"?`} name="transition-note" value={note} onChange={setNote}
+          <TextArea label={`Why move this case to "${moving}"?`} name="transition-note" value={note} onInput={setNote} onChange={setNote}
             required description="Saved to the case's activity log with your name and the time." />
           <ButtonRow>
             <Button variant="primary" disabled={note.trim().length < 10} onClick={move}>Move case</Button>

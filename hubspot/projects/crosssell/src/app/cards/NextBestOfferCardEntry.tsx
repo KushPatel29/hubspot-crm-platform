@@ -3,4 +3,4 @@ import React from 'react';
 import { hubspot } from '@hubspot/ui-extensions';
 import { NextBestOfferCard } from './NextBestOfferCard.tsx';
 
-hubspot.extend<'crm.record.tab'>(({ context }) => <NextBestOfferCard run={(name, options) => hubspot.serverless(name, options)} portalId={context.portal.id} />);
+hubspot.extend<'crm.record.tab'>(({ context }) => <NextBestOfferCard run={(name, options) => hubspot.serverless(name, options)} portalId={context.portal.id} actor={context.user.email} />);

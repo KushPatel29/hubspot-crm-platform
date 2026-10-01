@@ -130,7 +130,12 @@ async function main(context, { api = appClient(context) } = {}) {
   if (!caseId) return respond(400, { ok: false, error: "no case in context" });
   const caseType = await api.customType("investigation_case");
   const partyType = await api.customType("counterparty");
-  const [record] = await api.batchRead(caseType, [caseId], ["hs_pipeline", "hs_pipeline_stage"]);
+  const [record] = await api.batchRead(caseType, [caseId], [
+    "hs_pipeline",
+    "hs_pipeline_stage",
+    "sla_started_at",
+    "due_hours"
+  ]);
   const pipelines = await api.get(`/crm/v3/pipelines/${caseType}`);
   const pipeline = (pipelines.results ?? []).find((p) => p.id === record?.properties.hs_pipeline);
   const stage = pipeline?.stages.find((s) => s.id === record.properties.hs_pipeline_stage)?.label ?? null;
@@ -152,6 +157,7 @@ async function main(context, { api = appClient(context) } = {}) {
   return respond(200, {
     ok: true,
     stage,
+    clock: { startedAt: record?.properties.sla_started_at ?? null, dueHours: Number(record?.properties.due_hours) },
     subjects,
     counterparties: parties.map((p) => ({
       id: p.id,

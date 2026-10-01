@@ -18,7 +18,9 @@ export async function main(context, { api = appClient(context), now = Date.now()
   if (!current || !target) return respond(400, { ok: false, error: `unknown stage "${toStage}"` });
   const check = checkTransition(current.label, target.label, note);
   if (!check.ok) return respond(400, { ok: false, error: check.reason });
-  const who = context.userEmail ?? `user ${context.userId ?? 'unknown'}`;
+  // Private functions get no user identity on platform 2026.09 (found live: the log read "user unknown"), so the
+  // card passes the signed-in user from its own context.
+  const who = context.userEmail ?? context.parameters?.actor ?? `user ${context.userId ?? 'unknown'}`;
   const properties = {
     hs_pipeline_stage: target.id,
     case_activity_log: logEntry(record.properties.case_activity_log, now, who, current.label, target.label, note),

@@ -7,7 +7,10 @@ export async function main(context, { api = appClient(context) } = {}) {
   if (!caseId) return respond(400, { ok: false, error: 'no case in context' });
   const caseType = await api.customType('investigation_case');
   const partyType = await api.customType('counterparty');
-  const [record] = await api.batchRead(caseType, [caseId], ['hs_pipeline', 'hs_pipeline_stage']);
+  // The deadline is computed from the API's raw values: a card's property hook hands datetimes over formatted for
+  // display, which is no basis for arithmetic (found live: the card read "no deadline").
+  const [record] = await api.batchRead(caseType, [caseId], ['hs_pipeline', 'hs_pipeline_stage', 'sla_started_at',
+    'due_hours']);
   const pipelines = await api.get(`/crm/v3/pipelines/${caseType}`);
   const pipeline = (pipelines.results ?? []).find((p) => p.id === record?.properties.hs_pipeline);
   const stage = pipeline?.stages.find((s) => s.id === record.properties.hs_pipeline_stage)?.label ?? null;
@@ -25,6 +28,7 @@ export async function main(context, { api = appClient(context) } = {}) {
   return respond(200, {
     ok: true,
     stage,
+    clock: { startedAt: record?.properties.sla_started_at ?? null, dueHours: Number(record?.properties.due_hours) },
     subjects,
     counterparties: parties
       .map((p) => ({ id: p.id, name: p.properties.counterparty_name, type: p.properties.counterparty_type,

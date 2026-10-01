@@ -13,7 +13,7 @@ type Offer = { id: string; title: string; rank: number; opportunity: number; bec
 
 const STATUS: Record<string, 'info' | 'success' | 'default'> = { open: 'info', accepted: 'success', dismissed: 'default' };
 
-export function NextBestOfferCard({ run, portalId }: { run: Runner; portalId?: number }) {
+export function NextBestOfferCard({ run, portalId, actor }: { run: Runner; portalId?: number; actor?: string }) {
   const { properties: account } = useCrmProperties(['xsell_churn_risk', 'xsell_days_overdue', 'xsell_rfm_segment']);
   const [offers, setOffers] = useState<Offer[] | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
@@ -30,7 +30,7 @@ export function NextBestOfferCard({ run, portalId }: { run: Runner; portalId?: n
 
   const decide = (offerId: string, decision: 'accept' | 'dismiss', note = '') => {
     setBusy(offerId);
-    call(run, 'decide_offer', { parameters: { offerId, decision, note } })
+    call(run, 'decide_offer', { parameters: { offerId, decision, note, actor } })
       .then((r) => {
         if (!r.ok) setFailure(r.error);
         setDismissing(null);
@@ -72,7 +72,7 @@ export function NextBestOfferCard({ run, portalId }: { run: Runner; portalId?: n
           )}
           {dismissing === offer.id && (
             <Flex direction="column" gap="xs">
-              <TextArea label="Why is it not a fit?" name={`reason-${offer.id}`} value={reason} onChange={setReason}
+              <TextArea label="Why is it not a fit?" name={`reason-${offer.id}`} value={reason} onInput={setReason} onChange={setReason}
                 required />
               <ButtonRow>
                 <Button variant="destructive" disabled={reason.trim().length < 5 || busy !== null}

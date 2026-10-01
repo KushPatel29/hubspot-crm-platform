@@ -122,7 +122,7 @@ export const APPS = {
       schemas('contacts', 'companies', 'custom')),
     cards: [{ component: 'NextBestOfferCard', uid: 'next_best_offer_card', name: 'Next best offer',
       description: 'Eligible offers with the reason and the value, accepted into deals or dismissed with a reason.',
-      objectTypes: ['companies'], needs: ['run', 'portalId'] }],
+      objectTypes: ['companies'], needs: ['run', 'portalId', 'actor'] }],
     functions: [{ name: 'company_offers' }, { name: 'decide_offer' }, PROVISION],
   },
 
@@ -133,7 +133,7 @@ export const APPS = {
     scopes: unique(['oauth'], crud('contacts', 'companies', 'custom'), schemas('contacts', 'companies', 'custom')),
     cards: [{ component: 'CaseEvidenceCard', uid: 'case_evidence_card', name: 'Case evidence',
       description: 'Deadline, typology hypothesis against its lawful lookalike, shared counterparties, next moves.',
-      objectTypes: ['p_investigation_case'], needs: ['run'] }],
+      objectTypes: ['p_investigation_case'], needs: ['run', 'actor'] }],
     functions: [{ name: 'case_network' }, { name: 'case_transition' }, PROVISION],
   },
 };
