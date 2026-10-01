@@ -15,3 +15,5 @@ build/
 .secrets/
 .sf/
 .sfdx/
+# verify is read-only and its result is in apply.json; a rerun should not dirty the tree
+evidence/*/verify.json
