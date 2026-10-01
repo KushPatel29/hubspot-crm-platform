@@ -18,11 +18,13 @@ the key for short-lived tokens), so they hold no key of their own.
 ## 1. A portal per business
 
 Each business gets its own developer test account on Enterprise tiers (custom objects, app functions and public
-endpoints need Enterprise):
+endpoints need Enterprise). Test accounts are created from the parent account's CLI login, and the keys the CLI
+makes for them renew through the parent's key, so the parent's key must stay active.
 
 ```bash
-npx hs test-account create --name "Meridian Supply" --sales-level ENTERPRISE --service-level ENTERPRISE \
-  --marketing-level ENTERPRISE --content-level ENTERPRISE --ops-level ENTERPRISE
+npx hs account auth --account <parent id> --name dev     # inside the repo: outside it, npx fetches an unrelated "hs"
+npx hs test-account create -a dev --name "Meridian Supply" --sales-level ENTERPRISE --service-level ENTERPRISE \
+  --marketing-level ENTERPRISE --content-level ENTERPRISE --ops-level ENTERPRISE --commerce-level ENTERPRISE
 ```
 
 ScaleLab already exists (GrowthOps OS built it, portal 247549241).
