@@ -1,0 +1,56 @@
+{
+  "what": "A HubSpot workflow ran the ScaleLab app's custom workflow action; HubSpot signed the call, the advance_lifecycle endpoint function verified it and moved the contact forward with the app token",
+  "workflow": {
+    "name": "CRM platform: advance lifecycle, never backwards (demo)",
+    "id": 5033495234,
+    "trigger": "manual enrollment only",
+    "action": "Advance lifecycle stage (never backwards)",
+    "action_type_id": "1-273900586",
+    "target_stage": "salesqualifiedlead"
+  },
+  "enrolled": "HubSpot's own sample contact (Maria Johnson), not a GrowthOps record",
+  "result": {
+    "lifecyclestage_before": "marketingqualifiedlead",
+    "lifecyclestage_after": "salesqualifiedlead"
+  },
+  "hubspot_monitoring_2026-10-01_EDT": {
+    "endpoint_functions": [
+      {
+        "time": "7:52 AM",
+        "endpoint": "advance-lifecycle",
+        "result": 200,
+        "meaning": "the workflow's signed call, verified"
+      },
+      {
+        "time": "7:52 AM",
+        "endpoint": "webhooks",
+        "result": 200,
+        "meaning": "HubSpot's signed webhook for the lifecycle change the action just made"
+      },
+      {
+        "time": "5:50 AM",
+        "endpoint": "webhooks",
+        "result": 200,
+        "meaning": "the first webhook delivery"
+      },
+      {
+        "time": "4:16-4:54 AM",
+        "endpoint": "webhooks",
+        "result": 401,
+        "meaning": "unsigned probes made while the endpoints were being found; refused"
+      }
+    ],
+    "api_calls_by_the_app": [
+      {
+        "method": "GET",
+        "path": "/crm/v3/objects/contacts/560549151450",
+        "result": 200
+      },
+      {
+        "method": "PATCH",
+        "path": "/crm/v3/objects/contacts/560549151450",
+        "result": 200
+      }
+    ]
+  }
+}
