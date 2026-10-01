@@ -1,6 +1,6 @@
 # HubSpot CRM Platform
 
-![Tests](https://img.shields.io/badge/tests-119%20passing-3B8C6E)
+![Tests](https://img.shields.io/badge/tests-120%20passing-3B8C6E)
 ![HubSpot developer platform 2026.09](https://img.shields.io/badge/HubSpot%20projects-2026.09-FF7A59)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
@@ -9,6 +9,11 @@ portfolio; here each one gets a HubSpot portal built from code: custom objects, 
 records, loaded by the source system's key and proven to converge. Each portal also gets a private HubSpot app of
 its own, with React cards on the records, app functions behind them, and custom workflow actions. The same data
 model also compiles to Salesforce metadata, so the design is not tied to one CRM.
+
+> **Status, 1 October 2026:** built and tested (83 Python and 37 JavaScript tests, CI on every push). The ScaleLab
+> portal is live from GrowthOps OS; the Meridian, cross-sell and AML portals are being stood up in HubSpot developer
+> test accounts, and their live evidence is added below as each one converges. Until then, the HubSpot column in the
+> table describes what the code loads, verified against a strict HubSpot test double.
 
 | Business | Source project | In HubSpot | Its app |
 |---|---|---|---|
