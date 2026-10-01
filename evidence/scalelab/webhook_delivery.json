@@ -1,0 +1,13 @@
+{
+  "what": "A HubSpot-delivered, v3-signed webhook accepted by the ScaleLab app's webhook_receiver endpoint function",
+  "trigger": "lifecyclestage of HubSpot's own sample contact (not a GrowthOps record) moved lead -> marketingqualifiedlead",
+  "triggered_at": "2026-10-01T09:50:41Z",
+  "endpoint": "https://247549241.hs-sites-na2.com/hs/serverless/webhooks",
+  "hubspot_monitoring": {
+    "result": 200,
+    "subscription_type": "object.propertyChange",
+    "batch_id": "51e92a25-4d04-41f6-88aa-48e7614c2cf5",
+    "attempt_start": "2026-10-01T09:50:00-04:00 (minute resolution in HubSpot's log)"
+  },
+  "why_200_proves_the_signature": "the function answers 401 to any request whose X-HubSpot-Signature-v3 does not verify against the app's client secret (unsigned probes: 401 'unsigned request')"
+}

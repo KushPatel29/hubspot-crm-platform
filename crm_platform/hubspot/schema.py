@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from crm_platform.hubspot.client import HubSpotClient, HubSpotError
-from crm_platform.model import ObjectModel, Pipeline, Property, TenantModel
+from crm_platform.model import AssociationLabel, ObjectModel, Pipeline, Property, TenantModel
 
 STANDARD_TYPE_IDS = {"contacts": "0-1", "companies": "0-2", "deals": "0-3", "tickets": "0-5", "products": "0-7",
                      "line_items": "0-8"}
@@ -114,6 +114,21 @@ def stage_payload(object_name: str, stage_index: int, pipeline: Pipeline) -> dic
     else:
         metadata = {"isClosed": str(stage.closed).lower()}
     return {"label": stage.label, "displayOrder": stage_index, "metadata": metadata}
+
+
+def label_name(assoc: AssociationLabel) -> str:
+    """HubSpot's internal name for a label. Names are unique across the whole portal, not per object pair (found
+    live: "Association definition named subject already exists"), so the target object is part of it."""
+    return f"{assoc.name}_{assoc.to_object}"
+
+
+def label_payload(assoc: AssociationLabel) -> dict:
+    """The label to create. An inverse label identical to the label makes HubSpot answer 500 (found live); without
+    one, HubSpot creates the same label in both directions itself."""
+    body = {"label": assoc.label, "name": label_name(assoc)}
+    if assoc.inverse_label and assoc.inverse_label != assoc.label:
+        body["inverseLabel"] = assoc.inverse_label
+    return body
 
 
 def pipeline_payload(pipeline: Pipeline) -> dict:
@@ -264,10 +279,7 @@ def plan(model: TenantModel, state: PortalState) -> Plan:
         if labels is None:
             continue  # an end does not exist yet
         if not any(item.get("label") == assoc.label for item in labels):
-            body = {"label": assoc.label, "name": assoc.name}
-            if assoc.inverse_label:
-                body["inverseLabel"] = assoc.inverse_label
-            ops.append(Op("create_label", assoc.from_object, f"{assoc.to_object}:{assoc.label}", body))
+            ops.append(Op("create_label", assoc.from_object, f"{assoc.to_object}:{assoc.label}", label_payload(assoc)))
 
     for object_name, prop_name in model.requires:
         if prop_name not in state.properties.get(object_name, {}):

@@ -63,6 +63,7 @@ class FakeHubSpot:
             for pair, types in STANDARD_TYPES.items()}
         self.objects: dict[str, dict[str, dict]] = {}
         self.links: set[tuple[str, str, str, str, int]] = set()  # from type, from id, to type, to id, type id
+        self.label_names: set[str] = set()
         self.calls: list[tuple[str, str]] = []
         self._next = 1000
         self.fail_next: list[int] = []  # statuses to answer before handling the next calls (429, 500...)
@@ -241,6 +242,13 @@ class FakeHubSpot:
         pair = (self.tid(a), self.tid(b))
         if pair not in self.types:
             return 400, {"category": "VALIDATION_ERROR", "message": "objects cannot be associated"}
+        # Two HubSpot behaviours found live: label names are unique across the portal, and an inverse label
+        # identical to the label is answered with a 500.
+        if body["name"] in self.label_names:
+            return 400, {"category": "VALIDATION_ERROR", "message": "association definition name already exists"}
+        if body.get("inverseLabel") == body["label"]:
+            return 500, {"category": "INTERNAL_ERROR"}
+        self.label_names.add(body["name"])
         forward = {"category": "USER_DEFINED", "typeId": int(self._id()), "label": body["label"]}
         self.types[pair].append(forward)
         backward = {"category": "USER_DEFINED", "typeId": int(self._id()),
