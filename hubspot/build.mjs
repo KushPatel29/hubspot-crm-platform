@@ -14,7 +14,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { APPS, SIGNED_ENDPOINT_SECRETS } from './apps.mjs';
+import { APPS, CONNECTOR, SIGNED_ENDPOINT_SECRETS } from './apps.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '..');
@@ -189,6 +189,21 @@ async function project(tenant, app, out) {
   }
 }
 
+// The OAuth connector: an app with no components, private distribution (installed in allowlisted portals).
+function connector(out) {
+  const deploy = deployment('connector');
+  write(join(out, 'hsproject.json'), json({ name: 'crm-platform-connector', srcDir: 'src',
+    platformVersion: PLATFORM_VERSION }));
+  write(join(out, 'src', 'hsprofile.live.json'), json({ accountId: deploy.accountId, variables: {} }));
+  write(join(out, 'src', 'app', 'app-hsmeta.json'), json({ uid: 'crm_platform_connector', type: 'app', config: {
+    name: CONNECTOR.name, description: CONNECTOR.description, distribution: 'private',
+    auth: { type: 'oauth', redirectUrls: CONNECTOR.redirectUrls, requiredScopes: CONNECTOR.scopes,
+      optionalScopes: [], conditionallyRequiredScopes: [] },
+    permittedUrls: { fetch: [], iframe: [], img: [] },
+    support: { documentationUrl: 'https://github.com/KushPatel29/hubspot-crm-platform' },
+  } }));
+}
+
 // ------------------------------------------------------------------ all projects, or a check
 function files(dir, base = dir) {
   if (!existsSync(dir)) return [];
@@ -200,6 +215,7 @@ function files(dir, base = dir) {
 
 async function buildAll(out) {
   for (const [tenant, app] of Object.entries(APPS)) await project(tenant, app, join(out, tenant));
+  connector(join(out, 'connector'));
 }
 
 const check = process.argv.includes('--check');
@@ -225,8 +241,8 @@ if (argument('--out')) {
   // cannot be removed, and a deploy is usually run from inside one.
   for (const tenant of existsSync(out) ? readdirSync(out) : []) {
     for (const entry of readdirSync(join(out, tenant))) rmSync(join(out, tenant, entry), { recursive: true, force: true });
-    if (!(tenant in APPS)) rmSync(join(out, tenant), { recursive: true, force: true });
+    if (!(tenant in APPS) && tenant !== 'connector') rmSync(join(out, tenant), { recursive: true, force: true });
   }
   await buildAll(out);
-  console.log(`built ${Object.keys(APPS).length} HubSpot projects: ${Object.keys(APPS).join(', ')}`);
+  console.log(`built ${Object.keys(APPS).length + 1} HubSpot projects: ${Object.keys(APPS).join(', ')}, connector`);
 }

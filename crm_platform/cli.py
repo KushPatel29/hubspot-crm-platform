@@ -8,6 +8,9 @@ Commands:
 * ``bind``: record which portal a tenant lives in (``evidence/<tenant>/deploy.json``).
 * ``provision-key``: generate the portal's provision key (random, 32 bytes) and store it as the app secret
   ``PROVISION_KEY`` and in the git-ignored ``.secrets/<tenant>.provision.key``. Never printed.
+* ``oauth-secret``: put the connector app's client secret, read from the clipboard, into the OS credential store.
+* ``connect``: install the OAuth connector app into the tenant's portal (you approve it in the browser) and keep
+  its refresh token in the OS credential store. Refused unless the install lands in the tenant's bound portal.
 
 Guards before anything is written:
 
@@ -15,13 +18,16 @@ Guards before anything is written:
 * Each tenant is bound to exactly one portal. A run whose account resolves to a different portal is refused, so
   the AML cases can never be loaded into the ScaleLab portal because the wrong ``--account`` was typed.
 
-Two ways to reach a portal:
+Three ways to reach a portal:
 
 * ``--via cli``: the HubSpot CLI's own login (``npx hs account auth``) through ``scripts/hs_bridge.mjs``. A developer
   key reads the CRM and manages app secrets, but cannot write standard CRM records or their schemas.
 * ``--via app`` (the default once a provision key exists): the tenant app's ``provision`` function, which makes
   each call with the app's own token inside HubSpot (``hubspot/functions/provision.js``). No HubSpot credential
   leaves HubSpot; the loader holds only the portal's provision key, which it generated.
+* ``--via oauth``: the connector app's OAuth tokens (``crm_platform/hubspot/oauth.py``), after ``connect``: the
+  way a product installed into many portals reaches them.
+
 Evidence files hold counts, operations and IDs, never record values.
 """
 
@@ -31,12 +37,13 @@ import argparse
 import json
 import os
 import secrets
+import subprocess
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from crm_platform.hubspot import records, schema
+from crm_platform.hubspot import oauth, records, schema
 from crm_platform.hubspot.client import (
     BridgeTransport,
     FunctionTransport,
@@ -145,6 +152,57 @@ def app_transport(tenant: str) -> FunctionTransport:
     return FunctionTransport(f"{base}/hs/serverless/provision", key)
 
 
+CONNECTOR_APP = ROOT / "hubspot" / "projects" / "connector" / "src" / "app" / "app-hsmeta.json"
+OAUTH_SECRET_ENV = "HUBSPOT_OAUTH_CLIENT_SECRET"
+
+
+def connector_app() -> oauth.App:
+    """The connector as it is deployed: its scopes and redirect from the generated project, its client ID (which
+    is public) from ``evidence/connector/deploy.json`` once the app exists."""
+    config = json.loads(CONNECTOR_APP.read_text(encoding="utf-8"))["config"]["auth"]
+    deploy = deploy_file("connector")
+    client_id = json.loads(deploy.read_text(encoding="utf-8")).get("clientId", "") if deploy.exists() else ""
+    if not client_id:
+        raise Refused("the connector app has no client ID yet: upload hubspot/projects/connector, then record its "
+                      "client ID (public, on the app's Auth tab) as clientId in evidence/connector/deploy.json")
+    return oauth.App(client_id, config["redirectUrls"][0], tuple(config["requiredScopes"]))
+
+
+def oauth_client_secret(store: oauth.Store) -> str:
+    value = os.environ.get(OAUTH_SECRET_ENV, "").strip() or (store.get(oauth.CLIENT_SECRET) or "")
+    if not value:
+        raise Refused("the connector's client secret is not stored: copy it from the app's Auth tab and run "
+                      "python -m crm_platform oauth-secret connector")
+    return value
+
+
+def clipboard() -> str:
+    command = (["powershell", "-NoProfile", "-Command", "Get-Clipboard -Raw"] if sys.platform == "win32"
+               else ["pbpaste"] if sys.platform == "darwin" else ["xclip", "-o"])
+    return subprocess.run(command, capture_output=True, text=True, check=True).stdout.strip()
+
+
+def store_oauth_secret(store: oauth.Store, value: str) -> dict[str, Any]:
+    """Keep the connector's client secret in the credential store. Reports its length only."""
+    if not value or any(ch.isspace() for ch in value):
+        raise Refused("the clipboard does not hold a single value: copy the client secret and run this again")
+    store.set(oauth.CLIENT_SECRET, value)
+    return {"stored": oauth.CLIENT_SECRET, "length": len(value)}
+
+
+def connect_tenant(tenant: str, store: oauth.Store, **options: Any) -> dict[str, Any]:
+    portal = bound_portal(tenant)
+    if not portal:
+        raise Refused(f"{tenant} is not bound to a portal yet: run bind first")
+    summary = oauth.connect(connector_app(), oauth_client_secret(store), store, tenant, portal, **options)
+    write_evidence(tenant, "oauth_connect", {**summary, "at": _now()})
+    return summary
+
+
+def oauth_transport(tenant: str, store: oauth.Store) -> oauth.OAuthTransport:
+    return oauth.OAuthTransport(connector_app(), oauth_client_secret(store), store, tenant)
+
+
 def write_evidence(tenant: str, name: str, payload: dict) -> Path:
     path = EVIDENCE / tenant / f"{name}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -205,14 +263,22 @@ def run(command: str, tenant_key: str, transport: Transport, *, allow_portal: st
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="python -m crm_platform", description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=("plan", "apply", "verify", "bind", "provision-key"))
+    parser.add_argument("command", choices=("plan", "apply", "verify", "bind", "provision-key", "connect",
+                                            "oauth-secret"))
     parser.add_argument("tenant")
     parser.add_argument("--account", help="HubSpot CLI account name or ID (npx hs account list)")
     parser.add_argument("--token-env", help="read a bearer token from this environment variable instead")
     parser.add_argument("--allow-portal", help="allow writing to this non-test portal ID")
-    parser.add_argument("--via", choices=("app", "cli"), help="reach the portal through the tenant app's provision "
-                        "function (default once a provision key exists) or the HubSpot CLI login")
+    parser.add_argument("--via", choices=("app", "cli", "oauth"), help="reach the portal through the tenant app's "
+                        "provision function (default once a provision key exists), the HubSpot CLI login, or the "
+                        "connector app's OAuth tokens (after connect)")
     args = parser.parse_args(argv)
+    if args.command == "oauth-secret":
+        print(json.dumps(store_oauth_secret(oauth.KeyringStore(), clipboard()), indent=2))
+        return
+    if args.command == "connect":
+        print(json.dumps(connect_tenant(get(args.tenant).key, oauth.KeyringStore()), indent=2))
+        return
     if args.command == "provision-key":
         if not args.account:
             sys.exit("pass --account <HubSpot CLI account>: the CLI login manages app secrets")
@@ -222,7 +288,10 @@ def main(argv: list[str] | None = None) -> None:
             print(json.dumps(provision_key(client, get(args.tenant).key), indent=2))
         return
     via = args.via or ("app" if provision_key_value(args.tenant) and args.command != "bind" else "cli")
-    if via == "app" and not args.token_env:
+    if via == "oauth":
+        report = run(args.command, args.tenant, oauth_transport(get(args.tenant).key, oauth.KeyringStore()),
+                     allow_portal=args.allow_portal)
+    elif via == "app" and not args.token_env:
         report = run(args.command, args.tenant, app_transport(args.tenant), allow_portal=args.allow_portal)
     elif args.token_env:
         token = os.environ.get(args.token_env, "")

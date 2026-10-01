@@ -111,7 +111,8 @@ def test_hand_written_code_is_a_second_package_directory_the_generator_never_own
         files = build(TENANTS[key].model())
         directories = [d["path"] for d in json.loads(files["sfdx-project.json"])["packageDirectories"]]
         assert directories == (["force-app", "code"] if key in HAND_WRITTEN else ["force-app"])
-        assert all(rel.split("/")[0] in (*GENERATED_DIRS, "sfdx-project.json") for rel in files)
+        assert all(rel.split("/")[0] in (*GENERATED_DIRS, "sfdx-project.json", ".forceignore") for rel in files)
+        assert "**/__tests__/**" in files[".forceignore"].splitlines()  # a deploy must not pick up the Jest tests
     code = OUT / "meridian" / "code" / "main" / "default"
     assert (code / "classes" / "GuardrailService.cls").exists() and (code / "lwc" / "dealMarginGuardrail").is_dir()
 

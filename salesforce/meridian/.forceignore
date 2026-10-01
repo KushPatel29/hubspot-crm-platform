@@ -1,0 +1,8 @@
+**/__tests__/**
+**/*.notes.md
+**/jsconfig.json
+node_modules/
+scripts/
+package.json
+package-lock.json
+jest.config.js

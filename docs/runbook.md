@@ -101,6 +101,24 @@ npx hs project deploy --profile live --force --build <n>       # the private fun
 
 A deploy that removes a component is refused with a warning until it is forced; `--force` needs `--build`.
 
+## The OAuth connector
+
+The connector (`hubspot/projects/connector`) is an OAuth app with private distribution. Upload it once
+(`npx hs project upload --profile live --forceCreate` from its folder), then record its client ID, which is public
+and on the app's Auth tab, as `clientId` in `evidence/connector/deploy.json`.
+
+```bash
+python -m pip install -e .[oauth]
+python -m crm_platform oauth-secret connector    # copy the client secret on the Auth tab first: read from the clipboard
+python -m crm_platform connect meridian          # opens HubSpot; approve the install for the Meridian portal
+python -m crm_platform verify meridian --via oauth
+```
+
+`connect` listens on `http://localhost:3000/oauth-callback`, accepts only the redirect carrying the state it issued,
+exchanges the code, asks HubSpot which portal the token belongs to, and keeps the refresh token (Windows Credential
+Manager, macOS Keychain or Secret Service) only if that is the tenant's bound portal. To disconnect, uninstall the
+app in the portal (Settings > Integrations > Connected apps), which revokes its tokens.
+
 ## The nightly live check
 
 `.github/workflows/live-verify.yml` plans every portal read-only each night. Give it each portal's provision key as a

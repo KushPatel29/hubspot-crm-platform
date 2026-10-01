@@ -1,0 +1,9 @@
+{
+  "accountId": 247574101,
+  "appId": 55339007,
+  "authType": "OAUTH",
+  "distribution": "PRIVATE",
+  "home": "The OAuth app lives in the Meridian developer test account (project crm-platform-connector, build 1, deployed 2026-10-01). Its client ID, which is public, is added here as clientId from the app's Auth tab before the first connect.",
+  "projectId": 317874545,
+  "tenant": "connector"
+}

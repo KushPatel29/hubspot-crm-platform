@@ -296,6 +296,9 @@ def build(model: TenantModel) -> dict[str, str]:
     types = "".join("    <types>\n" + "".join(_tag("members", m, 2) for m in sorted(names)) + _tag("name", kind, 2)
                     + "    </types>\n" for kind, names in sorted(members.items()) if names)
     files["manifest/package.xml"] = _xml("Package", types + _tag("version", API_VERSION))
+    # What a deploy must not pick up: component tests, local tooling, and the notes file beside the value sets.
+    files[".forceignore"] = "\n".join(("**/__tests__/**", "**/*.notes.md", "**/jsconfig.json", "node_modules/",
+                                        "scripts/", "package.json", "package-lock.json", "jest.config.js", ""))
     files["sfdx-project.json"] = json.dumps({
         "packageDirectories": [{"path": "force-app", "default": True}]
         + ([{"path": "code", "default": False}] if model.key in HAND_WRITTEN else []),
@@ -311,7 +314,7 @@ def problems(files: dict[str, str]) -> list[str]:
 
     found = []
     for path, text in files.items():
-        if path.endswith(".json") or path.endswith(".md"):
+        if not path.endswith(".xml"):
             continue
         try:
             root = ET.fromstring(text.encode("utf-8"))

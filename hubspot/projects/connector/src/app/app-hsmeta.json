@@ -1,0 +1,50 @@
+{
+  "uid": "crm_platform_connector",
+  "type": "app",
+  "config": {
+    "name": "CRM platform connector",
+    "description": "Lets the CRM platform loader reach an approved portal over OAuth: schema and record reads and writes for the objects its models declare.",
+    "distribution": "private",
+    "auth": {
+      "type": "oauth",
+      "redirectUrls": [
+        "http://localhost:3000/oauth-callback"
+      ],
+      "requiredScopes": [
+        "oauth",
+        "e-commerce",
+        "crm.schemas.line_items.read",
+        "crm.objects.contacts.read",
+        "crm.objects.contacts.write",
+        "crm.objects.companies.read",
+        "crm.objects.companies.write",
+        "crm.objects.deals.read",
+        "crm.objects.deals.write",
+        "crm.objects.products.read",
+        "crm.objects.products.write",
+        "crm.objects.line_items.read",
+        "crm.objects.line_items.write",
+        "crm.objects.custom.read",
+        "crm.objects.custom.write",
+        "crm.schemas.contacts.read",
+        "crm.schemas.contacts.write",
+        "crm.schemas.companies.read",
+        "crm.schemas.companies.write",
+        "crm.schemas.deals.read",
+        "crm.schemas.deals.write",
+        "crm.schemas.custom.read",
+        "crm.schemas.custom.write"
+      ],
+      "optionalScopes": [],
+      "conditionallyRequiredScopes": []
+    },
+    "permittedUrls": {
+      "fetch": [],
+      "iframe": [],
+      "img": []
+    },
+    "support": {
+      "documentationUrl": "https://github.com/KushPatel29/hubspot-crm-platform"
+    }
+  }
+}

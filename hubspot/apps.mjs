@@ -29,6 +29,20 @@ const crud = (...objects) => objects.flatMap((o) => [`crm.objects.${o}.read`, `c
 const schemas = (...objects) => objects.flatMap((o) => [`crm.schemas.${o}.read`, `crm.schemas.${o}.write`]);
 const unique = (...lists) => [...new Set(lists.flat())];
 
+// The other way an integration reaches HubSpot: one OAuth app installed into many portals. It has no cards or
+// functions; it exists so the loader can also run over OAuth (python -m crm_platform connect <tenant>, then
+// --via oauth), with the scopes the loader's calls need across the tenants. The redirect is a local port the
+// connect command listens on, which HubSpot allows over http for localhost only.
+export const CONNECTOR = {
+  name: 'CRM platform connector',
+  description: 'Lets the CRM platform loader reach an approved portal over OAuth: schema and record reads and '
+    + 'writes for the objects its models declare.',
+  redirectUrls: ['http://localhost:3000/oauth-callback'],
+  scopes: unique(['oauth', 'e-commerce', 'crm.schemas.line_items.read'],
+    crud('contacts', 'companies', 'deals', 'products', 'line_items', 'custom'),
+    schemas('contacts', 'companies', 'deals', 'custom')),
+};
+
 export const APPS = {
   scalelab: {
     name: 'ScaleLab CRM platform',

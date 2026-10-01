@@ -1,6 +1,6 @@
 # HubSpot CRM Platform
 
-![Tests](https://img.shields.io/badge/tests-161%20passing-3B8C6E)
+![Tests](https://img.shields.io/badge/tests-172%20passing-3B8C6E)
 ![HubSpot developer platform 2026.09](https://img.shields.io/badge/HubSpot%20projects-2026.09-FF7A59)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
@@ -99,6 +99,7 @@ drifts from its sources.
 | Double clicks, races and retries | Accepting an offer writes a unique idempotency key on the deal (`offer-deal:<offer id>`), so HubSpot itself refuses a second deal; the deal and its line item are created already linked. One deal, one line item, whether two requests race, one runs twice or one fails part way (checked live: the duplicate is refused) | `makes one deal when two requests accept the same offer at once`, `turns an offer into one complete deal, even when clicked twice`, `resumes after a failure part way through instead of creating a second deal`, `adopts a deal that already carries the offer's key instead of creating another` |
 | Duplicate records | Two records with one source key (products and line items cannot be unique) are reported, the oldest by `createdAt` is kept in step, and the portal does not count as converged until a person merges them | `test_two_records_with_one_key_are_reported_and_block_convergence` |
 | Who really did it | A card action that records who acted is sent with `hubspot.fetch`, which HubSpot signs with the signed-in user in the URL; the function logs that name and ignores what the browser claims. While a portal's app has no client secret the private function is used instead and the log says "(unverified)" | `logs HubSpot's word for who moved a case when the card's request is signed`, `refuses a card request whose user, body or portal is not the one HubSpot signed`, `serves the actions that record who acted from signed endpoints, and the card calls them with hubspot.fetch` |
+| An OAuth install going to the wrong place | The connector's install is accepted only with the `state` this run issued, and its refresh token is kept only if HubSpot says the token belongs to the tenant's bound portal; tokens live in the OS credential store and never reach an error or an evidence file | `test_the_callback_takes_a_code_only_with_the_state_this_run_issued`, `test_connect_keeps_the_refresh_token_only_when_the_install_is_in_the_tenants_portal`, `test_errors_carry_hubspots_code_and_never_a_secret_a_code_or_a_token`, `test_a_401_gets_one_new_token_and_one_retry_and_a_rotated_refresh_token_is_kept` |
 | Forged workflow calls and webhooks | HubSpot v3 signatures verified (method, URI, body, timestamp; five-minute window) before anything is read | `refuses an unsigned or forged workflow request before touching the deal`, `accepts signed deliveries and logs a summary, never the payload values` |
 | Two copies of a business rule | The guardrail runs in Python (loader) and JavaScript (HubSpot); a test runs both over all 359 Meridian deals | `test_python_and_javascript_score_every_meridian_deal_identically` |
 | Lifecycle moving backwards | The workflow action moves a contact forward only (GrowthOps' field contract) | `moves forward, keeps backwards moves out, and says which` |
@@ -176,6 +177,11 @@ python -m crm_platform bind meridian --account meridian-supply           # pin t
 python -m crm_platform provision-key meridian --account meridian-supply  # per-portal signing key, never printed
 cd hubspot && npm run build && cd projects/meridian && npx hs project upload --profile live && npx hs project install-app --profile live
 python -m crm_platform apply meridian     # converge the schema, load the records, verify: through the app
+
+python -m pip install -e .[oauth]         # the other way in: the OAuth connector app
+python -m crm_platform oauth-secret connector    # the client secret, from the clipboard to the OS credential store
+python -m crm_platform connect meridian          # approve the install in the browser; the refresh token is stored
+python -m crm_platform verify meridian --via oauth
 ```
 
 The full sequence, from creating a test account to watching webhook deliveries, and the Salesforce deploy, is in
@@ -186,8 +192,11 @@ the [runbook](docs/runbook.md).
 * The Meridian *Check the price guardrail* workflow action is deployed but has not run in a live workflow: its
   function needs that app's client secret, which a person enters, and until then it refuses every call (401). The
   same verification path ran live in ScaleLab's action.
-* The apps are private, static-auth apps, one per portal (the agency pattern). A marketplace app with OAuth installs
-  across portals is a different distribution, not built here.
+* The per-portal apps are private, static-auth apps (the agency pattern). The OAuth side is the **connector**
+  ([`hubspot/projects/connector`](hubspot/projects/connector), [`oauth.py`](crm_platform/hubspot/oauth.py)): an OAuth
+  app deployed to a test account, with the install flow, token refresh and a client transport tested against a
+  stand-in for HubSpot's token endpoint. It has not been installed and run against the real one yet: that takes a
+  person approving the install and copying the client secret. It is private distribution, not a marketplace listing.
 * Salesforce has not been deployed to an org yet. The metadata is generated and validated, the Lightning component
   is tested, and the Apex parses; the deploy and the Apex tests need a Developer Edition org and run from
   `salesforce-org.yml` or the runbook's two commands.

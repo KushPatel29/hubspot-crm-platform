@@ -9,6 +9,10 @@ description = "HubSpot CRM developer platform: CRM-as-code, per-business HubSpot
 requires-python = ">=3.12"
 dependencies = []
 
+[project.optional-dependencies]
+# The OAuth commands keep the refresh token and client secret in the OS credential store.
+oauth = ["keyring>=25,<27"]
+
 [tool.setuptools.packages.find]
 include = ["crm_platform*"]
 
@@ -29,3 +33,7 @@ strict_optional = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "keyring"
+ignore_missing_imports = true

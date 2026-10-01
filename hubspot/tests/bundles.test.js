@@ -11,10 +11,25 @@ describe('generated function bundles', () => {
   it('export main as CommonJS, the way HubSpot loads an app function', () => {
     const require = createRequire(import.meta.url);
     const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'projects');
-    const bundles = readdirSync(root).flatMap((tenant) => readdirSync(join(root, tenant, 'src/app/functions'))
-      .filter((f) => f.endsWith('.js')).map((f) => join(root, tenant, 'src/app/functions', f)));
+    const bundles = readdirSync(root).filter((tenant) => existsSync(join(root, tenant, 'src/app/functions')))
+      .flatMap((tenant) => readdirSync(join(root, tenant, 'src/app/functions'))
+        .filter((f) => f.endsWith('.js')).map((f) => join(root, tenant, 'src/app/functions', f)));
     expect(bundles).toHaveLength(Object.values(APPS).reduce((n, app) => n + app.functions.length, 0));
     for (const bundle of bundles) expect(typeof require(bundle).main).toBe('function');
+  });
+});
+
+describe('the OAuth connector', () => {
+  it('is an OAuth app with a local redirect and exactly the scopes the per-portal apps use between them', async () => {
+    const { APPS, CONNECTOR } = await import('../apps.mjs');
+    const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'projects', 'connector', 'src', 'app');
+    const { config } = JSON.parse(readFileSync(join(root, 'app-hsmeta.json'), 'utf8'));
+    expect(config.distribution).toBe('private');
+    expect(config.auth).toMatchObject({ type: 'oauth', redirectUrls: ['http://localhost:3000/oauth-callback'] });
+    expect(config.auth.requiredScopes).toEqual(CONNECTOR.scopes);
+    const loaderScopes = new Set(Object.values(APPS).flatMap((app) => app.scopes));
+    expect(new Set(CONNECTOR.scopes)).toEqual(loaderScopes);
+    expect(existsSync(join(root, 'functions'))).toBe(false);
   });
 });
 
