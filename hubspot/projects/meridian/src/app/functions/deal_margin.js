@@ -116,6 +116,12 @@ function client({
 var MAX_AGE_MS = 5 * 60 * 1e3;
 
 // shared/endpoint.js
+function secret(context, name) {
+  return context?.secrets?.[name] || process.env[name] || void 0;
+}
+function appClient(context) {
+  return client({ token: secret(context, "PRIVATE_APP_ACCESS_TOKEN") });
+}
 function respond(statusCode, body) {
   return { statusCode, body };
 }
@@ -204,7 +210,7 @@ async function dealLines(api, dealId) {
   const unscored = lines.filter((l) => !Number.isFinite(l.targetMargin) || !Number.isFinite(l.cost));
   return { lines: lines.filter((l) => !unscored.includes(l)), unscored };
 }
-async function main(context, { api = client() } = {}) {
+async function main(context, { api = appClient(context) } = {}) {
   const dealId = context.propertiesToSend?.hs_object_id ?? context.parameters?.dealId;
   if (!dealId) return respond(400, { ok: false, error: "no deal in context" });
   const { lines, unscored } = await dealLines(api, dealId);

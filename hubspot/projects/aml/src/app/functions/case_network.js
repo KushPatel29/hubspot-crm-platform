@@ -114,12 +114,18 @@ function client({
 var MAX_AGE_MS = 5 * 60 * 1e3;
 
 // shared/endpoint.js
+function secret(context, name) {
+  return context?.secrets?.[name] || process.env[name] || void 0;
+}
+function appClient(context) {
+  return client({ token: secret(context, "PRIVATE_APP_ACCESS_TOKEN") });
+}
 function respond(statusCode, body) {
   return { statusCode, body };
 }
 
 // functions/case_network.js
-async function main(context, { api = client() } = {}) {
+async function main(context, { api = appClient(context) } = {}) {
   const caseId = context.propertiesToSend?.hs_object_id ?? context.parameters?.caseId;
   if (!caseId) return respond(400, { ok: false, error: "no case in context" });
   const caseType = await api.customType("investigation_case");

@@ -114,6 +114,12 @@ function client({
 var MAX_AGE_MS = 5 * 60 * 1e3;
 
 // shared/endpoint.js
+function secret(context, name) {
+  return context?.secrets?.[name] || process.env[name] || void 0;
+}
+function appClient(context) {
+  return client({ token: secret(context, "PRIVATE_APP_ACCESS_TOKEN") });
+}
 function respond(statusCode, body) {
   return { statusCode, body };
 }
@@ -166,7 +172,7 @@ async function ensureLineItem(api, dealId, sku) {
     [await api.labelType("line_items", "deals", null)]
   );
 }
-async function main(context, { api = client(), now = Date.now() } = {}) {
+async function main(context, { api = appClient(context), now = Date.now() } = {}) {
   const { offerId, decision, note = "" } = context.parameters ?? {};
   const who = context.userEmail ?? `user ${context.userId ?? "unknown"}`;
   if (!offerId || !["accept", "dismiss"].includes(decision)) {

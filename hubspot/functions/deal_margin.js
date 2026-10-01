@@ -1,7 +1,6 @@
 // Private function behind Meridian's "Deal margin" card: the deal's line items, each scored against its product's
 // guardrail band, and the deal's verdict (worst line) and approver (most senior signature any line needs).
-import { client } from '../shared/hubspot-api.js';
-import { respond } from '../shared/endpoint.js';
+import { appClient, respond } from '../shared/endpoint.js';
 import { scoreDeal } from '../shared/guardrail.js';
 
 export const LINE_PROPERTIES = ['name', 'price', 'quantity', 'hs_cost_of_goods_sold', 'hs_product_id'];
@@ -26,7 +25,7 @@ export async function dealLines(api, dealId) {
   return { lines: lines.filter((l) => !unscored.includes(l)), unscored };
 }
 
-export async function main(context, { api = client() } = {}) {
+export async function main(context, { api = appClient(context) } = {}) {
   const dealId = context.propertiesToSend?.hs_object_id ?? context.parameters?.dealId;
   if (!dealId) return respond(400, { ok: false, error: 'no deal in context' });
   const { lines, unscored } = await dealLines(api, dealId);

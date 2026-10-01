@@ -1,20 +1,19 @@
 // Custom workflow action "Check the price guardrail" (Meridian), served by a public endpoint function.
 // A workflow calls it when a deal enters "Pricing review": it verifies HubSpot's signature, scores the deal's lines,
 // writes the verdict to the deal, and returns output fields the workflow branches on (needs_approval, approver).
-import { client } from '../shared/hubspot-api.js';
 import { optionValue, scoreDeal } from '../shared/guardrail.js';
-import { authenticate, parsedBody, respond } from '../shared/endpoint.js';
+import { appClient, authenticate, parsedBody, respond } from '../shared/endpoint.js';
 import { dealLines } from './deal_margin.js';
 
 export const PATH = '/hs/serverless/price-guardrail';
 
-export async function main(context, { api, now = Date.now(), secret } = {}) {
-  const auth = authenticate(context, PATH, { secret, now });
+export async function main(context, { api, now = Date.now(), clientSecret } = {}) {
+  const auth = authenticate(context, PATH, { clientSecret, now });
   if (!auth.ok) return respond(401, { error: auth.reason });
   const request = parsedBody(context);
   const dealId = request.object?.objectId;
   if (!dealId) return respond(400, { error: 'no deal in the request' });
-  const hubspot = api ?? client();
+  const hubspot = api ?? appClient(context);
   const { lines, unscored } = await dealLines(hubspot, dealId);
   if (lines.length === 0) {
     return respond(200, { outputFields: { hs_execution_state: 'FAIL_CONTINUE', verdict: 'no_lines',

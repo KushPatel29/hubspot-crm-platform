@@ -115,6 +115,12 @@ function client({
 var MAX_AGE_MS = 5 * 60 * 1e3;
 
 // shared/endpoint.js
+function secret(context, name) {
+  return context?.secrets?.[name] || process.env[name] || void 0;
+}
+function appClient(context) {
+  return client({ token: secret(context, "PRIVATE_APP_ACCESS_TOKEN") });
+}
 function respond(statusCode, body) {
   return { statusCode, body };
 }
@@ -133,7 +139,7 @@ var OFFER_PROPERTIES = [
   "offer_decision_note"
 ];
 var STATUS_ORDER = { open: 0, accepted: 1, dismissed: 2 };
-async function main(context, { api = client() } = {}) {
+async function main(context, { api = appClient(context) } = {}) {
   const companyId = context.propertiesToSend?.hs_object_id ?? context.parameters?.companyId;
   if (!companyId) return respond(400, { ok: false, error: "no company in context" });
   const offerType = await api.customType("recommendation");

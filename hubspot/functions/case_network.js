@@ -1,9 +1,8 @@
 // Private function behind the AML "Case evidence" card: the case's subject and the shared counterparties its
 // subject transacts with, largest network first.
-import { client } from '../shared/hubspot-api.js';
-import { respond } from '../shared/endpoint.js';
+import { appClient, respond } from '../shared/endpoint.js';
 
-export async function main(context, { api = client() } = {}) {
+export async function main(context, { api = appClient(context) } = {}) {
   const caseId = context.propertiesToSend?.hs_object_id ?? context.parameters?.caseId;
   if (!caseId) return respond(400, { ok: false, error: 'no case in context' });
   const caseType = await api.customType('investigation_case');

@@ -4,6 +4,7 @@
   "config": {
     "entrypoint": "/app/functions/advance_lifecycle.js",
     "secretKeys": [
+      "HUBSPOT_CLIENT_SECRET",
       "ENDPOINT_BASE_URL"
     ],
     "endpoint": {

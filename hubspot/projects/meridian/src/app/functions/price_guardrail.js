@@ -26,6 +26,74 @@ __export(price_guardrail_exports, {
 });
 module.exports = __toCommonJS(price_guardrail_exports);
 
+// shared/guardrail.js
+var APPROVAL_TIERS = [
+  [0.02, "Rep"],
+  [0.05, "Sales manager"],
+  [0.1, "Commercial director"],
+  [Infinity, "VP Finance"]
+];
+var APPROVERS = ["None", "Rep", "Sales manager", "Commercial director", "VP Finance"];
+var VERDICTS = ["Above stretch", "At target", "Below target", "Below floor", "Loss-making"];
+var TOLERANCE = 1e-9;
+function band(targetMargin) {
+  return { floor: Math.max(0.05, targetMargin - 0.09), target: targetMargin, stretch: targetMargin + 0.08 };
+}
+function scoreLine(price, cost, quantity, targetMargin) {
+  const { floor, target, stretch } = band(targetMargin);
+  const revenue = price * quantity;
+  const marginPct = price > 0 ? (price - cost) / price : 0;
+  let verdict;
+  if (marginPct >= stretch - TOLERANCE) verdict = "Above stretch";
+  else if (marginPct >= target - TOLERANCE) verdict = "At target";
+  else if (marginPct >= floor - TOLERANCE) verdict = "Below target";
+  else if (price - cost > 0) verdict = "Below floor";
+  else verdict = "Loss-making";
+  const gap = target - marginPct;
+  let approver = "None";
+  if (gap > TOLERANCE) approver = APPROVAL_TIERS.find(([limit]) => gap <= limit)[1];
+  return {
+    marginPct,
+    verdict,
+    approver,
+    gap,
+    gapDollars: Math.max(0, gap) * revenue,
+    revenue,
+    margin: (price - cost) * quantity,
+    floor,
+    target,
+    stretch
+  };
+}
+function scoreDeal(lines) {
+  const scored = lines.map((l) => scoreLine(l.price, l.cost, l.quantity, l.targetMargin));
+  if (scored.length === 0) {
+    return { blendedMarginPct: 0, verdict: "At target", approver: "None", gapDollars: 0, worstLine: -1, lines: [] };
+  }
+  const revenue = scored.reduce((sum, s) => sum + s.revenue, 0);
+  let worst = 0;
+  scored.forEach((s, i) => {
+    const w = scored[worst];
+    const rank = VERDICTS.indexOf(s.verdict) - VERDICTS.indexOf(w.verdict);
+    if (rank > 0 || rank === 0 && s.gap > w.gap) worst = i;
+  });
+  const approver = scored.reduce(
+    (best, s) => APPROVERS.indexOf(s.approver) > APPROVERS.indexOf(best) ? s.approver : best,
+    "None"
+  );
+  return {
+    blendedMarginPct: revenue > 0 ? scored.reduce((sum, s) => sum + s.margin, 0) / revenue : 0,
+    verdict: scored[worst].verdict,
+    approver,
+    gapDollars: scored.reduce((sum, s) => sum + s.gapDollars, 0),
+    worstLine: worst,
+    lines: scored
+  };
+}
+function optionValue(label) {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
 // shared/hubspot-api.js
 var HubSpotApiError = class extends Error {
   constructor(status, method, path, category = "", correlationId = "") {
@@ -111,74 +179,6 @@ function client({
   return api;
 }
 
-// shared/guardrail.js
-var APPROVAL_TIERS = [
-  [0.02, "Rep"],
-  [0.05, "Sales manager"],
-  [0.1, "Commercial director"],
-  [Infinity, "VP Finance"]
-];
-var APPROVERS = ["None", "Rep", "Sales manager", "Commercial director", "VP Finance"];
-var VERDICTS = ["Above stretch", "At target", "Below target", "Below floor", "Loss-making"];
-var TOLERANCE = 1e-9;
-function band(targetMargin) {
-  return { floor: Math.max(0.05, targetMargin - 0.09), target: targetMargin, stretch: targetMargin + 0.08 };
-}
-function scoreLine(price, cost, quantity, targetMargin) {
-  const { floor, target, stretch } = band(targetMargin);
-  const revenue = price * quantity;
-  const marginPct = price > 0 ? (price - cost) / price : 0;
-  let verdict;
-  if (marginPct >= stretch - TOLERANCE) verdict = "Above stretch";
-  else if (marginPct >= target - TOLERANCE) verdict = "At target";
-  else if (marginPct >= floor - TOLERANCE) verdict = "Below target";
-  else if (price - cost > 0) verdict = "Below floor";
-  else verdict = "Loss-making";
-  const gap = target - marginPct;
-  let approver = "None";
-  if (gap > TOLERANCE) approver = APPROVAL_TIERS.find(([limit]) => gap <= limit)[1];
-  return {
-    marginPct,
-    verdict,
-    approver,
-    gap,
-    gapDollars: Math.max(0, gap) * revenue,
-    revenue,
-    margin: (price - cost) * quantity,
-    floor,
-    target,
-    stretch
-  };
-}
-function scoreDeal(lines) {
-  const scored = lines.map((l) => scoreLine(l.price, l.cost, l.quantity, l.targetMargin));
-  if (scored.length === 0) {
-    return { blendedMarginPct: 0, verdict: "At target", approver: "None", gapDollars: 0, worstLine: -1, lines: [] };
-  }
-  const revenue = scored.reduce((sum, s) => sum + s.revenue, 0);
-  let worst = 0;
-  scored.forEach((s, i) => {
-    const w = scored[worst];
-    const rank = VERDICTS.indexOf(s.verdict) - VERDICTS.indexOf(w.verdict);
-    if (rank > 0 || rank === 0 && s.gap > w.gap) worst = i;
-  });
-  const approver = scored.reduce(
-    (best, s) => APPROVERS.indexOf(s.approver) > APPROVERS.indexOf(best) ? s.approver : best,
-    "None"
-  );
-  return {
-    blendedMarginPct: revenue > 0 ? scored.reduce((sum, s) => sum + s.margin, 0) / revenue : 0,
-    verdict: scored[worst].verdict,
-    approver,
-    gapDollars: scored.reduce((sum, s) => sum + s.gapDollars, 0),
-    worstLine: worst,
-    lines: scored
-  };
-}
-function optionValue(label) {
-  return label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
-}
-
 // shared/signature.js
 var import_node_crypto = require("node:crypto");
 var MAX_AGE_MS = 5 * 60 * 1e3;
@@ -199,15 +199,15 @@ var DECODE = {
 function canonicalUri(uri) {
   return uri.replace(/%3A|%2F|%3F|%40|%21|%24|%27|%28|%29|%2A|%2C|%3B/gi, (m) => DECODE[m.toUpperCase()]);
 }
-function sign(secret, method, uri, body, timestamp) {
-  return (0, import_node_crypto.createHmac)("sha256", secret).update(`${method.toUpperCase()}${canonicalUri(uri)}${body}${timestamp}`).digest("base64");
+function sign(secret2, method, uri, body, timestamp) {
+  return (0, import_node_crypto.createHmac)("sha256", secret2).update(`${method.toUpperCase()}${canonicalUri(uri)}${body}${timestamp}`).digest("base64");
 }
-function verify(secret, { method, uri, body, timestamp, signature }, now) {
-  if (!secret) return { ok: false, reason: "no client secret configured" };
+function verify(secret2, { method, uri, body, timestamp, signature }, now) {
+  if (!secret2) return { ok: false, reason: "no client secret configured" };
   if (!signature || !timestamp) return { ok: false, reason: "unsigned request" };
   const age = now - Number(timestamp);
   if (!Number.isFinite(age) || age > MAX_AGE_MS || age < -MAX_AGE_MS) return { ok: false, reason: "stale timestamp" };
-  const expected = Buffer.from(sign(secret, method, uri, body, timestamp));
+  const expected = Buffer.from(sign(secret2, method, uri, body, timestamp));
   const given = Buffer.from(String(signature));
   if (expected.length !== given.length || !(0, import_node_crypto.timingSafeEqual)(expected, given)) {
     return { ok: false, reason: "signature mismatch" };
@@ -223,6 +223,12 @@ function header(headers, name) {
 }
 
 // shared/endpoint.js
+function secret(context, name) {
+  return context?.secrets?.[name] || process.env[name] || void 0;
+}
+function appClient(context) {
+  return client({ token: secret(context, "PRIVATE_APP_ACCESS_TOKEN") });
+}
 function rawBody(context) {
   const body = context.body;
   if (body === void 0 || body === null) return "";
@@ -233,7 +239,7 @@ function parsedBody(context) {
   if (typeof body === "string") return body ? JSON.parse(body) : {};
   return body ?? {};
 }
-function signedRequest(context, path, base = process.env.ENDPOINT_BASE_URL) {
+function signedRequest(context, path, base = secret(context, "ENDPOINT_BASE_URL")) {
   const query = new URLSearchParams(context.query ?? {}).toString();
   return {
     method: context.method ?? "POST",
@@ -243,8 +249,8 @@ function signedRequest(context, path, base = process.env.ENDPOINT_BASE_URL) {
     signature: header(context.headers, "x-hubspot-signature-v3")
   };
 }
-function authenticate(context, path, { secret = process.env.HUBSPOT_CLIENT_SECRET, now = Date.now() } = {}) {
-  return verify(secret, signedRequest(context, path), now);
+function authenticate(context, path, { clientSecret = secret(context, "HUBSPOT_CLIENT_SECRET"), now = Date.now() } = {}) {
+  return verify(clientSecret, signedRequest(context, path), now);
 }
 function respond(statusCode, body) {
   return { statusCode, body };
@@ -272,13 +278,13 @@ async function dealLines(api, dealId) {
 
 // functions/price_guardrail.js
 var PATH = "/hs/serverless/price-guardrail";
-async function main(context, { api, now = Date.now(), secret } = {}) {
-  const auth = authenticate(context, PATH, { secret, now });
+async function main(context, { api, now = Date.now(), clientSecret } = {}) {
+  const auth = authenticate(context, PATH, { clientSecret, now });
   if (!auth.ok) return respond(401, { error: auth.reason });
   const request = parsedBody(context);
   const dealId = request.object?.objectId;
   if (!dealId) return respond(400, { error: "no deal in the request" });
-  const hubspot = api ?? client();
+  const hubspot = api ?? appClient(context);
   const { lines, unscored } = await dealLines(hubspot, dealId);
   if (lines.length === 0) {
     return respond(200, { outputFields: {

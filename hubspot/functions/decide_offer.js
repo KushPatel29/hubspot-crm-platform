@@ -8,8 +8,7 @@
 //   2. associations are PUTs, which HubSpot treats as "ensure", not "add again";
 //   3. the line item is created only if the deal has none;
 //   4. the offer is marked accepted last, so "accepted" always means the deal is complete.
-import { client } from '../shared/hubspot-api.js';
-import { respond } from '../shared/endpoint.js';
+import { appClient, respond } from '../shared/endpoint.js';
 
 async function ensureDeal(api, offerType, offerId, offer, company) {
   const existing = await api.associated(offerType, offerId, 'deals');
@@ -51,7 +50,7 @@ async function ensureLineItem(api, dealId, sku) {
     [await api.labelType('line_items', 'deals', null)]);
 }
 
-export async function main(context, { api = client(), now = Date.now() } = {}) {
+export async function main(context, { api = appClient(context), now = Date.now() } = {}) {
   const { offerId, decision, note = '' } = context.parameters ?? {};
   const who = context.userEmail ?? `user ${context.userId ?? 'unknown'}`;
   if (!offerId || !['accept', 'dismiss'].includes(decision)) {

@@ -26,6 +26,34 @@ __export(advance_lifecycle_exports, {
 });
 module.exports = __toCommonJS(advance_lifecycle_exports);
 
+// shared/lifecycle.js
+var LADDER = [
+  "subscriber",
+  "lead",
+  "marketingqualifiedlead",
+  "salesqualifiedlead",
+  "opportunity",
+  "customer",
+  "evangelist"
+];
+function decide(current, target) {
+  if (!LADDER.includes(target)) {
+    return { action: "reject", reason: `"${target}" is not a lifecycle stage this action can set` };
+  }
+  if (current === "other") {
+    return { action: "keep", reason: `the contact is marked "other"; that is a person's decision, not a stage` };
+  }
+  const from = current ? LADDER.indexOf(current) : -1;
+  if (current && from === -1) {
+    return { action: "keep", reason: `unknown current stage "${current}"; not changed` };
+  }
+  const to = LADDER.indexOf(target);
+  if (to <= from) {
+    return { action: "keep", reason: to === from ? "already at that stage" : "that would move the contact backwards" };
+  }
+  return { action: "move", reason: `${current || "no stage"} to ${target}` };
+}
+
 // shared/hubspot-api.js
 var HubSpotApiError = class extends Error {
   constructor(status, method, path, category = "", correlationId = "") {
@@ -111,34 +139,6 @@ function client({
   return api;
 }
 
-// shared/lifecycle.js
-var LADDER = [
-  "subscriber",
-  "lead",
-  "marketingqualifiedlead",
-  "salesqualifiedlead",
-  "opportunity",
-  "customer",
-  "evangelist"
-];
-function decide(current, target) {
-  if (!LADDER.includes(target)) {
-    return { action: "reject", reason: `"${target}" is not a lifecycle stage this action can set` };
-  }
-  if (current === "other") {
-    return { action: "keep", reason: `the contact is marked "other"; that is a person's decision, not a stage` };
-  }
-  const from = current ? LADDER.indexOf(current) : -1;
-  if (current && from === -1) {
-    return { action: "keep", reason: `unknown current stage "${current}"; not changed` };
-  }
-  const to = LADDER.indexOf(target);
-  if (to <= from) {
-    return { action: "keep", reason: to === from ? "already at that stage" : "that would move the contact backwards" };
-  }
-  return { action: "move", reason: `${current || "no stage"} to ${target}` };
-}
-
 // shared/signature.js
 var import_node_crypto = require("node:crypto");
 var MAX_AGE_MS = 5 * 60 * 1e3;
@@ -159,15 +159,15 @@ var DECODE = {
 function canonicalUri(uri) {
   return uri.replace(/%3A|%2F|%3F|%40|%21|%24|%27|%28|%29|%2A|%2C|%3B/gi, (m) => DECODE[m.toUpperCase()]);
 }
-function sign(secret, method, uri, body, timestamp) {
-  return (0, import_node_crypto.createHmac)("sha256", secret).update(`${method.toUpperCase()}${canonicalUri(uri)}${body}${timestamp}`).digest("base64");
+function sign(secret2, method, uri, body, timestamp) {
+  return (0, import_node_crypto.createHmac)("sha256", secret2).update(`${method.toUpperCase()}${canonicalUri(uri)}${body}${timestamp}`).digest("base64");
 }
-function verify(secret, { method, uri, body, timestamp, signature }, now) {
-  if (!secret) return { ok: false, reason: "no client secret configured" };
+function verify(secret2, { method, uri, body, timestamp, signature }, now) {
+  if (!secret2) return { ok: false, reason: "no client secret configured" };
   if (!signature || !timestamp) return { ok: false, reason: "unsigned request" };
   const age = now - Number(timestamp);
   if (!Number.isFinite(age) || age > MAX_AGE_MS || age < -MAX_AGE_MS) return { ok: false, reason: "stale timestamp" };
-  const expected = Buffer.from(sign(secret, method, uri, body, timestamp));
+  const expected = Buffer.from(sign(secret2, method, uri, body, timestamp));
   const given = Buffer.from(String(signature));
   if (expected.length !== given.length || !(0, import_node_crypto.timingSafeEqual)(expected, given)) {
     return { ok: false, reason: "signature mismatch" };
@@ -183,6 +183,12 @@ function header(headers, name) {
 }
 
 // shared/endpoint.js
+function secret(context, name) {
+  return context?.secrets?.[name] || process.env[name] || void 0;
+}
+function appClient(context) {
+  return client({ token: secret(context, "PRIVATE_APP_ACCESS_TOKEN") });
+}
 function rawBody(context) {
   const body = context.body;
   if (body === void 0 || body === null) return "";
@@ -193,7 +199,7 @@ function parsedBody(context) {
   if (typeof body === "string") return body ? JSON.parse(body) : {};
   return body ?? {};
 }
-function signedRequest(context, path, base = process.env.ENDPOINT_BASE_URL) {
+function signedRequest(context, path, base = secret(context, "ENDPOINT_BASE_URL")) {
   const query = new URLSearchParams(context.query ?? {}).toString();
   return {
     method: context.method ?? "POST",
@@ -203,8 +209,8 @@ function signedRequest(context, path, base = process.env.ENDPOINT_BASE_URL) {
     signature: header(context.headers, "x-hubspot-signature-v3")
   };
 }
-function authenticate(context, path, { secret = process.env.HUBSPOT_CLIENT_SECRET, now = Date.now() } = {}) {
-  return verify(secret, signedRequest(context, path), now);
+function authenticate(context, path, { clientSecret = secret(context, "HUBSPOT_CLIENT_SECRET"), now = Date.now() } = {}) {
+  return verify(clientSecret, signedRequest(context, path), now);
 }
 function respond(statusCode, body) {
   return { statusCode, body };
@@ -212,14 +218,14 @@ function respond(statusCode, body) {
 
 // functions/advance_lifecycle.js
 var PATH = "/hs/serverless/advance-lifecycle";
-async function main(context, { api, now = Date.now(), secret } = {}) {
-  const auth = authenticate(context, PATH, { secret, now });
+async function main(context, { api, now = Date.now(), clientSecret } = {}) {
+  const auth = authenticate(context, PATH, { clientSecret, now });
   if (!auth.ok) return respond(401, { error: auth.reason });
   const request = parsedBody(context);
   const contactId = request.object?.objectId;
   const target = request.inputFields?.target_stage;
   if (!contactId || !target) return respond(400, { error: "needs a contact and a target_stage" });
-  const hubspot = api ?? client();
+  const hubspot = api ?? appClient(context);
   const contact = await hubspot.get(`/crm/v3/objects/contacts/${contactId}?properties=lifecyclestage`);
   const current = contact.properties?.lifecyclestage ?? "";
   const decision = decide(current, target);

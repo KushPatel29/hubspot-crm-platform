@@ -53,7 +53,7 @@ describe('deal margin and the price guardrail', () => {
     const { fake, deal } = meridianDeal();
     const request = signed(GUARDRAIL, { object: { objectId: deal.id } });
     request.body = request.body.replace(deal.id, '999');
-    const response = await priceGuardrail(request, { api: fake.api, now: NOW, secret: SECRET });
+    const response = await priceGuardrail(request, { api: fake.api, now: NOW, clientSecret: SECRET });
     expect(response.statusCode).toBe(401);
     expect(fake.state.calls).toEqual([]);
   });
@@ -61,7 +61,7 @@ describe('deal margin and the price guardrail', () => {
   it('writes the verdict to the deal and returns fields a workflow can branch on', async () => {
     const { fake, deal } = meridianDeal();
     const response = await priceGuardrail(signed(GUARDRAIL, { object: { objectId: deal.id } }),
-      { api: fake.api, now: NOW, secret: SECRET });
+      { api: fake.api, now: NOW, clientSecret: SECRET });
     expect(response.statusCode).toBe(200);
     expect(output(response).outputFields).toMatchObject({ verdict: 'below_target', approver: 'sales_manager',
       needs_approval: 'true' });
@@ -70,16 +70,30 @@ describe('deal margin and the price guardrail', () => {
   });
 });
 
+describe('secrets', () => {
+  it('reads the client secret and endpoint URL from context.secrets, as HubSpot passes them', async () => {
+    delete process.env.ENDPOINT_BASE_URL;
+    const events = [{ eventId: 9, subscriptionType: 'contact.creation', objectId: 1 }];
+    const request = signed(WEBHOOKS, events);
+    delete process.env.ENDPOINT_BASE_URL;
+    const response = await webhookReceiver({ ...request, secrets: { HUBSPOT_CLIENT_SECRET: SECRET,
+      ENDPOINT_BASE_URL: BASE } }, { now: NOW, log: () => {} });
+    expect(response.statusCode).toBe(200);
+    const missing = await webhookReceiver(request, { now: NOW, log: () => {} });
+    expect(missing.body.error).toBe('no client secret configured');
+  });
+});
+
 describe('advance lifecycle', () => {
   it('moves forward, keeps backwards moves out, and says which', async () => {
     const fake = fakeApi();
     const contact = fake.add('contacts', { lifecyclestage: 'customer' });
     const back = await advanceLifecycle(signed(LIFECYCLE, { object: { objectId: contact.id },
-      inputFields: { target_stage: 'lead' } }), { api: fake.api, now: NOW, secret: SECRET });
+      inputFields: { target_stage: 'lead' } }), { api: fake.api, now: NOW, clientSecret: SECRET });
     expect(output(back).outputFields.outcome).toBe('kept');
     expect(fake.state.objects.contacts[contact.id].properties.lifecyclestage).toBe('customer');
     const forward = await advanceLifecycle(signed(LIFECYCLE, { object: { objectId: contact.id },
-      inputFields: { target_stage: 'evangelist' } }), { api: fake.api, now: NOW, secret: SECRET });
+      inputFields: { target_stage: 'evangelist' } }), { api: fake.api, now: NOW, clientSecret: SECRET });
     expect(output(forward).outputFields).toMatchObject({ outcome: 'moved', from_stage: 'customer' });
   });
 });
@@ -89,13 +103,13 @@ describe('webhook receiver', () => {
     const lines = [];
     const events = [{ eventId: 1, subscriptionType: 'contact.propertyChange', objectId: 7, propertyValue: 'x@y.com' },
       { eventId: 2, subscriptionType: 'contact.privacyDeletion', objectId: 8, attemptNumber: 1 }];
-    const response = await webhookReceiver(signed(WEBHOOKS, events), { now: NOW, secret: SECRET,
+    const response = await webhookReceiver(signed(WEBHOOKS, events), { now: NOW, clientSecret: SECRET,
       log: (line) => lines.push(line) });
     expect(response.statusCode).toBe(200);
     expect(lines[0]).not.toContain('x@y.com');
     expect(JSON.parse(lines[0])).toMatchObject({ webhook: 'accepted', events: 2, attempts: 1 });
     expect(summarise(events).byType).toEqual({ 'contact.propertyChange': 1, 'contact.privacyDeletion': 1 });
-    const forged = await webhookReceiver({ ...signed(WEBHOOKS, events), body: '[]' }, { now: NOW, secret: SECRET,
+    const forged = await webhookReceiver({ ...signed(WEBHOOKS, events), body: '[]' }, { now: NOW, clientSecret: SECRET,
       log: () => {} });
     expect(forged.statusCode).toBe(401);
   });

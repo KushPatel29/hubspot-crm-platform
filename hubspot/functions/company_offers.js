@@ -1,13 +1,12 @@
 // Private function behind the meat distributor's "Next best offer" card: the company's recommendations, open ones
 // first by rank, with the deal each accepted one became.
-import { client } from '../shared/hubspot-api.js';
-import { respond } from '../shared/endpoint.js';
+import { appClient, respond } from '../shared/endpoint.js';
 
 export const OFFER_PROPERTIES = ['offer_title', 'offer_rank', 'offer_score', 'offer_sku', 'offer_protein',
   'offer_revenue_opportunity', 'offer_because', 'offer_status', 'offer_decided_at', 'offer_decision_note'];
 const STATUS_ORDER = { open: 0, accepted: 1, dismissed: 2 };
 
-export async function main(context, { api = client() } = {}) {
+export async function main(context, { api = appClient(context) } = {}) {
   const companyId = context.propertiesToSend?.hs_object_id ?? context.parameters?.companyId;
   if (!companyId) return respond(400, { ok: false, error: 'no company in context' });
   const offerType = await api.customType('recommendation');

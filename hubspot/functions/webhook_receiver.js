@@ -18,8 +18,8 @@ export function summarise(events) {
   };
 }
 
-export async function main(context, { now = Date.now(), secret, log = console.log } = {}) {
-  const auth = authenticate(context, PATH, { secret, now });
+export async function main(context, { now = Date.now(), clientSecret, log = console.log } = {}) {
+  const auth = authenticate(context, PATH, { clientSecret, now });
   if (!auth.ok) {
     log(JSON.stringify({ webhook: 'refused', reason: auth.reason }));
     return respond(401, { error: auth.reason });

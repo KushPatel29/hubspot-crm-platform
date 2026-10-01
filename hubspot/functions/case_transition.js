@@ -1,11 +1,10 @@
 // Private function: an investigator moves a case to its next stage from the "Case evidence" card.
 // Only the transitions in shared/cases.js are allowed, a note is required, closing sets the decision, and every
 // move is appended to the case's activity log (HubSpot's property history records the same change natively).
-import { client } from '../shared/hubspot-api.js';
-import { respond } from '../shared/endpoint.js';
+import { appClient, respond } from '../shared/endpoint.js';
 import { checkTransition, logEntry } from '../shared/cases.js';
 
-export async function main(context, { api = client(), now = Date.now() } = {}) {
+export async function main(context, { api = appClient(context), now = Date.now() } = {}) {
   const caseId = context.propertiesToSend?.hs_object_id ?? context.parameters?.caseId;
   const { toStage, note } = context.parameters ?? {};
   if (!caseId || !toStage) return respond(400, { ok: false, error: 'needs a case and a target stage' });
