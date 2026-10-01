@@ -32,7 +32,7 @@ private class GuardrailServiceTest {
             new List<Object>{ -0.05, 'Loss-making', 'VP Finance' }
         };
         for (List<Object> c : cases) {
-            Double margin = (Double) c[0];
+            Double margin = ((Decimal) c[0]).doubleValue(); // a 0.4 literal in a List<Object> is a Decimal
             GuardrailService.LineScore s = GuardrailService.scoreLine(100, 100 * (1 - margin), 1, 0.3);
             Assert.areEqual(c[1], s.verdict, 'verdict at ' + margin);
             Assert.areEqual(c[2], s.approver, 'approver at ' + margin);
@@ -49,7 +49,8 @@ private class GuardrailServiceTest {
         Assert.areEqual('Below target', deal.verdict);
         Assert.areEqual(1, deal.worstLine);
         Assert.areEqual('Sales manager', deal.approver);
-        near(210.0 / 700.0, deal.blendedMarginPct, 'blended margin');
+        Double blended = 0.3; // 210 of margin on 700 of revenue
+        near(blended, deal.blendedMarginPct, 'blended margin');
         GuardrailService.DealScore empty = GuardrailService.scoreDeal(new List<GuardrailService.Line>());
         Assert.areEqual('None', empty.approver);
         Assert.areEqual(-1, empty.worstLine);
