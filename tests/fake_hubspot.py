@@ -172,10 +172,12 @@ class FakeHubSpot:
         return 201, {"id": schema["associations"][-1]["id"]}
 
     def create_group(self, body: dict, query: dict, object_type: str) -> tuple[int, Any]:
-        groups = self.groups[self.tid(object_type)]
-        if body["name"] in groups:
+        tid = self.tid(object_type)
+        if body["name"] in self.groups[tid]:
             return 409, {"category": "OBJECT_ALREADY_EXISTS"}
-        groups.add(body["name"])
+        # Like HubSpot, products and line items share property groups.
+        for shared in ({"0-7", "0-8"} if tid in {"0-7", "0-8"} else {tid}):
+            self.groups[shared].add(body["name"])
         return 201, body
 
     def _check_property(self, object_type: str, body: dict) -> str:

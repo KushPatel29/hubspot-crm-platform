@@ -8,6 +8,8 @@
 // Guards, in order:
 //   * Signature: hex HMAC-SHA256 over "<timestamp>.<method>.<path>.<bodyText>" with PROVISION_KEY, a random key the
 //     loader generated for this portal and stored as an app secret. Timestamps older than five minutes are refused.
+//     Timestamp and signature travel inside the JSON envelope: HubSpot's gateway does not pass custom request
+//     headers to public functions (found live), and the signature covers the timestamp either way.
 //   * Allowlist: only the calls the loader makes (account details; properties, groups, schemas, pipelines and
 //     association labels; object list, batch read/create/update; association batch read/create). Never DELETE, and
 //     nothing outside the CRM.
@@ -47,8 +49,8 @@ export function signRequest(key, timestamp, method, path, body) {
 }
 
 function verified(key, context, request, now) {
-  const timestamp = Number(header(context.headers, 'x-crm-platform-timestamp'));
-  const given = String(header(context.headers, 'x-crm-platform-signature') ?? '');
+  const timestamp = Number(request.timestamp ?? header(context.headers, 'x-crm-platform-timestamp'));
+  const given = String(request.signature ?? header(context.headers, 'x-crm-platform-signature') ?? '');
   if (!key) return 'no provision key configured';
   if (!Number.isFinite(timestamp) || Math.abs(now - timestamp) > MAX_AGE_MS) return 'stale or missing timestamp';
   // The body is signed and forwarded as the exact text the loader sent, so no JSON re-serialisation can differ.

@@ -27,11 +27,11 @@ def test_calls_are_signed_enveloped_and_unwrapped():
     status, body, headers = transport("POST", "/crm/v3/objects/0-2/batch/create", {"inputs": [{"name": "Côté"}]})
     assert (status, body, headers) == (207, {"results": []}, {"retry-after": "1"})
     url, envelope, sent_headers = sent[0]
-    assert envelope == {"method": "POST", "path": "/crm/v3/objects/0-2/batch/create",
-                        "bodyText": '{"inputs":[{"name":"Côté"}]}'}
-    assert sent_headers["X-Crm-Platform-Timestamp"] == "1790000000000"
-    assert sent_headers["X-Crm-Platform-Signature"] == transport.sign("1790000000000", "POST", envelope["path"],
-                                                                      envelope["bodyText"])
+    assert {k: envelope[k] for k in ("method", "path", "bodyText", "timestamp")} == {
+        "method": "POST", "path": "/crm/v3/objects/0-2/batch/create", "bodyText": '{"inputs":[{"name":"Côté"}]}',
+        "timestamp": "1790000000000"}
+    assert envelope["signature"] == transport.sign("1790000000000", "POST", envelope["path"], envelope["bodyText"])
+    assert set(sent_headers) == {"Content-Type"}  # nothing rides in headers HubSpot's gateway would drop
 
 
 def test_a_refusal_by_the_function_reaches_the_client_as_a_permanent_error():

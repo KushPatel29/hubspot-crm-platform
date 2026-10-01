@@ -6,10 +6,9 @@ const NOW = Date.parse('2026-10-01T12:00:00Z');
 
 function call(method, path, body, { key = KEY, at = NOW } = {}) {
   const bodyText = body === undefined ? '' : JSON.stringify(body);
-  return {
-    method: 'POST', params: {}, body: JSON.stringify({ method, path, bodyText }),
-    headers: { 'x-crm-platform-timestamp': String(at), 'x-crm-platform-signature': signRequest(key, at, method, path, bodyText) },
-  };
+  const signature = signRequest(key, at, method, path, bodyText);
+  return { method: 'POST', params: {}, headers: {},
+    body: JSON.stringify({ method, path, bodyText, timestamp: String(at), signature }) };
 }
 
 function upstream(status, body, headers = {}) {

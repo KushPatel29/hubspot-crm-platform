@@ -21,7 +21,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any
 
-from crm_platform.hubspot.client import HubSpotClient
+from crm_platform.hubspot.client import HubSpotClient, HubSpotError
 from crm_platform.model import ObjectModel, Pipeline, Property, TenantModel
 
 STANDARD_TYPE_IDS = {"contacts": "0-1", "companies": "0-2", "deals": "0-3", "tickets": "0-5", "products": "0-7",
@@ -324,8 +324,15 @@ def apply(client: HubSpotClient, model: TenantModel, *, max_passes: int = 4) -> 
                     "drift": current.drift, "summary": {}}
         runnable = [op for op in current.ops if op.payload is not None]
         for op in runnable:
-            _run(client, state, op)
-            done.append(op.describe())
+            try:
+                _run(client, state, op)
+                done.append(op.describe())
+            except HubSpotError as exc:
+                # A create HubSpot answers 409 to already happened: products and line items share property groups,
+                # so the group created for one exists for the other. The next pass re-reads and confirms.
+                if exc.status != 409 or not op.kind.startswith("create_"):
+                    raise
+                done.append(f"{op.describe()} (already existed)")
     final = plan(model, read_state(client, model))
     return {"applied": done, "converged": final.converged, "conflicts": [c.describe() for c in final.conflicts],
             "drift": final.drift, "summary": final.summary()}

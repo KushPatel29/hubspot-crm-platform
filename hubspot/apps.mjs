@@ -77,8 +77,9 @@ export const APPS = {
     name: 'Meridian Supply pricing guardrail',
     description: 'Line-by-line deal margin against each product\'s guardrail band, and a workflow action that '
       + 'decides who has to sign.',
-    scopes: unique(['oauth'], crud('contacts', 'companies', 'deals', 'products', 'line_items'),
-      schemas('contacts', 'companies', 'deals', 'products', 'line_items')),
+    // Product and line-item properties have no crm.schemas.* scopes; the legacy e-commerce scope covers them.
+    scopes: unique(['oauth', 'e-commerce', 'crm.schemas.line_items.read'],
+      crud('contacts', 'companies', 'deals', 'products', 'line_items'), schemas('contacts', 'companies', 'deals')),
     cards: [{ component: 'DealMarginCard', uid: 'deal_margin_card', name: 'Deal margin guardrail',
       description: 'Each line against its floor and target margin, the verdict and the approver needed.',
       objectTypes: ['deals'], needs: ['run'] }],
@@ -117,8 +118,8 @@ export const APPS = {
   crosssell: {
     name: 'Cross-sell next best offer',
     description: 'The recommendation engine\'s next-best offers on every account, turned into deals in one click.',
-    scopes: unique(['oauth'], crud('contacts', 'companies', 'deals', 'products', 'line_items', 'custom'),
-      schemas('contacts', 'companies', 'products', 'custom')),
+    scopes: unique(['oauth', 'e-commerce'], crud('contacts', 'companies', 'deals', 'products', 'line_items', 'custom'),
+      schemas('contacts', 'companies', 'custom')),
     cards: [{ component: 'NextBestOfferCard', uid: 'next_best_offer_card', name: 'Next best offer',
       description: 'Eligible offers with the reason and the value, accepted into deals or dismissed with a reason.',
       objectTypes: ['companies'], needs: ['run', 'portalId'] }],

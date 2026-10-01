@@ -159,9 +159,11 @@ class FunctionTransport:
 
     A developer key cannot write standard CRM records, and HubSpot does not issue local-dev app tokens on test
     accounts, so the loader's writes run inside HubSpot instead (``hubspot/functions/provision.js``). Each call is
-    sent as ``{method, path, bodyText}`` with a timestamp and a hex HMAC-SHA256 over
-    ``"<timestamp>.<method>.<path>.<bodyText>"``, keyed with the portal's provision key. The function returns the
-    upstream status, body and rate-limit headers, so the client's retries, pacing and 207 handling are unchanged.
+    sent as ``{method, path, bodyText, timestamp, signature}``, the signature a hex HMAC-SHA256 over
+    ``"<timestamp>.<method>.<path>.<bodyText>"`` keyed with the portal's provision key. (HubSpot's gateway does not
+    pass custom headers to public functions, so the timestamp and signature travel in the signed envelope.) The
+    function returns the upstream status, body and rate-limit headers, so the client's retries, pacing and 207
+    handling are unchanged.
     """
 
     def __init__(self, url: str, key: str, *, timeout: float = 60, clock: Callable[[], float] = time.time,
@@ -187,9 +189,9 @@ class FunctionTransport:
     def __call__(self, method: str, path: str, body: Any) -> tuple[int, Any, dict[str, str]]:
         body_text = json.dumps(body, separators=(",", ":"), ensure_ascii=False) if body is not None else ""
         timestamp = str(int(self.clock() * 1000))
-        headers = {"Content-Type": "application/json", "X-Crm-Platform-Timestamp": timestamp,
-                   "X-Crm-Platform-Signature": self.sign(timestamp, method, path, body_text)}
-        envelope = json.dumps({"method": method, "path": path, "bodyText": body_text}).encode()
+        headers = {"Content-Type": "application/json"}
+        envelope = json.dumps({"method": method, "path": path, "bodyText": body_text, "timestamp": timestamp,
+                               "signature": self.sign(timestamp, method, path, body_text)}).encode()
         status, payload = self._post(self.url, envelope, headers, self.timeout)
         try:
             parsed = json.loads(payload) if payload else None

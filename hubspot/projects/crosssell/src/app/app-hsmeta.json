@@ -9,6 +9,7 @@
       "type": "static",
       "requiredScopes": [
         "oauth",
+        "e-commerce",
         "crm.objects.contacts.read",
         "crm.objects.contacts.write",
         "crm.objects.companies.read",
@@ -25,8 +26,6 @@
         "crm.schemas.contacts.write",
         "crm.schemas.companies.read",
         "crm.schemas.companies.write",
-        "crm.schemas.products.read",
-        "crm.schemas.products.write",
         "crm.schemas.custom.read",
         "crm.schemas.custom.write"
       ],

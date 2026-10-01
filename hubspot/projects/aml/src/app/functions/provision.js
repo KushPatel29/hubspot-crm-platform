@@ -82,8 +82,8 @@ function signRequest(key, timestamp, method, path, body) {
   return (0, import_node_crypto.createHmac)("sha256", key).update(`${timestamp}.${method}.${path}.${body}`).digest("hex");
 }
 function verified(key, context, request, now) {
-  const timestamp = Number(header(context.headers, "x-crm-platform-timestamp"));
-  const given = String(header(context.headers, "x-crm-platform-signature") ?? "");
+  const timestamp = Number(request.timestamp ?? header(context.headers, "x-crm-platform-timestamp"));
+  const given = String(request.signature ?? header(context.headers, "x-crm-platform-signature") ?? "");
   if (!key) return "no provision key configured";
   if (!Number.isFinite(timestamp) || Math.abs(now - timestamp) > MAX_AGE_MS2) return "stale or missing timestamp";
   const expected = signRequest(key, timestamp, request.method, request.path, request.bodyText ?? "");
