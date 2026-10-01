@@ -14,7 +14,7 @@ export function parsedBody(context) {
   return body ?? {};
 }
 
-// HubSpot signs the URL it called. A public app function is served at https://<portal domain>/_hcms/api/<path>;
+// HubSpot signs the URL it called. A public app function is served at https://<portal domain>/hs/serverless/<path>;
 // the runtime does not pass the domain in, so it comes from the ENDPOINT_BASE_URL secret
 // (for example https://123.hs-sites-na2.com), which `python -m crm_platform bind` reads from the portal.
 export function signedRequest(context, path, base = process.env.ENDPOINT_BASE_URL) {

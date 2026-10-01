@@ -5,7 +5,7 @@
 // Per project: hsproject.json (platform 2026.09); src/app/app-hsmeta.json (a private static-auth app with only the
 // scopes its parts use); cards with their shared modules copied beside them; each function bundled with esbuild
 // into one CommonJS file (app functions load `exports.main`); workflow actions and webhooks pointing at the
-// function endpoints (a public app function is served at https://<portal domain>/_hcms/api/<path>); and
+// function endpoints (a public app function is served at https://<portal domain>/hs/serverless/<path>); and
 // src/hsprofile.live.json, whose account ID and endpoint base URL come from
 // ../evidence/<tenant>/deploy.json once a portal exists.
 import { build } from 'esbuild';
@@ -64,7 +64,8 @@ function typologies() {
 function deployment(tenant) {
   const path = join(ROOT, 'evidence', tenant, 'deploy.json');
   const found = existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : {};
-  return { accountId: found.accountId ?? 0, endpointBaseUrl: found.endpointBaseUrl ?? 'https://example.invalid' };
+  return { accountId: found.accountId ?? 0, endpointBaseUrl: found.endpointBaseUrl ?? 'https://example.invalid',
+    secrets: found.secrets ?? {} };
 }
 
 function entry(card) {
@@ -133,7 +134,11 @@ async function project(tenant, app, out) {
     private: true, dependencies: {} }));
   for (const fn of app.functions) {
     await bundle(join(HERE, 'functions', `${fn.name}.js`), join(functions, `${fn.name}.js`));
-    const config = { entrypoint: `/app/functions/${fn.name}.js`, secretKeys: fn.secrets ?? [] };
+    // A function may only name secrets that exist in the portal, or the deploy fails. HubSpot shows an app's client
+    // secret only after its first successful deploy, so the first deploy leaves HUBSPOT_CLIENT_SECRET out: the
+    // endpoint functions then fail closed (every request answers 401) until it is added and the app redeployed.
+    const secretKeys = (fn.secrets ?? []).filter((key) => key !== 'HUBSPOT_CLIENT_SECRET' || deploy.secrets[key]);
+    const config = { entrypoint: `/app/functions/${fn.name}.js`, secretKeys };
     if (fn.endpoint) config.endpoint = { path: fn.endpoint, methods: ['POST'] };
     write(join(functions, `${fn.name}-hsmeta.json`), json({ uid: fn.name, type: 'app-function', config }));
   }
@@ -142,7 +147,7 @@ async function project(tenant, app, out) {
     const fn = app.functions.find((f) => f.name === action.function);
     write(join(src, 'app', 'workflow-actions', `${action.uid}-hsmeta.json`), json({ uid: action.uid,
       type: 'workflow-action', config: {
-        actionUrl: `\${ENDPOINT_BASE_URL}/_hcms/api/${fn.endpoint}`, isPublished: true,
+        actionUrl: `\${ENDPOINT_BASE_URL}/hs/serverless/${fn.endpoint}`, isPublished: true,
         supportedClients: [{ client: 'WORKFLOWS' }], inputFields: action.inputFields,
         outputFields: action.outputFields, labels: { en: action.labels }, objectTypes: action.objectTypes,
       } }));
@@ -150,7 +155,7 @@ async function project(tenant, app, out) {
   if (app.webhooks) {
     const fn = app.functions.find((f) => f.name === app.webhooks.function);
     write(join(src, 'app', 'webhooks', 'webhooks-hsmeta.json'), json({ uid: 'webhooks', type: 'webhooks', config: {
-      settings: { targetUrl: `\${ENDPOINT_BASE_URL}/_hcms/api/${fn.endpoint}`, maxConcurrentRequests: 10 },
+      settings: { targetUrl: `\${ENDPOINT_BASE_URL}/hs/serverless/${fn.endpoint}`, maxConcurrentRequests: 10 },
       subscriptions: {
         crmObjects: app.webhooks.crmObjects.map((s) => ({ ...s, active: true })),
         hubEvents: app.webhooks.hubEvents.map((s) => ({ ...s, active: true })),

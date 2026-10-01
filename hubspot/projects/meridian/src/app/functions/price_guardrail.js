@@ -271,7 +271,7 @@ async function dealLines(api, dealId) {
 }
 
 // functions/price_guardrail.js
-var PATH = "/_hcms/api/price-guardrail";
+var PATH = "/hs/serverless/price-guardrail";
 async function main(context, { api, now = Date.now(), secret } = {}) {
   const auth = authenticate(context, PATH, { secret, now });
   if (!auth.ok) return respond(401, { error: auth.reason });

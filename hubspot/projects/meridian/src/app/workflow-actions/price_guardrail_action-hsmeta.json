@@ -2,7 +2,7 @@
   "uid": "price_guardrail_action",
   "type": "workflow-action",
   "config": {
-    "actionUrl": "${ENDPOINT_BASE_URL}/_hcms/api/price-guardrail",
+    "actionUrl": "${ENDPOINT_BASE_URL}/hs/serverless/price-guardrail",
     "isPublished": true,
     "supportedClients": [
       {

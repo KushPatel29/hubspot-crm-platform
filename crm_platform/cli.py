@@ -71,7 +71,7 @@ def guard(client: HubSpotClient, tenant: str, *, allow_portal: str | None = None
 
 
 def endpoint_base_url(client: HubSpotClient, portal_id: str) -> str | None:
-    """The portal's system domain, where its public app functions are served (``/_hcms/api/<path>``)."""
+    """The portal's system domain, where its public app functions are served (``/hs/serverless/<path>``)."""
     try:
         domains = client.get("/cms/v3/domains").get("results", [])
     except HubSpotError:

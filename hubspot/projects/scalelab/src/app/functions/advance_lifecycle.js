@@ -211,7 +211,7 @@ function respond(statusCode, body) {
 }
 
 // functions/advance_lifecycle.js
-var PATH = "/_hcms/api/advance-lifecycle";
+var PATH = "/hs/serverless/advance-lifecycle";
 async function main(context, { api, now = Date.now(), secret } = {}) {
   const auth = authenticate(context, PATH, { secret, now });
   if (!auth.ok) return respond(401, { error: auth.reason });

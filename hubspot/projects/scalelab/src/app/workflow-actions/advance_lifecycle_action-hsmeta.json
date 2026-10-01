@@ -2,7 +2,7 @@
   "uid": "advance_lifecycle_action",
   "type": "workflow-action",
   "config": {
-    "actionUrl": "${ENDPOINT_BASE_URL}/_hcms/api/advance-lifecycle",
+    "actionUrl": "${ENDPOINT_BASE_URL}/hs/serverless/advance-lifecycle",
     "isPublished": true,
     "supportedClients": [
       {

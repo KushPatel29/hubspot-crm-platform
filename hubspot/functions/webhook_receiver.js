@@ -4,7 +4,7 @@
 // hubspot_webhooks.py); this receiver is what proves HubSpot delivers, signs and retries them to a live endpoint.
 import { authenticate, parsedBody, respond } from '../shared/endpoint.js';
 
-export const PATH = '/_hcms/api/webhooks';
+export const PATH = '/hs/serverless/webhooks';
 
 export function summarise(events) {
   const byType = {};

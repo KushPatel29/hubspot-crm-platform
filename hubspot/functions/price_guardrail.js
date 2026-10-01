@@ -6,7 +6,7 @@ import { optionValue, scoreDeal } from '../shared/guardrail.js';
 import { authenticate, parsedBody, respond } from '../shared/endpoint.js';
 import { dealLines } from './deal_margin.js';
 
-export const PATH = '/_hcms/api/price-guardrail';
+export const PATH = '/hs/serverless/price-guardrail';
 
 export async function main(context, { api, now = Date.now(), secret } = {}) {
   const auth = authenticate(context, PATH, { secret, now });
