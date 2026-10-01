@@ -19,7 +19,7 @@ describe('Revenue truth card', () => {
     mocks.useCrmProperties.willCall(() => loaded({
       growthops_contact_id: 'c-1', growthops_net_cash: '1500', lifecyclestage: 'customer',
       growthops_first_touch_campaign: 'meta_broad_v17', growthops_lead_creation_campaign: 'webinar_q3',
-      growthops_last_non_direct_campaign: 'webinar_q3', growthops_tracking_status: 'tracked',
+      growthops_last_non_direct_campaign: 'webinar_q3', growthops_tracking_status: 'complete',
       growthops_has_closed_won: 'true', growthops_renewal_risk: 'high', growthops_renewal_due_date: '2026-10-05',
     }));
     mocks.useAssociations.willCall(() => ({ results: [
@@ -33,6 +33,15 @@ describe('Revenue truth card', () => {
     expect(findAll(Text).some((t) => t.text?.includes('models disagree'))).toBe(true);
     expect(find(StatusTag).text).toBe('High risk');
     expect(find(DescriptionListItem, { label: 'Bought' }).text).toBe('Accelerator, Community');
+    expect(findAll(Alert)).toHaveLength(0);  // "complete" tracking raises no warning
+  });
+
+  it('warns when the landing page dropped the UTMs', () => {
+    const { render, mocks, find } = createRenderer('crm.record.tab');
+    mocks.useCrmProperties.willCall(() => loaded({ growthops_contact_id: 'c-2', growthops_tracking_status: 'missing_utm' }));
+    render(<RevenueTruthCard />);
+    expect(find(Alert).props.title).toBe('Attribution is incomplete');
+    expect(find(Alert).text).toContain('dropped its UTM parameters');
   });
 
   it('says so instead of showing zeros for a contact GrowthOps did not create', () => {

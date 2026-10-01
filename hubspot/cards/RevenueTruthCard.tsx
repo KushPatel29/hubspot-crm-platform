@@ -19,6 +19,14 @@ export const PROPERTIES = [
 // What was bought lives on the deals (GrowthOps writes growthops_product there), read through the association.
 export const DEAL_PROPERTIES = ['dealname', 'growthops_product', 'growthops_net_cash'];
 
+// GrowthOps' tracking statuses that mean the campaign credit below cannot be trusted ("complete" and "direct" are
+// fine: direct traffic legitimately has no campaign).
+export const TRACKING_PROBLEMS: Record<string, string> = {
+  missing_utm: 'the landing page dropped its UTM parameters',
+  off_taxonomy: 'the UTM values are outside the campaign taxonomy',
+  no_lead_touch: 'no touch was recorded before the lead was created',
+};
+
 const RISK: Record<string, 'danger' | 'warning' | 'success' | 'default'> = {
   high: 'danger', medium: 'warning', not_due: 'success',
 };
@@ -44,9 +52,10 @@ export function RevenueTruthCard() {
         <StatisticsItem label="Net cash collected" number={money(num(p.growthops_net_cash))} />
         <StatisticsItem label="Lifecycle stage" number={label(p.lifecyclestage)} />
       </Statistics>
-      {p.growthops_tracking_status && p.growthops_tracking_status !== 'tracked' && (
+      {TRACKING_PROBLEMS[p.growthops_tracking_status ?? ''] && (
         <Alert title="Attribution is incomplete" variant="warning">
-          Tracking status is {label(p.growthops_tracking_status)}: the campaigns below may not be the whole story.
+          For this contact {TRACKING_PROBLEMS[p.growthops_tracking_status ?? '']}, so the campaigns below may not be the
+          whole story.
         </Alert>
       )}
       <Text format={{ fontWeight: 'demibold' }}>Which campaign gets the credit</Text>
