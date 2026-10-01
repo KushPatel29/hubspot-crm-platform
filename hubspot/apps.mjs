@@ -18,6 +18,12 @@ const lifecycleOptions = [
   ['evangelist', 'Evangelist'],
 ];
 const toOptions = (pairs) => pairs.map(([value, label]) => ({ value, label }));
+// The loader's write path (functions/provision.js) runs under the app's token, so each app also carries the read and
+// write scopes its tenant's schema and records need, and nothing more.
+const PROVISION = { name: 'provision', endpoint: 'provision', secrets: ['PROVISION_KEY'] };
+const crud = (...objects) => objects.flatMap((o) => [`crm.objects.${o}.read`, `crm.objects.${o}.write`]);
+const schemas = (...objects) => objects.flatMap((o) => [`crm.schemas.${o}.read`, `crm.schemas.${o}.write`]);
+const unique = (...lists) => [...new Set(lists.flat())];
 
 export const APPS = {
   scalelab: {
@@ -71,14 +77,15 @@ export const APPS = {
     name: 'Meridian Supply pricing guardrail',
     description: 'Line-by-line deal margin against each product\'s guardrail band, and a workflow action that '
       + 'decides who has to sign.',
-    scopes: ['oauth', 'crm.objects.deals.read', 'crm.objects.deals.write', 'crm.objects.line_items.read',
-      'crm.objects.products.read'],
+    scopes: unique(['oauth'], crud('contacts', 'companies', 'deals', 'products', 'line_items'),
+      schemas('contacts', 'companies', 'deals', 'products', 'line_items')),
     cards: [{ component: 'DealMarginCard', uid: 'deal_margin_card', name: 'Deal margin guardrail',
       description: 'Each line against its floor and target margin, the verdict and the approver needed.',
       objectTypes: ['deals'], needs: ['run'] }],
     functions: [
       { name: 'deal_margin' },
       { name: 'price_guardrail', endpoint: 'price-guardrail', secrets: SIGNED_ENDPOINT_SECRETS },
+      PROVISION,
     ],
     workflowActions: [{
       uid: 'price_guardrail_action',
@@ -110,24 +117,22 @@ export const APPS = {
   crosssell: {
     name: 'Cross-sell next best offer',
     description: 'The recommendation engine\'s next-best offers on every account, turned into deals in one click.',
-    scopes: ['oauth', 'crm.objects.companies.read', 'crm.objects.contacts.read', 'crm.objects.deals.read',
-      'crm.objects.deals.write', 'crm.objects.line_items.read', 'crm.objects.line_items.write',
-      'crm.objects.products.read', 'crm.objects.custom.read', 'crm.objects.custom.write', 'crm.schemas.custom.read'],
+    scopes: unique(['oauth'], crud('contacts', 'companies', 'deals', 'products', 'line_items', 'custom'),
+      schemas('contacts', 'companies', 'products', 'custom')),
     cards: [{ component: 'NextBestOfferCard', uid: 'next_best_offer_card', name: 'Next best offer',
       description: 'Eligible offers with the reason and the value, accepted into deals or dismissed with a reason.',
       objectTypes: ['companies'], needs: ['run', 'portalId'] }],
-    functions: [{ name: 'company_offers' }, { name: 'decide_offer' }],
+    functions: [{ name: 'company_offers' }, { name: 'decide_offer' }, PROVISION],
   },
 
   aml: {
     name: 'Investigation case desk',
     description: 'Case evidence, deadline and shared counterparties on every investigation case, with audited '
       + 'stage moves. Synthetic data; an educational simulation, not a compliance tool.',
-    scopes: ['oauth', 'crm.objects.contacts.read', 'crm.objects.companies.read', 'crm.objects.custom.read',
-      'crm.objects.custom.write', 'crm.schemas.custom.read'],
+    scopes: unique(['oauth'], crud('contacts', 'companies', 'custom'), schemas('contacts', 'companies', 'custom')),
     cards: [{ component: 'CaseEvidenceCard', uid: 'case_evidence_card', name: 'Case evidence',
       description: 'Deadline, typology hypothesis against its lawful lookalike, shared counterparties, next moves.',
       objectTypes: ['p_investigation_case'], needs: ['run'] }],
-    functions: [{ name: 'case_network' }, { name: 'case_transition' }],
+    functions: [{ name: 'case_network' }, { name: 'case_transition' }, PROVISION],
   },
 };

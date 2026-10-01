@@ -1,0 +1,10 @@
+{
+  "accountId": 247574104,
+  "boundAt": "2026-10-01T09:03:01Z",
+  "endpointBaseUrl": "https://247574104.hs-sites-na2.com",
+  "secrets": {
+    "ENDPOINT_BASE_URL": true,
+    "HUBSPOT_CLIENT_SECRET": false
+  },
+  "tenant": "crosssell"
+}

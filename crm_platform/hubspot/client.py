@@ -20,6 +20,8 @@ What the client guarantees, each pinned by a test in ``tests/test_client.py``:
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
 import subprocess
 import time
@@ -150,6 +152,53 @@ class BridgeTransport:
 
     def __exit__(self, *_: object) -> None:
         self.close()
+
+
+class FunctionTransport:
+    """HubSpot through a tenant app's ``provision`` function, which makes each call with the app's own token.
+
+    A developer key cannot write standard CRM records, and HubSpot does not issue local-dev app tokens on test
+    accounts, so the loader's writes run inside HubSpot instead (``hubspot/functions/provision.js``). Each call is
+    sent as ``{method, path, bodyText}`` with a timestamp and a hex HMAC-SHA256 over
+    ``"<timestamp>.<method>.<path>.<bodyText>"``, keyed with the portal's provision key. The function returns the
+    upstream status, body and rate-limit headers, so the client's retries, pacing and 207 handling are unchanged.
+    """
+
+    def __init__(self, url: str, key: str, *, timeout: float = 60, clock: Callable[[], float] = time.time,
+                 post: Callable[[str, bytes, dict[str, str], float], tuple[int, bytes]] | None = None) -> None:
+        self.url, self._key, self.timeout, self.clock = url, key.encode(), timeout, clock
+        self._post = post or self._urllib_post
+
+    @staticmethod
+    def _urllib_post(url: str, data: bytes, headers: dict[str, str], timeout: float) -> tuple[int, bytes]:
+        http_request = request.Request(url, data=data, headers=headers, method="POST")
+        try:
+            with request.urlopen(http_request, timeout=timeout) as response:
+                return response.status, response.read()
+        except error.HTTPError as exc:
+            return exc.code, exc.read()
+        except (error.URLError, TimeoutError, OSError):
+            return 0, b""
+
+    def sign(self, timestamp: str, method: str, path: str, body_text: str) -> str:
+        message = f"{timestamp}.{method}.{path}.{body_text}".encode()
+        return hmac.new(self._key, message, hashlib.sha256).hexdigest()
+
+    def __call__(self, method: str, path: str, body: Any) -> tuple[int, Any, dict[str, str]]:
+        body_text = json.dumps(body, separators=(",", ":"), ensure_ascii=False) if body is not None else ""
+        timestamp = str(int(self.clock() * 1000))
+        headers = {"Content-Type": "application/json", "X-Crm-Platform-Timestamp": timestamp,
+                   "X-Crm-Platform-Signature": self.sign(timestamp, method, path, body_text)}
+        envelope = json.dumps({"method": method, "path": path, "bodyText": body_text}).encode()
+        status, payload = self._post(self.url, envelope, headers, self.timeout)
+        try:
+            parsed = json.loads(payload) if payload else None
+        except ValueError:
+            parsed = None
+        if status != 200 or not isinstance(parsed, dict) or "status" not in parsed:
+            return status, parsed, {}  # the function itself refused (401/403) or is unavailable (0/5xx)
+        headers = {str(k): str(v) for k, v in (parsed.get("headers") or {}).items()}
+        return int(parsed["status"]), parsed.get("body"), headers
 
 
 def _int(value: str | None) -> int | None:

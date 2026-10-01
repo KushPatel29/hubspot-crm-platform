@@ -1,0 +1,16 @@
+{
+  "uid": "provision",
+  "type": "app-function",
+  "config": {
+    "entrypoint": "/app/functions/provision.js",
+    "secretKeys": [
+      "PROVISION_KEY"
+    ],
+    "endpoint": {
+      "path": "provision",
+      "methods": [
+        "POST"
+      ]
+    }
+  }
+}

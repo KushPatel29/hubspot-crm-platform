@@ -12,3 +12,4 @@ hubspot.config.yml
 .hscli/
 build/
 *.log
+.secrets/

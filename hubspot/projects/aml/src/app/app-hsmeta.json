@@ -10,10 +10,17 @@
       "requiredScopes": [
         "oauth",
         "crm.objects.contacts.read",
+        "crm.objects.contacts.write",
         "crm.objects.companies.read",
+        "crm.objects.companies.write",
         "crm.objects.custom.read",
         "crm.objects.custom.write",
-        "crm.schemas.custom.read"
+        "crm.schemas.contacts.read",
+        "crm.schemas.contacts.write",
+        "crm.schemas.companies.read",
+        "crm.schemas.companies.write",
+        "crm.schemas.custom.read",
+        "crm.schemas.custom.write"
       ],
       "optionalScopes": []
     },
