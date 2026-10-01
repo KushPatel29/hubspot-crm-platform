@@ -19,3 +19,9 @@ def test_every_cited_test_exists():
     missing = [name for name in cited if not (
         name in python if name.startswith("test_") else name.startswith("npm ") or f"it('{name}'" in javascript)]
     assert cited and not missing, missing
+
+
+def test_the_live_evidence_page_is_generated_from_the_evidence_files():
+    from crm_platform.evidence import DOC, render
+
+    assert DOC.read_text(encoding="utf-8") == render(), "run python -m crm_platform.evidence"

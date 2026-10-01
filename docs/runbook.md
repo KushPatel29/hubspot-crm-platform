@@ -27,46 +27,57 @@ npx hs test-account create --name "Meridian Supply" --sales-level ENTERPRISE --s
 
 ScaleLab already exists (GrowthOps OS built it, portal 247549241).
 
-## 2. Schema and records
+## 2. Bind the tenant and give its app a provision key
 
 ```bash
-python -m crm_platform bind meridian --account "Meridian Supply"    # pin the tenant to this portal
-python -m crm_platform plan meridian --account "Meridian Supply"    # read-only: what would change
-python -m crm_platform apply meridian --account "Meridian Supply"   # converge schema, load records, verify
-python -m crm_platform verify meridian --account "Meridian Supply"  # read-only: fails unless nothing is left to do
+python -m crm_platform bind meridian --account meridian-supply           # pin the tenant; record its function domain
+python -m crm_platform provision-key meridian --account meridian-supply  # PROVISION_KEY app secret + .secrets/ file
 ```
+
+A personal access key cannot write standard CRM records or their schemas, so the loader's writes go through the
+app's `provision` function, under the app's own token. That needs the app installed (step 3) before step 4.
 
 `bind` refuses anything but a developer test account or sandbox, and every later run refuses a portal other than
 the bound one. `apply` writes `evidence/<tenant>/apply.json`: operations, counts and IDs, never record values.
 
-## 3. The app
+## 3. The app (before loading: the loader writes through it)
 
 ```bash
 cd hubspot && npm run build                       # regenerate projects/ from the shared cards and functions
 cd projects/meridian
 npx hs project upload --profile live              # src/hsprofile.live.json names the account
 npx hs project install-app --profile live
-npx hs secret add HUBSPOT_CLIENT_SECRET           # the app's client secret: typed into the CLI prompt
-npx hs secret add ENDPOINT_BASE_URL               # the portal's public function base URL
+npm run set-secret -- HUBSPOT_CLIENT_SECRET <portal id>   # only for apps with signed endpoints; reads the clipboard
 ```
 
-`ENDPOINT_BASE_URL` and the account ID are read from `evidence/<tenant>/deploy.json` by the generator, so the
-workflow action's `actionUrl` and the webhook `targetUrl` are the ones the signature check expects.
+`bind` sets `ENDPOINT_BASE_URL` itself (a public URL, not a credential). HubSpot shows an app's client secret only
+after its first successful deploy, so the first deploy leaves `HUBSPOT_CLIENT_SECRET` out of the functions' secrets
+and the signed endpoints refuse every call until it is added; then rebind, rebuild and upload again. `set-secret`
+reads the value from the clipboard because a paste into the CLI's hidden prompt is easy to lose (a blank secret
+fails closed: every call answers 401).
+
+## 4. Schema and records
+
+```bash
+python -m crm_platform plan meridian      # read-only: what would change (through the app, once a key exists)
+python -m crm_platform apply meridian     # converge schema, load records, verify
+python -m crm_platform verify meridian    # read-only: fails unless nothing is left to do
+```
 
 Cards appear after they are added to a record view: open a record, **Customize**, add the card from the app's card
 library, save.
 
-## 4. Workflows that use the custom actions
+## 5. Workflows that use the custom actions
 
 * **Meridian, "Pricing review" guardrail:** trigger on deal stage = Pricing review, action *Check the price
   guardrail*, then branch on *Needs approval* and create a task for the approver it names.
 * **ScaleLab, "Paid means customer":** trigger on GrowthOps' closed-won flag, action *Advance lifecycle stage (never
   backwards)* with target *Customer*.
 
-## 5. Watching it run
+## 6. Watching it run
 
 ```bash
-npx hs project logs --limit 20                    # app function logs: guardrail calls, webhook deliveries
+# HubSpot: Development > Monitoring > Logs > Endpoint functions / Webhooks / API calls (per app)
 python -m crm_platform verify <tenant> --account <account>
 ```
 

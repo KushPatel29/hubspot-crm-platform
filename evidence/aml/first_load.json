@@ -1,0 +1,18 @@
+{
+  "note": "The first AML load, transcribed from that run's report: apply.json in this folder is the rerun after the custom-object stage fix, which is the idempotency proof (every record unchanged, zero record writes).",
+  "at": "2026-10-01T10:01Z",
+  "portal_id": "247574105",
+  "created": {
+    "contacts": 90,
+    "companies": 276,
+    "investigation_case": 366,
+    "counterparty": 286
+  },
+  "associations_created": {
+    "investigation_case->contacts": 90,
+    "investigation_case->companies": 276,
+    "investigation_case->counterparty": 987
+  },
+  "failures": 0,
+  "verify": "not converged: the two closed stages of the Investigation pipeline stayed open (custom-object stages close on metadata.state, not isClosed); fixed, and the rerun converged with zero writes"
+}

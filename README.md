@@ -1,6 +1,6 @@
 # HubSpot CRM Platform
 
-![Tests](https://img.shields.io/badge/tests-120%20passing-3B8C6E)
+![Tests](https://img.shields.io/badge/tests-129%20passing-3B8C6E)
 ![HubSpot developer platform 2026.09](https://img.shields.io/badge/HubSpot%20projects-2026.09-FF7A59)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
@@ -10,10 +10,22 @@ records, loaded by the source system's key and proven to converge. Each portal a
 its own, with React cards on the records, app functions behind them, and custom workflow actions. The same data
 model also compiles to Salesforce metadata, so the design is not tied to one CRM.
 
-> **Status, 1 October 2026:** built and tested (83 Python and 37 JavaScript tests, CI on every push). The ScaleLab
-> portal is live from GrowthOps OS; the Meridian, cross-sell and AML portals are being stood up in HubSpot developer
-> test accounts, and their live evidence is added below as each one converges. Until then, the HubSpot column in the
-> table describes what the code loads, verified against a strict HubSpot test double.
+**Live in HubSpot, 1 October 2026.** Four developer test accounts on Enterprise tiers, one per business: 2,977
+records and 3,393 associations loaded through each app's own token, every portal re-planned to zero writes; all four
+cards working on real records; a HubSpot-delivered, signed webhook and a HubSpot workflow running the custom action,
+both verified by the app functions. The record is in [live evidence](docs/live-evidence.md), generated from the
+[evidence files](evidence/) the runs wrote.
+
+| Deal margin guardrail (Meridian) | Next best offer, accepted into a deal (meat distributor) |
+|---|---|
+| ![The Deal margin guardrail card on a Meridian deal: 2.9% blended margin, $2,030 under target, below floor, VP Finance must approve](docs/images/meridian-deal-margin-card.png) | ![The Next best offer card: offer #1 accepted with a link to its new deal, the company's Deals card showing the $522.50 deal](docs/images/crosssell-next-best-offer-card.png) |
+| **Case evidence (AML)** | **Revenue truth (ScaleLab)** |
+| ![The Case evidence card on a P0 investigation case after a move to Evidence requested, with the activity log entry](docs/images/aml-case-evidence-card.png) | ![The Revenue truth card on a GrowthOps customer: $6,300 collected, the campaign each model credits, high renewal risk](docs/images/scalelab-revenue-truth-card.png) |
+
+Recordings: [accepting an offer](docs/images/crosssell-next-best-offer.gif) ·
+[moving a case with a logged reason](docs/images/aml-case-evidence.gif) ·
+[HubSpot's endpoint-function log](docs/images/scalelab-endpoint-function-log.png) (the signed workflow call and
+webhooks accepted with 200, unsigned probes refused with 401).
 
 | Business | Source project | In HubSpot | Its app |
 |---|---|---|---|
@@ -61,6 +73,13 @@ rerun updates what it created instead of duplicating it. Values are compared the
 rerun plans zero writes. Fields people own after creation (a case's stage, an offer's status, a deadline's start)
 are written once and never put back.
 
+**Writes run inside HubSpot, under each app's own token.** A developer's personal access key can read the CRM but
+not write standard records or their schemas, and HubSpot issues no local-dev app tokens on test accounts. Rather than
+copy an app token out of HubSpot, each app carries a `provision` function: the loader sends it each API call signed
+with a per-portal key it generated (HMAC over timestamp, method, path and body, five-minute window), and the function
+makes the call with the token HubSpot gives the app. It allows only the calls the loader makes and never a DELETE.
+No HubSpot credential leaves HubSpot. ([`provision.js`](hubspot/functions/provision.js))
+
 **An app per business, from one library.** `hubspot/apps.mjs` says which cards, functions, workflow actions and
 webhooks each portal gets, and with which scopes; `hubspot/build.mjs` generates one deployable HubSpot project
 per business (platform 2026.09, private static-auth app). The functions share their business rules with the
@@ -84,6 +103,18 @@ drifts from its sources.
 | Leaking data or keys | Errors carry category, property names and correlation ID only; evidence files hold counts, never values | `test_errors_name_category_properties_and_correlation_never_values`, `test_apply_converges_and_the_evidence_has_counts_not_values` |
 | What is deployed drifting from what is tested | Generated projects and Salesforce metadata rebuilt and compared in CI | `npm run check`, `test_generated_metadata_is_valid_and_committed` |
 
+## What the real API taught (each one found live, each now in the test double)
+
+* Custom-object pipeline stages close on `metadata.state`, not `isClosed`; an `isClosed` sent directly is ignored.
+* Association label names are unique across the whole portal, and an inverse label identical to the label is a 500.
+* Products and line items share property groups and mirror each other's properties.
+* There are no `crm.schemas.products.*` scopes; the `e-commerce` scope covers product and line-item settings.
+* Public app functions are served at `https://<portal domain>/hs/serverless/<path>`; their secrets arrive in
+  `process.env`; the gateway drops custom request headers; a secret saved blank must fail closed, and does.
+* A card's property hook hands datetimes over formatted for display, so arithmetic on them (a case deadline) uses the
+  API's raw values instead; private functions get no user identity, so the card passes the signed-in user.
+* Offset paging on CRM search skips records edited mid-scan (from GrowthOps' sync): the loader reads by key.
+
 ## Salesforce-ready
 
 `python -m crm_platform.salesforce.metadata` compiles the same models to SFDX source format under
@@ -100,12 +131,26 @@ API-name rules in the tests; it has not been deployed to a Salesforce org.
 python -m pip install -e . -r requirements-dev.txt && npm install && npm install --prefix hubspot
 python -m pytest -q                       # model, engine, loader, CLI, Salesforce compilation, JS parity
 npm test --prefix hubspot                 # cards (HubSpot's test renderer), functions, signatures, bundles
-npx hs account auth                       # the only credential step: typed into the CLI's prompt
-python -m crm_platform apply meridian --account "Meridian Supply"
+
+npx hs account auth --account <parent> --name dev        # the only credential step: typed into the CLI's prompt
+npx hs test-account create -a dev --name "Meridian Supply" --sales-level ENTERPRISE ...
+python -m crm_platform bind meridian --account meridian-supply           # pin the tenant; find its function domain
+python -m crm_platform provision-key meridian --account meridian-supply  # per-portal signing key, never printed
+cd hubspot && npm run build && cd projects/meridian && npx hs project upload --profile live && npx hs project install-app --profile live
+python -m crm_platform apply meridian     # converge the schema, load the records, verify: through the app
 ```
 
 The full sequence, from creating a test account to watching webhook deliveries, is in the
 [runbook](docs/runbook.md).
+
+## Not done, on purpose or not yet
+
+* The Meridian *Check the price guardrail* workflow action is deployed but has not run in a live workflow: its
+  function needs that app's client secret, which a person enters, and until then it refuses every call (401). The
+  same verification path ran live in ScaleLab's action.
+* The apps are private, static-auth apps, one per portal (the agency pattern). A marketplace app with OAuth installs
+  across portals is a different distribution, not built here.
+* The Salesforce metadata is generated and validated, not deployed to an org.
 
 ## Data and honesty
 
