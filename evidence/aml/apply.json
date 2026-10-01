@@ -1,0 +1,149 @@
+{
+  "at": "2026-10-01T10:05:48Z",
+  "load": {
+    "failures": [],
+    "links": {
+      "investigation_case->companies": {
+        "create": 0,
+        "present": 276,
+        "unresolved": 0
+      },
+      "investigation_case->contacts": {
+        "create": 0,
+        "present": 90,
+        "unresolved": 0
+      },
+      "investigation_case->counterparty": {
+        "create": 0,
+        "present": 987,
+        "unresolved": 0
+      }
+    },
+    "objects": {
+      "companies": {
+        "create": 0,
+        "desired": 276,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 276,
+        "unmanaged": 0,
+        "update": 0
+      },
+      "contacts": {
+        "create": 0,
+        "desired": 90,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 90,
+        "unmanaged": 2,
+        "update": 0
+      },
+      "counterparty": {
+        "create": 0,
+        "desired": 286,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 286,
+        "unmanaged": 0,
+        "update": 0
+      },
+      "investigation_case": {
+        "create": 0,
+        "desired": 366,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 366,
+        "unmanaged": 0,
+        "update": 0
+      }
+    }
+  },
+  "portal": {
+    "account_type": "DEVELOPER_TEST",
+    "data_hosting": "na2",
+    "portal_id": "247574105",
+    "time_zone": "US/Eastern"
+  },
+  "requests": 100,
+  "schema_apply": {
+    "applied": [
+      "update_stage investigation_case Investigation/Closed: no further action (metadata)",
+      "update_stage investigation_case Investigation/Closed: referred for a reporting decision (metadata)"
+    ],
+    "conflicts": [],
+    "converged": true,
+    "drift": [],
+    "summary": {}
+  },
+  "tenant": "aml",
+  "verify": {
+    "converged": true,
+    "records": {
+      "failures": [],
+      "links": {
+        "investigation_case->companies": {
+          "create": 0,
+          "present": 276,
+          "unresolved": 0
+        },
+        "investigation_case->contacts": {
+          "create": 0,
+          "present": 90,
+          "unresolved": 0
+        },
+        "investigation_case->counterparty": {
+          "create": 0,
+          "present": 987,
+          "unresolved": 0
+        }
+      },
+      "objects": {
+        "companies": {
+          "create": 0,
+          "desired": 276,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 276,
+          "unmanaged": 0,
+          "update": 0
+        },
+        "contacts": {
+          "create": 0,
+          "desired": 90,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 90,
+          "unmanaged": 2,
+          "update": 0
+        },
+        "counterparty": {
+          "create": 0,
+          "desired": 286,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 286,
+          "unmanaged": 0,
+          "update": 0
+        },
+        "investigation_case": {
+          "create": 0,
+          "desired": 366,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 366,
+          "unmanaged": 0,
+          "update": 0
+        }
+      }
+    },
+    "schema": {
+      "conflicts": [],
+      "converged": true,
+      "drift": [],
+      "missing_requirements": [],
+      "operations": []
+    },
+    "writes": 0
+  },
+  "writes": 2
+}

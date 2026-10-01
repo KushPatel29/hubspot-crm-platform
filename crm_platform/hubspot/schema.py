@@ -115,7 +115,9 @@ def stage_payload(object_name: str, stage_index: int, pipeline: Pipeline) -> dic
     elif object_name == "tickets":
         metadata = {"ticketState": "CLOSED" if stage.closed else "OPEN"}
     else:
-        metadata = {"isClosed": str(stage.closed).lower()}
+        # Custom-object stages: HubSpot keys open/closed on "state" and derives "isClosed" from it, ignoring an
+        # isClosed sent directly (found live: every stage stayed open).
+        metadata = {"state": "CLOSED" if stage.closed else "OPEN"}
     return {"label": stage.label, "displayOrder": stage_index, "metadata": metadata}
 
 

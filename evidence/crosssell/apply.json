@@ -1,0 +1,146 @@
+{
+  "at": "2026-10-01T09:57:02Z",
+  "load": {
+    "failures": [],
+    "links": {
+      "contacts->companies": {
+        "create": 240,
+        "present": 0,
+        "unresolved": 0
+      },
+      "recommendation->companies": {
+        "create": 302,
+        "present": 0,
+        "unresolved": 0
+      }
+    },
+    "objects": {
+      "companies": {
+        "create": 120,
+        "desired": 120,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 0,
+        "unmanaged": 0,
+        "update": 0
+      },
+      "contacts": {
+        "create": 120,
+        "desired": 120,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 0,
+        "unmanaged": 2,
+        "update": 0
+      },
+      "products": {
+        "create": 38,
+        "desired": 38,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 0,
+        "unmanaged": 0,
+        "update": 0
+      },
+      "recommendation": {
+        "create": 302,
+        "desired": 302,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 0,
+        "unmanaged": 0,
+        "update": 0
+      }
+    }
+  },
+  "portal": {
+    "account_type": "DEVELOPER_TEST",
+    "data_hosting": "na2",
+    "portal_id": "247574104",
+    "time_zone": "US/Eastern"
+  },
+  "requests": 114,
+  "schema_apply": {
+    "applied": [
+      "create_group recommendation recommendation_details",
+      "create_properties recommendation 9 properties",
+      "update_property recommendation offer_title (groupName)",
+      "update_property recommendation offer_sku (groupName)",
+      "update_property recommendation offer_revenue_opportunity (groupName)",
+      "update_property recommendation offer_status (groupName)",
+      "create_label contacts companies:Buyer",
+      "create_label recommendation companies:Recommended for",
+      "create_label recommendation deals:Converted to deal"
+    ],
+    "conflicts": [],
+    "converged": true,
+    "drift": [],
+    "summary": {}
+  },
+  "tenant": "crosssell",
+  "verify": {
+    "converged": true,
+    "records": {
+      "failures": [],
+      "links": {
+        "contacts->companies": {
+          "create": 0,
+          "present": 240,
+          "unresolved": 0
+        },
+        "recommendation->companies": {
+          "create": 0,
+          "present": 302,
+          "unresolved": 0
+        }
+      },
+      "objects": {
+        "companies": {
+          "create": 0,
+          "desired": 120,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 120,
+          "unmanaged": 0,
+          "update": 0
+        },
+        "contacts": {
+          "create": 0,
+          "desired": 120,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 120,
+          "unmanaged": 2,
+          "update": 0
+        },
+        "products": {
+          "create": 0,
+          "desired": 38,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 38,
+          "unmanaged": 0,
+          "update": 0
+        },
+        "recommendation": {
+          "create": 0,
+          "desired": 302,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 302,
+          "unmanaged": 0,
+          "update": 0
+        }
+      }
+    },
+    "schema": {
+      "conflicts": [],
+      "converged": true,
+      "drift": [],
+      "missing_requirements": [],
+      "operations": []
+    },
+    "writes": 0
+  },
+  "writes": 25
+}
