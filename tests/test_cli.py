@@ -49,3 +49,14 @@ def test_apply_converges_and_the_evidence_has_counts_not_values(fake, evidence):
     plan = cli.run("plan", "crosssell", fake)
     assert plan["schema"]["converged"] and plan["writes"] == 0
     assert all(o["create"] == 0 and o["update"] == 0 for o in plan["records"]["objects"].values())
+
+
+def test_the_provision_key_can_come_from_the_environment_and_is_preferred_to_the_file(tmp_path, monkeypatch):
+    monkeypatch.setattr(cli, "SECRETS_DIR", tmp_path)
+    monkeypatch.delenv("CRM_PLATFORM_PROVISION_KEY_MERIDIAN", raising=False)
+    assert cli.provision_key_value("meridian") == ""
+    (tmp_path / "meridian.provision.key").write_text("from-file\n", encoding="utf-8")
+    assert cli.provision_key_value("meridian") == "from-file"
+    monkeypatch.setenv("CRM_PLATFORM_PROVISION_KEY_MERIDIAN", " from-ci ")
+    assert cli.provision_key_value("meridian") == "from-ci"
+    assert cli.provision_key_value("aml") == ""  # one tenant's key is never another's

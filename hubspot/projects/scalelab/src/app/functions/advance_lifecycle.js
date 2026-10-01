@@ -212,8 +212,11 @@ function parsedBody(context) {
   if (typeof body === "string") return body ? JSON.parse(body) : {};
   return body ?? {};
 }
+function queryOf(context) {
+  return context.query ?? context.params ?? {};
+}
 function signedRequest(context, path, base = secret(context, "ENDPOINT_BASE_URL")) {
-  const query = new URLSearchParams(context.query ?? {}).toString();
+  const query = new URLSearchParams(queryOf(context)).toString();
   return {
     method: context.method ?? "POST",
     uri: `${(base ?? "").replace(/\/$/, "")}${path}${query ? `?${query}` : ""}`,

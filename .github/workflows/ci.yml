@@ -54,3 +54,22 @@ jobs:
         run: npm run typecheck
       - name: Generated HubSpot projects match their sources
         run: npm run check
+
+  salesforce:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: salesforce/meridian
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: salesforce/meridian/package-lock.json
+      - run: npm ci
+      - name: Lightning Web Component tests (the Salesforce twin of the deal margin card)
+        run: npm test
+      - name: Apex parses, has its metadata, and every class is exercised by a test
+        run: npm run check:apex

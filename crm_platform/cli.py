@@ -124,12 +124,25 @@ def provision_key(client: HubSpotClient, tenant: str) -> dict[str, Any]:
     return {"tenant": tenant, "stored": "PROVISION_KEY", "local_file": str(path.relative_to(ROOT)), "rotated": True}
 
 
+def key_env(tenant: str) -> str:
+    return f"CRM_PLATFORM_PROVISION_KEY_{tenant.upper()}"
+
+
+def provision_key_value(tenant: str) -> str:
+    """The tenant's provision key: the environment first (CI holds it as a repository secret), then the local file."""
+    from_env = os.environ.get(key_env(tenant), "").strip()
+    if from_env:
+        return from_env
+    return key_file(tenant).read_text(encoding="utf-8").strip() if key_file(tenant).exists() else ""
+
+
 def app_transport(tenant: str) -> FunctionTransport:
     deploy = json.loads(deploy_file(tenant).read_text(encoding="utf-8"))
     base = deploy.get("endpointBaseUrl")
-    if not base or not key_file(tenant).exists():
+    key = provision_key_value(tenant)
+    if not base or not key:
         raise Refused(f"tenant {tenant} has no provision endpoint or key yet; run bind and provision-key first")
-    return FunctionTransport(f"{base}/hs/serverless/provision", key_file(tenant).read_text(encoding="utf-8").strip())
+    return FunctionTransport(f"{base}/hs/serverless/provision", key)
 
 
 def write_evidence(tenant: str, name: str, payload: dict) -> Path:
@@ -208,7 +221,7 @@ def main(argv: list[str] | None = None) -> None:
             guard(client, args.tenant, allow_portal=args.allow_portal)
             print(json.dumps(provision_key(client, get(args.tenant).key), indent=2))
         return
-    via = args.via or ("app" if key_file(args.tenant).exists() and args.command != "bind" else "cli")
+    via = args.via or ("app" if provision_key_value(args.tenant) and args.command != "bind" else "cli")
     if via == "app" and not args.token_env:
         report = run(args.command, args.tenant, app_transport(args.tenant), allow_portal=args.allow_portal)
     elif args.token_env:

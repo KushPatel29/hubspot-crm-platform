@@ -27,6 +27,7 @@
         <members>OpportunityLineItem.Meridian_Line_Outcome__c</members>
         <members>OpportunityLineItem.Meridian_Line_Verdict__c</members>
         <members>OpportunityLineItem.Meridian_List_Price__c</members>
+        <members>OpportunityLineItem.Unit_Cost__c</members>
         <members>Product2.Crm_Platform_Key__c</members>
         <members>Product2.Meridian_Brand_Tier__c</members>
         <members>Product2.Meridian_Category__c</members>
@@ -36,7 +37,12 @@
         <members>Product2.Meridian_Sub_Category__c</members>
         <members>Product2.Meridian_Supplier__c</members>
         <members>Product2.Meridian_Target_Margin__c</members>
+        <members>Product2.Unit_Cost__c</members>
         <name>CustomField</name>
+    </types>
+    <types>
+        <members>Crm_Platform_Meridian</members>
+        <name>PermissionSet</name>
     </types>
     <types>
         <members>OpportunityStage</members>

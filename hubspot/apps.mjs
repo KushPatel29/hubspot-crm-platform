@@ -2,7 +2,11 @@
 // own private app with only the parts that fit it, and only the scopes those parts use. build.mjs turns this into
 // one deployable HubSpot project per business under projects/.
 
-const SIGNED_ENDPOINT_SECRETS = ['HUBSPOT_CLIENT_SECRET', 'ENDPOINT_BASE_URL'];
+export const SIGNED_ENDPOINT_SECRETS = ['HUBSPOT_CLIENT_SECRET', 'ENDPOINT_BASE_URL'];
+// A function marked `signed: '<path>'` records who acted. While a portal's app has no client secret it is deployed as
+// a private function and logs the card's word for the user ("unverified"). Once the secret exists, build.mjs deploys
+// <name>_signed at that endpoint instead and the card calls it with hubspot.fetch, which HubSpot signs with the
+// signed-in user in the URL.
 
 const guardrailOptions = [
   ['above_stretch', 'Above stretch'], ['at_target', 'At target'], ['below_target', 'Below target'],
@@ -125,7 +129,7 @@ export const APPS = {
     cards: [{ component: 'NextBestOfferCard', uid: 'next_best_offer_card', name: 'Next best offer',
       description: 'Eligible offers with the reason and the value, accepted into deals or dismissed with a reason.',
       objectTypes: ['companies'], needs: ['run', 'portalId', 'actor'] }],
-    functions: [{ name: 'company_offers' }, { name: 'decide_offer' }, PROVISION],
+    functions: [{ name: 'company_offers' }, { name: 'decide_offer', signed: 'decide-offer' }, PROVISION],
   },
 
   aml: {
@@ -136,6 +140,6 @@ export const APPS = {
     cards: [{ component: 'CaseEvidenceCard', uid: 'case_evidence_card', name: 'Case evidence',
       description: 'Deadline, typology hypothesis against its lawful lookalike, shared counterparties, next moves.',
       objectTypes: ['p_investigation_case'], needs: ['run', 'actor'] }],
-    functions: [{ name: 'case_network' }, { name: 'case_transition' }, PROVISION],
+    functions: [{ name: 'case_network' }, { name: 'case_transition', signed: 'case-transition' }, PROVISION],
   },
 };

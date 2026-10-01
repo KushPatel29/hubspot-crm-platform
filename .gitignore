@@ -13,3 +13,5 @@ hubspot.config.yml
 build/
 *.log
 .secrets/
+.sf/
+.sfdx/

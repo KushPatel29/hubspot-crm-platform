@@ -1,4 +1,5 @@
-"""Every test the README cites as holding a guarantee exists, in Python or in the HubSpot apps' JavaScript suite."""
+"""Every test the README cites as holding a guarantee exists: in Python, in the HubSpot apps' JavaScript suite, in
+the Salesforce code's Apex test classes, or as a workflow file."""
 
 from __future__ import annotations
 
@@ -15,10 +16,22 @@ def test_every_cited_test_exists():
              for name in re.findall(r"`([^`]+)`", row.rsplit("|", 2)[-2])]
     python = {name for path in (ROOT / "tests").glob("test_*.py")
               for name in re.findall(r"^def (test_\w+)", path.read_text(encoding="utf-8"), re.MULTILINE)}
+    # JavaScript test titles, with the escapes a quoted title needs taken back out
     javascript = "\n".join(p.read_text(encoding="utf-8") for p in (ROOT / "hubspot" / "tests").glob("*.test.*"))
-    in_js = lambda name: f"it('{name}'" in javascript or f'it("{name}"' in javascript  # noqa: E731
-    missing = [name for name in cited if not (
-        name in python if name.startswith("test_") else name.startswith("npm ") or in_js(name))]
+    javascript = javascript.replace("\\'", "'")
+    apex = {f"{path.stem}.{name}" for path in (ROOT / "salesforce").glob("*/code/main/default/classes/*Test.cls")
+            for name in re.findall(r"static void (\w+)\(", path.read_text(encoding="utf-8"))}
+
+    def exists(name: str) -> bool:
+        if name.startswith("test_"):
+            return name in python
+        if name.startswith("npm "):
+            return True
+        if name.endswith(".yml"):
+            return (ROOT / ".github" / "workflows" / name).exists()
+        return name in apex or f"it('{name}'" in javascript or f'it("{name}"' in javascript
+
+    missing = [name for name in cited if not exists(name)]
     assert cited and not missing, missing
 
 

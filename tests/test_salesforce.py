@@ -79,3 +79,56 @@ def test_package_manifest_lists_every_component():
     members = {m.text for m in package.iter(f"{{{NS}}}members")}
     fields = {Path(p).name.removesuffix(".field-meta.xml") for p in files if p.endswith(".field-meta.xml")}
     assert {m.split(".")[1] for m in members if "." in m} >= fields
+
+
+def test_unit_cost_is_a_currency_field_wherever_hubspot_holds_cost_of_goods():
+    for obj in ("Product2", "OpportunityLineItem"):
+        cost = _field("meridian", obj, "Unit_Cost__c")
+        assert (cost.findtext(f"{{{NS}}}type"), cost.findtext(f"{{{NS}}}scale")) == ("Currency", "2")
+    assert "force-app/main/default/objects/Product2/fields/Unit_Cost__c.field-meta.xml" in build(
+        TENANTS["crosssell"].model())
+
+
+def test_the_permission_set_grants_every_field_except_the_ones_salesforce_refuses():
+    files = build(TENANTS["aml"].model())
+    name = "force-app/main/default/permissionsets/Crm_Platform_Aml.permissionset-meta.xml"
+    granted = {f.findtext(f"{{{NS}}}field") for f in ET.fromstring(files[name]).iter(f"{{{NS}}}fieldPermissions")}
+    assert "Investigation_Case__c.Case_Priority__c" in granted and "Contact.Crm_Platform_Key__c" in granted
+    assert "Investigation_Case__c.Stage__c" not in granted  # required: access comes from the object
+    assert not any(field.startswith("Transacted_With__c.") for field in granted)  # master-detail
+    objects = {o.findtext(f"{{{NS}}}object") for o in ET.fromstring(files[name]).iter(f"{{{NS}}}objectPermissions")}
+    assert {"Investigation_Case__c", "Counterparty__c", "Transacted_With__c"} <= objects
+    package = ET.fromstring(files["manifest/package.xml"])
+    assert "Crm_Platform_Aml" in {m.text for m in package.iter(f"{{{NS}}}members")}
+
+
+def test_hand_written_code_is_a_second_package_directory_the_generator_never_owns():
+    import json
+
+    from crm_platform.salesforce.metadata import GENERATED_DIRS, HAND_WRITTEN
+
+    for key in LOADED:
+        files = build(TENANTS[key].model())
+        directories = [d["path"] for d in json.loads(files["sfdx-project.json"])["packageDirectories"]]
+        assert directories == (["force-app", "code"] if key in HAND_WRITTEN else ["force-app"])
+        assert all(rel.split("/")[0] in (*GENERATED_DIRS, "sfdx-project.json") for rel in files)
+    code = OUT / "meridian" / "code" / "main" / "default"
+    assert (code / "classes" / "GuardrailService.cls").exists() and (code / "lwc" / "dealMarginGuardrail").is_dir()
+
+
+def test_the_apex_parity_fixture_is_every_meridian_deal_scored_by_the_python_guardrail():
+    import json
+
+    from crm_platform import guardrails
+    from crm_platform.salesforce.metadata import PARITY, parity_fixture
+
+    files = parity_fixture(TENANTS["meridian"].records())
+    assert (OUT / "meridian" / f"{PARITY}.json").read_text(encoding="utf-8") == files[f"{PARITY}.json"], "stale"
+    cases = json.loads(files[f"{PARITY}.json"])
+    assert len(cases) == 359
+    for case in cases[:25]:
+        score = guardrails.score_deal([tuple(line) for line in case["lines"]])
+        assert (score.verdict, score.approver, score.worst_line) == (case["verdict"], case["approver"],
+                                                                     case["worstLine"])
+        assert score.blended_margin_pct == case["blendedMarginPct"]  # JSON round-trips a double exactly
+    assert ET.fromstring(files[f"{PARITY}.resource-meta.xml"]).findtext(f"{{{NS}}}contentType") == "application/json"

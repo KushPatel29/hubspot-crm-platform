@@ -1,0 +1,51 @@
+name: Salesforce org checks
+
+# Deploys the generated metadata and the hand-written code to a Salesforce org and runs every Apex test there: the
+# only place Apex compiles and runs. It needs one repository secret, SFDX_AUTH_URL (from
+# `sf org display --verbose --json` on a Developer Edition org); without it the job says so and passes.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "salesforce/**"
+      - "crm_platform/salesforce/**"
+      - ".github/workflows/salesforce-org.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: salesforce-org
+  cancel-in-progress: false
+
+jobs:
+  deploy-and-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+      - name: No org connected
+        if: env.SFDX_AUTH_URL == ''
+        run: echo "::notice::No SFDX_AUTH_URL secret, so nothing was deployed. Add it to run the Apex tests in an org."
+      - name: Install the Salesforce CLI
+        if: env.SFDX_AUTH_URL != ''
+        run: npm install --global @salesforce/cli@2.152.14
+      - name: Log in with the stored auth URL
+        if: env.SFDX_AUTH_URL != ''
+        run: |
+          printf '%s' "$SFDX_AUTH_URL" > "$RUNNER_TEMP/auth-url.txt"
+          sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth-url.txt" --alias ci-org --set-default
+          rm "$RUNNER_TEMP/auth-url.txt"
+      - name: Deploy the metadata and the code, and run every Apex test
+        if: env.SFDX_AUTH_URL != ''
+        working-directory: salesforce/meridian
+        run: >
+          sf project deploy start --source-dir force-app --source-dir code
+          --test-level RunLocalTests --wait 30 --target-org ci-org

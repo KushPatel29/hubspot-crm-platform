@@ -4,6 +4,7 @@ import { decide } from '../shared/lifecycle.js';
 import { allowedNext, checkTransition, deadline, describeRemaining, logEntry } from '../shared/cases.js';
 import { canonicalUri, sign, verify } from '../shared/signature.js';
 import { client } from '../shared/hubspot-api.js';
+import { runner } from '../cards/runner.ts';
 
 describe('guardrail', () => {
   it('derives the band from target margin, flooring at 5%', () => {
@@ -102,6 +103,34 @@ describe('signature v3', () => {
 
   it('decodes the characters HubSpot decodes before signing', () => {
     expect(canonicalUri('https://x.com/a%3Ab%2Fc%3Fd%40e')).toBe('https://x.com/a:b/c?d@e');
+  });
+});
+
+describe('card runner', () => {
+  const platform = () => {
+    const calls = [];
+    return { calls,
+      serverless: async (name, options) => { calls.push(['serverless', name, options]); return { statusCode: 200, body: { ok: true } }; },
+      fetch: async (url, options) => { calls.push(['fetch', url, options]); return { status: 409, json: async () => ({ ok: false, error: 'offer was dismissed' }) }; } };
+  };
+
+  it('sends a signed action through hubspot.fetch with the record, and everything else to a private function', async () => {
+    const hubspot = platform();
+    const run = runner(hubspot, { decide_offer: 'https://1.hs-sites-na2.com/hs/serverless/decide-offer' }, 42);
+    expect(await run('company_offers', { propertiesToSend: ['hs_object_id'] })).toEqual({ statusCode: 200, body: { ok: true } });
+    expect(await run('decide_offer', { parameters: { offerId: '7', decision: 'accept' } }))
+      .toEqual({ statusCode: 409, body: { ok: false, error: 'offer was dismissed' } });
+    expect(hubspot.calls).toEqual([
+      ['serverless', 'company_offers', { propertiesToSend: ['hs_object_id'] }],
+      ['fetch', 'https://1.hs-sites-na2.com/hs/serverless/decide-offer',
+        { method: 'POST', body: { offerId: '7', decision: 'accept', objectId: '42' } }],
+    ]);
+  });
+
+  it('turns an answer that is not JSON into an error the card can show', async () => {
+    const run = runner({ serverless: async () => ({}), fetch: async () => ({ status: 502,
+      json: async () => { throw new Error('not json'); } }) }, { x: 'https://example.com/x' });
+    expect(await run('x')).toEqual({ statusCode: 502, body: { ok: false, error: 'the action endpoint answered HTTP 502' } });
   });
 });
 

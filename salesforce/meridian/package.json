@@ -1,0 +1,14 @@
+{
+  "name": "crm-platform-meridian-salesforce",
+  "private": true,
+  "description": "Local checks for the hand-written Salesforce code in code/: Lightning Web Component tests and an Apex syntax check. The Apex tests themselves run in an org.",
+  "scripts": {
+    "test": "sfdx-lwc-jest",
+    "check:apex": "node scripts/check-apex.mjs",
+    "check": "npm test && npm run check:apex"
+  },
+  "devDependencies": {
+    "@apexdevtools/apex-parser": "5.2.0",
+    "@salesforce/sfdx-lwc-jest": "7.9.0"
+  }
+}

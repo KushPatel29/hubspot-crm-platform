@@ -21,7 +21,8 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // functions/case_transition.js
 var case_transition_exports = {};
 __export(case_transition_exports, {
-  main: () => main
+  main: () => main,
+  transition: () => transition
 });
 module.exports = __toCommonJS(case_transition_exports);
 
@@ -169,9 +170,7 @@ ${line}` : line;
 }
 
 // functions/case_transition.js
-async function main(context, { api = appClient(context), now = Date.now() } = {}) {
-  const caseId = context.propertiesToSend?.hs_object_id ?? context.parameters?.caseId;
-  const { toStage, note } = context.parameters ?? {};
+async function transition(api, { caseId, toStage, note } = {}, who, now) {
   if (!caseId || !toStage) return respond(400, { ok: false, error: "needs a case and a target stage" });
   const caseType = await api.customType("investigation_case");
   const [record] = await api.batchRead(caseType, [caseId], ["hs_pipeline", "hs_pipeline_stage", "case_activity_log"]);
@@ -184,7 +183,6 @@ async function main(context, { api = appClient(context), now = Date.now() } = {}
   if (!current || !target) return respond(400, { ok: false, error: `unknown stage "${toStage}"` });
   const check = checkTransition(current.label, target.label, note);
   if (!check.ok) return respond(400, { ok: false, error: check.reason });
-  const who = context.userEmail ?? context.parameters?.actor ?? `user ${context.userId ?? "unknown"}`;
   const properties = {
     hs_pipeline_stage: target.id,
     case_activity_log: logEntry(record.properties.case_activity_log, now, who, current.label, target.label, note)
@@ -193,7 +191,14 @@ async function main(context, { api = appClient(context), now = Date.now() } = {}
   await api.patch(`/crm/v3/objects/${caseType}/${caseId}`, { properties });
   return respond(200, { ok: true, from: current.label, to: target.label, decision: check.decision });
 }
+async function main(context, { api = appClient(context), now = Date.now() } = {}) {
+  const parameters = context.parameters ?? {};
+  const caseId = context.propertiesToSend?.hs_object_id ?? parameters.caseId;
+  const who = context.userEmail ?? `${parameters.actor ?? `user ${context.userId ?? "unknown"}`} (unverified)`;
+  return transition(api, { caseId, toStage: parameters.toStage, note: parameters.note }, who, now);
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  main
+  main,
+  transition
 });

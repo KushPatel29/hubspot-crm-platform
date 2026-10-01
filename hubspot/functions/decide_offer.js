@@ -83,9 +83,9 @@ async function ensureLineItem(api, dealId, sku) {
   });
 }
 
-export async function main(context, { api = appClient(context), now = Date.now() } = {}) {
-  const { offerId, decision, note = '' } = context.parameters ?? {};
-  const who = context.userEmail ?? context.parameters?.actor ?? `user ${context.userId ?? 'unknown'}`;
+// The decision itself, whoever asks: the private function below (the card's word for who) and the signed endpoint
+// (decide_offer_signed.js, HubSpot's word for who) both end here.
+export async function decide(api, { offerId, decision, note = '' } = {}, who, now) {
   if (!offerId || !['accept', 'dismiss'].includes(decision)) {
     return respond(400, { ok: false, error: 'needs offerId and decision' });
   }
@@ -135,4 +135,11 @@ export async function main(context, { api = appClient(context), now = Date.now()
     await api.patch(`/crm/v3/objects/${offerType}/${offerId}`, { properties: { offer_status: 'accepted', ...decided } });
   }
   return respond(200, { ok: true, dealId: deal.dealId, resumed: deal.how === 'resumed' });
+}
+
+// Private function: HubSpot gives it no user identity, so the name is the card's and is recorded as unverified.
+export async function main(context, { api = appClient(context), now = Date.now() } = {}) {
+  const parameters = context.parameters ?? {};
+  const who = context.userEmail ?? `${parameters.actor ?? `user ${context.userId ?? 'unknown'}`} (unverified)`;
+  return decide(api, parameters, who, now);
 }

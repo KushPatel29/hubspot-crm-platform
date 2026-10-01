@@ -9,6 +9,7 @@
     "set-secret": "node scripts/set_secret.mjs"
   },
   "devDependencies": {
-    "@hubspot/cli": "8.15.0"
+    "@hubspot/cli": "8.15.0",
+    "@salesforce/cli": "^2.152.14"
   }
 }

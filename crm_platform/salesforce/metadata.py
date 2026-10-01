@@ -1,8 +1,10 @@
 """The same tenant models compiled to Salesforce metadata (SFDX source format), so a Salesforce build is a deploy away.
 
-Nothing here has been deployed to a Salesforce org; the output is generated, parsed back as XML and checked against
-Salesforce's naming rules by the tests, and committed under ``salesforce/<tenant>`` with a CI gate that fails if it
-drifts from the models. What maps to what:
+The output is generated, parsed back as XML and checked against Salesforce's naming rules by the tests, and
+committed under ``salesforce/<tenant>/force-app`` with a CI gate that fails if it drifts from the models. A tenant
+may also carry hand-written Salesforce code (Apex, Lightning Web Components, flows) under ``salesforce/<tenant>/code``,
+a second package directory this generator lists but never writes to or deletes from, except the guardrail parity
+fixture it derives from the same records the Python and JavaScript guardrails are tested on. What maps to what:
 
 ========================  ==============================================================================
 HubSpot (the model)       Salesforce
@@ -15,6 +17,9 @@ property                  custom field ``<Title_Case>__c``: text → Text(255), 
                           number → Number(18, 4), date / datetime → Date / DateTime, select / radio →
                           restricted Picklist, checkbox → MultiselectPicklist, booleancheckbox → Checkbox
 crm_platform_key          Text external ID, unique where the model marks it unique (upsert by it)
+hs_cost_of_goods_sold     ``Unit_Cost__c`` Currency(16, 2) on Product2 and OpportunityLineItem (HubSpot's own
+                          property, which Salesforce has no standard field for)
+field access              a permission set, ``Crm_Platform_<Tenant>``, granting read/edit on every field above
 deal pipeline             an Opportunity sales process (BusinessProcess) over the OpportunityStage values
 custom-object pipeline    a restricted ``Stage__c`` picklist; closed stages named in its description
 custom → standard label   a lookup field on the custom object (``Subject_Contact__c`` → Contact)
@@ -42,6 +47,11 @@ API_VERSION = "62.0"
 STANDARD = {"contacts": "Contact", "companies": "Account", "deals": "Opportunity", "products": "Product2",
             "line_items": "OpportunityLineItem", "tickets": "Case"}
 API_NAME = re.compile(r"^[A-Za-z](?:[A-Za-z0-9]|_(?!_))*(?<!_)$")
+# Tenants with hand-written Salesforce code in salesforce/<tenant>/code (a second package directory).
+HAND_WRITTEN = frozenset({"meridian"})
+GENERATED_DIRS = ("force-app", "manifest")
+UNIT_COST = "Unit_Cost__c"  # HubSpot's hs_cost_of_goods_sold, on products and line items
+PARITY = "code/main/default/staticresources/GuardrailParity"
 
 
 def api_name(name: str) -> str:
@@ -92,6 +102,58 @@ def field_xml(prop: Property) -> str:
     else:
         body += _tag("required", False) + _tag("type", "Picklist") + _values(prop)
     return _xml("CustomField", body)
+
+
+def unit_cost_xml() -> str:
+    return _xml("CustomField", _tag("fullName", UNIT_COST) + _tag("description", "HubSpot: hs_cost_of_goods_sold.")
+                + _tag("label", "Unit cost") + _tag("precision", 16) + _tag("required", False) + _tag("scale", 2)
+                + _tag("type", "Currency"))
+
+
+def permission_set_name(model: TenantModel) -> str:
+    return f"Crm_Platform_{api_name(model.key)}"
+
+
+def permission_set_xml(model: TenantModel, fields: list[str], custom_objects: list[str]) -> str:
+    """Read and edit on every generated field (a deploy grants no field access), and full access to the custom
+    objects. Required and master-detail fields take their access from the object, so Salesforce refuses them here."""
+    body = _tag("description", f"Field and object access for the CRM platform's {model.name} model. Generated.")
+    body += _tag("hasActivationRequired", False) + _tag("label", f"CRM platform: {model.name}"[:80])
+    for field in sorted(fields):
+        body += ("    <fieldPermissions>\n" + _tag("editable", True, 2) + _tag("field", field, 2)
+                 + _tag("readable", True, 2) + "    </fieldPermissions>\n")
+    for obj in sorted(custom_objects):
+        body += ("    <objectPermissions>\n" + _tag("allowCreate", True, 2) + _tag("allowDelete", True, 2)
+                 + _tag("allowEdit", True, 2) + _tag("allowRead", True, 2) + _tag("modifyAllRecords", False, 2)
+                 + _tag("object", obj, 2) + _tag("viewAllRecords", False, 2) + "    </objectPermissions>\n")
+    return _xml("PermissionSet", body)
+
+
+def parity_fixture(records: list) -> dict[str, str]:
+    """Every Meridian deal's lines and the Python guardrail's answer for each, for the Apex test that holds the
+    Salesforce guardrail to the same rule (a static resource in the hand-written code directory)."""
+    from crm_platform import guardrails
+
+    targets = {r.key: float(r.properties["meridian_target_margin"]) for r in records if r.object_name == "products"}
+    deals: dict[str, list[tuple[float, float, float, float]]] = {}
+    for r in records:
+        if r.object_name == "line_items":
+            product = r.properties["hs_product_id"].rsplit(":", 1)[1]
+            deals.setdefault(r.links[0].to_key, []).append((
+                float(r.properties["price"]), float(r.properties["hs_cost_of_goods_sold"]),
+                float(r.properties["quantity"]), targets[product]))
+    cases = []
+    for key in sorted(deals):
+        score = guardrails.score_deal(deals[key])
+        cases.append({"deal": key, "lines": [list(line) for line in deals[key]], "verdict": score.verdict,
+                      "approver": score.approver, "worstLine": score.worst_line,
+                      "blendedMarginPct": score.blended_margin_pct, "gapDollars": score.gap_dollars,
+                      "lineVerdicts": [line.verdict for line in score.lines],
+                      "lineApprovers": [line.approver for line in score.lines]})
+    meta = _xml("StaticResource", _tag("cacheControl", "Private") + _tag("contentType", "application/json")
+                + _tag("description", "Generated: every Meridian deal and the Python guardrail's answer."))
+    return {f"{PARITY}.json": json.dumps(cases, separators=(",", ":")) + "\n",
+            f"{PARITY}.resource-meta.xml": meta}
 
 
 def custom_object_xml(obj: ObjectModel, description: str) -> str:
@@ -154,11 +216,14 @@ def build(model: TenantModel) -> dict[str, str]:
     base = "force-app/main/default/objects"
     files: dict[str, str] = {}
     members: dict[str, list[str]] = {"CustomObject": [], "CustomField": [], "BusinessProcess": [],
-                                     "StandardValueSet": []}
+                                     "StandardValueSet": [], "PermissionSet": []}
+    grantable: list[str] = []  # fields a permission set may grant (not required, not master-detail)
 
     def add_field(obj_api: str, name: str, xml: str) -> None:
         files[f"{base}/{obj_api}/fields/{name}.field-meta.xml"] = xml
         members["CustomField"].append(f"{obj_api}.{name}")
+        if "<type>MasterDetail</type>" not in xml and "<required>true</required>" not in xml:
+            grantable.append(f"{obj_api}.{name}")
 
     for obj in model.objects:
         obj_api = object_api(model, obj.name)
@@ -169,6 +234,8 @@ def build(model: TenantModel) -> dict[str, str]:
             if obj.custom and prop.name == obj.primary_display:
                 continue  # the record Name field
             add_field(obj_api, f"{api_name(prop.name)}__c", field_xml(prop))
+        if obj.name in ("products", "line_items"):
+            add_field(obj_api, UNIT_COST, unit_cost_xml())
 
     for pipeline in model.pipelines:
         if pipeline.object_name == "deals":
@@ -221,11 +288,18 @@ def build(model: TenantModel) -> dict[str, str]:
             "Roles picklist (Setup > Account Contact Relationship Fields > Roles):\n\n"
             + "".join(f"- {a.label}\n" for a in roles)) + "\n<!--\n" + values + "-->\n"
 
+    permission_set = permission_set_name(model)
+    files[f"force-app/main/default/permissionsets/{permission_set}.permissionset-meta.xml"] = permission_set_xml(
+        model, grantable, members["CustomObject"])
+    members["PermissionSet"].append(permission_set)
+
     types = "".join("    <types>\n" + "".join(_tag("members", m, 2) for m in sorted(names)) + _tag("name", kind, 2)
                     + "    </types>\n" for kind, names in sorted(members.items()) if names)
     files["manifest/package.xml"] = _xml("Package", types + _tag("version", API_VERSION))
     files["sfdx-project.json"] = json.dumps({
-        "packageDirectories": [{"path": "force-app", "default": True}], "name": f"crm-platform-{model.key}",
+        "packageDirectories": [{"path": "force-app", "default": True}]
+        + ([{"path": "code", "default": False}] if model.key in HAND_WRITTEN else []),
+        "name": f"crm-platform-{model.key}",
         "namespace": "", "sfdcLoginUrl": "https://login.salesforce.com", "sourceApiVersion": API_VERSION,
     }, indent=2) + "\n"
     return files
@@ -274,6 +348,8 @@ def main() -> None:
         if not model.objects:
             continue
         files = build(model)
+        if tenant.key in HAND_WRITTEN:
+            files.update(parity_fixture(tenant.records()))
         issues = problems(files)
         if issues:
             sys.exit("\n".join(issues))
@@ -288,9 +364,10 @@ def main() -> None:
             written += 1
         if not args.check:
             known = {OUT / tenant.key / rel for rel in files}
-            for extra in (OUT / tenant.key).rglob("*"):
-                if extra.is_file() and extra not in known:
-                    extra.unlink()
+            for directory in GENERATED_DIRS:  # never code/, which people write
+                for extra in (OUT / tenant.key / directory).rglob("*"):
+                    if extra.is_file() and extra not in known:
+                        extra.unlink()
     if stale:
         sys.exit("stale Salesforce metadata (run python -m crm_platform.salesforce.metadata): " + ", ".join(stale))
     print("Salesforce metadata is current" if args.check else f"wrote {written} Salesforce metadata files")

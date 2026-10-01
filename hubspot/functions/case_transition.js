@@ -4,9 +4,9 @@
 import { appClient, respond } from '../shared/endpoint.js';
 import { checkTransition, logEntry } from '../shared/cases.js';
 
-export async function main(context, { api = appClient(context), now = Date.now() } = {}) {
-  const caseId = context.propertiesToSend?.hs_object_id ?? context.parameters?.caseId;
-  const { toStage, note } = context.parameters ?? {};
+// The move itself, whoever asks: the private function below (the card's word for who) and the signed endpoint
+// (case_transition_signed.js, HubSpot's word for who) both end here.
+export async function transition(api, { caseId, toStage, note } = {}, who, now) {
   if (!caseId || !toStage) return respond(400, { ok: false, error: 'needs a case and a target stage' });
   const caseType = await api.customType('investigation_case');
   const [record] = await api.batchRead(caseType, [caseId], ['hs_pipeline', 'hs_pipeline_stage', 'case_activity_log']);
@@ -19,9 +19,6 @@ export async function main(context, { api = appClient(context), now = Date.now()
   if (!current || !target) return respond(400, { ok: false, error: `unknown stage "${toStage}"` });
   const check = checkTransition(current.label, target.label, note);
   if (!check.ok) return respond(400, { ok: false, error: check.reason });
-  // Private functions get no user identity on platform 2026.09 (found live: the log read "user unknown"), so the
-  // card passes the signed-in user from its own context.
-  const who = context.userEmail ?? context.parameters?.actor ?? `user ${context.userId ?? 'unknown'}`;
   const properties = {
     hs_pipeline_stage: target.id,
     case_activity_log: logEntry(record.properties.case_activity_log, now, who, current.label, target.label, note),
@@ -29,4 +26,13 @@ export async function main(context, { api = appClient(context), now = Date.now()
   if (check.decision) properties.decision_status = check.decision;
   await api.patch(`/crm/v3/objects/${caseType}/${caseId}`, { properties });
   return respond(200, { ok: true, from: current.label, to: target.label, decision: check.decision });
+}
+
+// Private functions get no user identity on platform 2026.09 (found live: the log read "user unknown"), so the card
+// passes the signed-in user from its own context, and the log says the name is unverified.
+export async function main(context, { api = appClient(context), now = Date.now() } = {}) {
+  const parameters = context.parameters ?? {};
+  const caseId = context.propertiesToSend?.hs_object_id ?? parameters.caseId;
+  const who = context.userEmail ?? `${parameters.actor ?? `user ${context.userId ?? 'unknown'}`} (unverified)`;
+  return transition(api, { caseId, toStage: parameters.toStage, note: parameters.note }, who, now);
 }

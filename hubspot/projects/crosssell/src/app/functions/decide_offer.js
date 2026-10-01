@@ -23,6 +23,7 @@ var decide_offer_exports = {};
 __export(decide_offer_exports, {
   KEY_PROPERTY: () => KEY_PROPERTY,
   dealKey: () => dealKey,
+  decide: () => decide,
   main: () => main
 });
 module.exports = __toCommonJS(decide_offer_exports);
@@ -209,9 +210,7 @@ async function ensureLineItem(api, dealId, sku) {
     associations: [link(dealId, await api.labelType("line_items", "deals", null))]
   });
 }
-async function main(context, { api = appClient(context), now = Date.now() } = {}) {
-  const { offerId, decision, note = "" } = context.parameters ?? {};
-  const who = context.userEmail ?? context.parameters?.actor ?? `user ${context.userId ?? "unknown"}`;
+async function decide(api, { offerId, decision, note = "" } = {}, who, now) {
   if (!offerId || !["accept", "dismiss"].includes(decision)) {
     return respond(400, { ok: false, error: "needs offerId and decision" });
   }
@@ -272,9 +271,15 @@ async function main(context, { api = appClient(context), now = Date.now() } = {}
   }
   return respond(200, { ok: true, dealId: deal.dealId, resumed: deal.how === "resumed" });
 }
+async function main(context, { api = appClient(context), now = Date.now() } = {}) {
+  const parameters = context.parameters ?? {};
+  const who = context.userEmail ?? `${parameters.actor ?? `user ${context.userId ?? "unknown"}`} (unverified)`;
+  return decide(api, parameters, who, now);
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   KEY_PROPERTY,
   dealKey,
+  decide,
   main
 });

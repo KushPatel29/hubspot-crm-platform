@@ -9,6 +9,8 @@ import { main as companyOffers } from '../functions/company_offers.js';
 import { main as decideOffer } from '../functions/decide_offer.js';
 import { main as caseNetwork } from '../functions/case_network.js';
 import { main as caseTransition } from '../functions/case_transition.js';
+import { main as decideOfferSigned, PATH as DECIDE } from '../functions/decide_offer_signed.js';
+import { main as caseTransitionSigned, PATH as TRANSITION } from '../functions/case_transition_signed.js';
 
 const SECRET = 'client-secret';
 const NOW = Date.parse('2026-10-01T12:00:00Z');
@@ -24,6 +26,19 @@ function signed(path, body) {
   };
 }
 const output = (response) => response.body;
+
+// A card action as hubspot.fetch delivers it: HubSpot appends the signed-in user to the URL and signs the URL.
+const USER = { userId: '77', portalId: '1234', userEmail: 'rep@example.com', appId: '9' };
+function fromCard(path, body, { query = USER, signedQuery = query } = {}) {
+  const raw = JSON.stringify(body);
+  process.env.ENDPOINT_BASE_URL = BASE;
+  const url = `${BASE}${path}?${new URLSearchParams(signedQuery)}`;
+  return {
+    method: 'POST', body: raw, params: query, accountId: 1234,
+    headers: { 'X-HubSpot-Request-Timestamp': String(NOW),
+      'X-HubSpot-Signature-v3': sign(SECRET, 'POST', url, raw, String(NOW)) },
+  };
+}
 
 function meridianDeal() {
   const fake = fakeApi();
@@ -195,6 +210,20 @@ describe('next best offer', () => {
     expect(fake.state.objects['2-9'][offers[0].id].properties.offer_status).toBe('accepted');
   });
 
+  it('records the verified user on a signed decision, and an unverified one from the private function', async () => {
+    const { fake, offers } = crossSell();
+    const signedCall = fromCard(DECIDE, { offerId: offers[0].id, decision: 'dismiss', note: 'not stocked in BC' });
+    expect((await decideOfferSigned(signedCall, { api: fake.api, now: NOW, clientSecret: SECRET })).body.ok).toBe(true);
+    expect(fake.state.objects['2-9'][offers[0].id].properties.offer_decision_note).toBe('rep@example.com: not stocked in BC');
+    await decideOffer({ parameters: { offerId: offers[1].id, decision: 'dismiss', note: 'too pricey', actor: 'a@b.example' } },
+      { api: fake.api, now: NOW });
+    expect(fake.state.objects['2-9'][offers[1].id].properties.offer_decision_note)
+      .toBe('a@b.example (unverified): too pricey');
+    const unsigned = await decideOfferSigned({ method: 'POST', body: '{}', params: USER, headers: {} },
+      { api: fake.api, now: NOW, clientSecret: SECRET });
+    expect([unsigned.statusCode, unsigned.body.error]).toEqual([401, 'unsigned request']);
+  });
+
   it('answers 404 for an offer that does not exist and 409 for one already decided', async () => {
     const { fake, offers } = crossSell();
     const missing = await decideOffer({ parameters: { offerId: '999', decision: 'accept' } }, { api: fake.api });
@@ -264,7 +293,37 @@ describe('investigation cases', () => {
     expect(moved).toMatchObject({ ok: true, from: 'Open triage', to: 'Evidence requested' });
     const props = fake.state.objects['2-1'][record.id].properties;
     expect(props.hs_pipeline_stage).toBe('s1');
-    expect(props.case_activity_log).toContain('inv@example.com: Open triage → Evidence requested. need the supplier');
+    expect(props.case_activity_log)
+      .toContain('inv@example.com (unverified): Open triage → Evidence requested. need the supplier');
+  });
+
+  it('logs HubSpot\'s word for who moved a case when the card\'s request is signed', async () => {
+    const { fake, record } = amlCase();
+    const body = { objectId: record.id, toStage: 'Evidence requested', note: 'need the supplier invoices',
+      actor: 'someone.else@example.com' };  // what a browser claims is ignored
+    const moved = await caseTransitionSigned(fromCard(TRANSITION, body), { api: fake.api, now: NOW, clientSecret: SECRET });
+    expect(moved.body).toMatchObject({ ok: true, to: 'Evidence requested' });
+    const log = fake.state.objects['2-1'][record.id].properties.case_activity_log;
+    expect(log).toContain('rep@example.com: Open triage → Evidence requested.');
+    expect(log).not.toContain('someone.else');
+    expect(log).not.toContain('unverified');
+  });
+
+  it('refuses a card request whose user, body or portal is not the one HubSpot signed', async () => {
+    const { fake, record } = amlCase();
+    const body = { objectId: record.id, toStage: 'Evidence requested', note: 'need the supplier invoices' };
+    const options = { api: fake.api, now: NOW, clientSecret: SECRET };
+    const impostor = fromCard(TRANSITION, body, { query: { ...USER, userEmail: 'boss@example.com' }, signedQuery: USER });
+    expect((await caseTransitionSigned(impostor, options)).statusCode).toBe(401);
+    const forged = { ...fromCard(TRANSITION, body), body: JSON.stringify({ ...body, toStage: 'Closed: no further action' }) };
+    expect((await caseTransitionSigned(forged, options)).statusCode).toBe(401);
+    const elsewhere = fromCard(TRANSITION, body, { query: { ...USER, portalId: '999' } });
+    expect((await caseTransitionSigned(elsewhere, options)).statusCode).toBe(403);
+    const stale = await caseTransitionSigned(fromCard(TRANSITION, body), { ...options, now: NOW + 6 * 60 * 1000 });
+    expect(stale.body).toEqual({ ok: false, error: 'stale timestamp' });
+    const noSecret = await caseTransitionSigned(fromCard(TRANSITION, body), { api: fake.api, now: NOW, clientSecret: '' });
+    expect(noSecret.body.error).toBe('no client secret configured');
+    expect(fake.state.objects['2-1'][record.id].properties.hs_pipeline_stage).toBe('s0');  // nothing moved
   });
 
   it('answers 404 for a case that does not exist instead of failing', async () => {

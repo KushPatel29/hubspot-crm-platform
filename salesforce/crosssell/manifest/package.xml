@@ -18,6 +18,7 @@
         <members>Contact.Crm_Platform_Key__c</members>
         <members>Opportunity.Crm_Platform_Key__c</members>
         <members>Product2.Crm_Platform_Key__c</members>
+        <members>Product2.Unit_Cost__c</members>
         <members>Product2.Xsell_Protein__c</members>
         <members>Recommendation__c.Converted_To_Deal__c</members>
         <members>Recommendation__c.Crm_Platform_Key__c</members>
@@ -38,6 +39,10 @@
     <types>
         <members>Recommendation__c</members>
         <name>CustomObject</name>
+    </types>
+    <types>
+        <members>Crm_Platform_Crosssell</members>
+        <name>PermissionSet</name>
     </types>
     <version>62.0</version>
 </Package>

@@ -1,0 +1,48 @@
+name: Live portals still match the models
+
+# Every night, plan each business's schema and records against its live HubSpot portal, read-only, and fail if
+# anything is left to do: a property someone deleted, a stage renamed, a record edited back. It reaches each portal
+# through that portal's provision function, so it needs one repository secret per portal, PROVISION_KEY_<TENANT>
+# (the contents of .secrets/<tenant>.provision.key). A portal without its secret is skipped, with a notice.
+
+on:
+  schedule:
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tenant: meridian
+            secret: PROVISION_KEY_MERIDIAN
+          - tenant: crosssell
+            secret: PROVISION_KEY_CROSSSELL
+          - tenant: aml
+            secret: PROVISION_KEY_AML
+    env:
+      PROVISION_KEY: ${{ secrets[matrix.secret] }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: No key for this portal
+        if: env.PROVISION_KEY == ''
+        run: echo "::notice::No ${{ matrix.secret }} secret, so ${{ matrix.tenant }} was not checked."
+      - run: python -m pip install -e .
+        if: env.PROVISION_KEY != ''
+      - name: Plan against the live portal (read-only) and require nothing left to do
+        if: env.PROVISION_KEY != ''
+        run: |
+          export "CRM_PLATFORM_PROVISION_KEY_$(echo '${{ matrix.tenant }}' | tr '[:lower:]' '[:upper:]')=$PROVISION_KEY"
+          python -m crm_platform verify ${{ matrix.tenant }} > verify.json
+          python -c "import json; r = json.load(open('verify.json')); v = r.get('verify', r); print('converged:', v.get('converged'), '| writes:', r.get('writes'))"

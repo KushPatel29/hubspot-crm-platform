@@ -42,5 +42,9 @@
         <members>Transacted_With__c</members>
         <name>CustomObject</name>
     </types>
+    <types>
+        <members>Crm_Platform_Aml</members>
+        <name>PermissionSet</name>
+    </types>
     <version>62.0</version>
 </Package>

@@ -86,6 +86,49 @@ python -m crm_platform verify <tenant> --account <account>
 A webhook delivery logs one line: `{"webhook":"accepted","events":2,"byType":{...},"eventIds":[...]}`. A refused
 one logs the reason (`signature mismatch`, `stale timestamp`) and answers 401, which HubSpot retries.
 
+## Verified identity on card actions
+
+Once an app's client secret is in its portal (`npm run set-secret -- HUBSPOT_CLIENT_SECRET <portal id>`), rebind,
+rebuild and upload: the actions that record who acted move to signed endpoints and the cards call them with
+`hubspot.fetch`.
+
+```bash
+python -m crm_platform bind aml --account aml-investigations   # records that the secret now exists
+cd hubspot && npm run build
+cd projects/aml && npx hs project upload --profile live
+npx hs project deploy --profile live --force --build <n>       # the private function is removed: HubSpot asks
+```
+
+A deploy that removes a component is refused with a warning until it is forced; `--force` needs `--build`.
+
+## The nightly live check
+
+`.github/workflows/live-verify.yml` plans every portal read-only each night. Give it each portal's provision key as a
+repository secret (GitHub > Settings > Secrets and variables > Actions): `PROVISION_KEY_MERIDIAN`,
+`PROVISION_KEY_CROSSSELL`, `PROVISION_KEY_AML`. The values are the files `provision-key` wrote:
+
+```powershell
+Get-Content .secrets\meridian.provision.key | Set-Clipboard    # then paste into the secret's value box
+```
+
+## Salesforce
+
+A free Developer Edition org (developer.salesforce.com/signup), then:
+
+```bash
+npx sf org login web --alias crm-dev                           # log in in the browser it opens
+cd salesforce/meridian
+npx sf project deploy start --source-dir force-app --source-dir code --test-level RunLocalTests --target-org crm-dev
+npx sf org assign permset --name Crm_Platform_Meridian --name Meridian_Guardrail_Code --target-org crm-dev
+cd ../.. && python -m crm_platform.salesforce.load meridian --org crm-dev            # plan
+python -m crm_platform.salesforce.load meridian --org crm-dev --write               # load, then plan again: zero
+```
+
+The deploy runs the 11 Apex tests, including the 359-deal parity test. The loader refuses anything but a Developer
+Edition org or a sandbox and binds the tenant to the first org it loads. Add the *Deal margin guardrail* component
+to the Opportunity record page in Lightning App Builder. For CI, store the org's auth URL
+(`npx sf org display --verbose --json --target-org crm-dev`, the `sfdxAuthUrl` value) as the `SFDX_AUTH_URL` secret.
+
 ## Rotating a key
 
 Create the new personal access key in HubSpot, run `npx hs account auth` again, run `verify` for each tenant, then

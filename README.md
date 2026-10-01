@@ -1,6 +1,6 @@
 # HubSpot CRM Platform
 
-![Tests](https://img.shields.io/badge/tests-138%20passing-3B8C6E)
+![Tests](https://img.shields.io/badge/tests-161%20passing-3B8C6E)
 ![HubSpot developer platform 2026.09](https://img.shields.io/badge/HubSpot%20projects-2026.09-FF7A59)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
@@ -8,7 +8,8 @@
 portfolio; here each one gets a HubSpot portal built from code: custom objects, pipelines, association labels and
 records, loaded by the source system's key and proven to converge. Each portal also gets a private HubSpot app of
 its own, with React cards on the records, app functions behind them, and custom workflow actions. The same data
-model also compiles to Salesforce metadata, so the design is not tied to one CRM.
+model also compiles to Salesforce metadata, and Meridian's guardrail is written a third time in Apex with a Lightning
+Web Component and a Flow, so the design is not tied to one CRM.
 
 **Live in HubSpot, 1 October 2026.** Four developer test accounts on Enterprise tiers, one per business: 2,977
 records and 3,393 associations loaded through each app's own token, every portal re-planned to zero writes; all four
@@ -97,12 +98,15 @@ drifts from its sources.
 | Partial failures | HubSpot 207 batch errors recorded per record with HubSpot's category | `test_a_partial_batch_failure_is_reported_with_its_category` |
 | Double clicks, races and retries | Accepting an offer writes a unique idempotency key on the deal (`offer-deal:<offer id>`), so HubSpot itself refuses a second deal; the deal and its line item are created already linked. One deal, one line item, whether two requests race, one runs twice or one fails part way (checked live: the duplicate is refused) | `makes one deal when two requests accept the same offer at once`, `turns an offer into one complete deal, even when clicked twice`, `resumes after a failure part way through instead of creating a second deal`, `adopts a deal that already carries the offer's key instead of creating another` |
 | Duplicate records | Two records with one source key (products and line items cannot be unique) are reported, the oldest by `createdAt` is kept in step, and the portal does not count as converged until a person merges them | `test_two_records_with_one_key_are_reported_and_block_convergence` |
+| Who really did it | A card action that records who acted is sent with `hubspot.fetch`, which HubSpot signs with the signed-in user in the URL; the function logs that name and ignores what the browser claims. While a portal's app has no client secret the private function is used instead and the log says "(unverified)" | `logs HubSpot's word for who moved a case when the card's request is signed`, `refuses a card request whose user, body or portal is not the one HubSpot signed`, `serves the actions that record who acted from signed endpoints, and the card calls them with hubspot.fetch` |
 | Forged workflow calls and webhooks | HubSpot v3 signatures verified (method, URI, body, timestamp; five-minute window) before anything is read | `refuses an unsigned or forged workflow request before touching the deal`, `accepts signed deliveries and logs a summary, never the payload values` |
 | Two copies of a business rule | The guardrail runs in Python (loader) and JavaScript (HubSpot); a test runs both over all 359 Meridian deals | `test_python_and_javascript_score_every_meridian_deal_identically` |
 | Lifecycle moving backwards | The workflow action moves a contact forward only (GrowthOps' field contract) | `moves forward, keeps backwards moves out, and says which` |
 | Rate limits and outages | Paced under 100 requests per 10 seconds, `Retry-After` honoured, a circuit breaker | `test_retries_wait_at_least_as_long_as_retry_after`, `test_the_circuit_opens_after_repeated_exhausted_retries_and_closes_after_cooldown` |
 | Leaking data or keys | Errors carry category, property names and correlation ID only; evidence files hold counts, never values | `test_errors_name_category_properties_and_correlation_never_values`, `test_apply_converges_and_the_evidence_has_counts_not_values` |
 | What is deployed drifting from what is tested | Generated projects and Salesforce metadata rebuilt and compared in CI | `npm run check`, `test_generated_metadata_is_valid_and_committed` |
+| A live portal drifting from its model | A nightly job plans every portal read-only through its provision function and fails if anything is left to do (it needs each portal's key as a repository secret; without one that portal is skipped) | `test_the_provision_key_can_come_from_the_environment_and_is_preferred_to_the_file`, [`live-verify.yml`](.github/workflows/live-verify.yml) |
+| Three copies of the guardrail | Apex scores every Meridian deal in a fixture the Python guardrail generated, and must agree to 1e-9 (an Apex test: it runs in an org) | `test_the_apex_parity_fixture_is_every_meridian_deal_scored_by_the_python_guardrail`, `GuardrailServiceTest.everyMeridianDealScoresAsThePythonGuardrailDoes` |
 
 ## What the real API taught (each one found live, each now in the test double)
 
@@ -120,22 +124,51 @@ drifts from its sources.
 * Record IDs are not issued in creation order (a deal created today has a lower ID than yesterday's), so "oldest"
   means `createdAt`.
 
-## Salesforce-ready
+## Salesforce: the same model, and the guardrail in Apex
 
-`python -m crm_platform.salesforce.metadata` compiles the same models to SFDX source format under
+**Code** ([`salesforce/meridian/code`](salesforce/meridian/code), hand-written). Meridian's pricing guardrail on the
+Salesforce platform, the twin of the HubSpot build:
+
+* [`GuardrailService`](salesforce/meridian/code/main/default/classes/GuardrailService.cls): the rule in Apex, on
+  doubles, so it can be held to the Python and JavaScript versions. Its test scores all 359 Meridian deals from a
+  fixture the Python guardrail generated.
+* [`OpportunityLineItemGuardrail`](salesforce/meridian/code/main/default/triggers/OpportunityLineItemGuardrail.trigger)
+  and [`OpportunityGuardrail`](salesforce/meridian/code/main/default/classes/OpportunityGuardrail.cls): a trigger that
+  only collects opportunity IDs, and a handler that rescores them with one query and one update whatever the batch
+  size (tested with 200 opportunities in one transaction).
+* [`dealMarginGuardrail`](salesforce/meridian/code/main/default/lwc/dealMarginGuardrail): a Lightning Web Component for
+  the Opportunity page, the twin of the HubSpot Deal margin card, over an Apex controller that runs in user mode
+  (field-level security enforced; its test runs as a sales user holding the permission sets, not as the admin).
+* [`Meridian guardrail approval task`](salesforce/meridian/code/main/default/flows/Meridian_Guardrail_Approval_Task.flow-meta.xml):
+  a record-triggered Flow that creates a task for the owner when an open opportunity needs a signature.
+
+**Loader.** `python -m crm_platform.salesforce.load meridian --org <alias>` loads the same records by
+`Crm_Platform_Key__c` and plans zero on a rerun, like the HubSpot loader. It is also the cross-system check: the loader
+writes each opportunity's verdict as Python computed it, inserting the lines fires the Apex trigger, and a rerun that
+plans nothing means the two agreed on every deal.
+
+**What is checked where.** Locally and in CI: the component's Jest tests, an Apex syntax check (the ANTLR grammar the
+Apex Dev Tools project keeps in step with the platform compiler), and the loader against an in-memory Salesforce.
+In an org, by [`salesforce-org.yml`](.github/workflows/salesforce-org.yml) once an org is connected: the deploy
+itself and the 11 Apex tests. Apex compiles and runs nowhere else, so until that has run, the Apex is parsed, not
+proven.
+
+**Metadata** (generated). `python -m crm_platform.salesforce.metadata` compiles the same models to SFDX source format under
 [`salesforce/`](salesforce): custom objects and fields, `crm_platform_key` as an external ID for upserts, picklists
 from enumerations, the deal pipeline as an Opportunity sales process, a custom object's pipeline as a `Stage__c`
 picklist, association labels as lookups (custom to standard) or junction objects with two master-detail fields
 (custom to custom). The model's naming rules are the intersection of both CRMs' (lower snake case, at most 40
-characters, no `hs_` prefix), so every name compiles to both. The output is parsed and checked against Salesforce's
-API-name rules in the tests; it has not been deployed to a Salesforce org.
+characters, no `hs_` prefix), so every name compiles to both. HubSpot's own cost-of-goods property becomes a
+`Unit_Cost__c` currency field, and each tenant gets a permission set granting its fields (a deploy grants none). The
+output is parsed and checked against Salesforce's API-name rules in the tests.
 
 ## Run it
 
 ```bash
 python -m pip install -e . -r requirements-dev.txt && npm install && npm install --prefix hubspot
-python -m pytest -q                       # model, engine, loader, CLI, Salesforce compilation, JS parity
+python -m pytest -q                       # model, engine, both loaders, CLI, Salesforce compilation, JS parity
 npm test --prefix hubspot                 # cards (HubSpot's test renderer), functions, signatures, bundles
+npm install --prefix salesforce/meridian && npm run check --prefix salesforce/meridian   # LWC tests, Apex syntax
 
 npx hs account auth --account <parent> --name dev        # the only credential step: typed into the CLI's prompt
 npx hs test-account create -a dev --name "Meridian Supply" --sales-level ENTERPRISE ...
@@ -145,8 +178,8 @@ cd hubspot && npm run build && cd projects/meridian && npx hs project upload --p
 python -m crm_platform apply meridian     # converge the schema, load the records, verify: through the app
 ```
 
-The full sequence, from creating a test account to watching webhook deliveries, is in the
-[runbook](docs/runbook.md).
+The full sequence, from creating a test account to watching webhook deliveries, and the Salesforce deploy, is in
+the [runbook](docs/runbook.md).
 
 ## Not done, on purpose or not yet
 
@@ -155,11 +188,14 @@ The full sequence, from creating a test account to watching webhook deliveries, 
   same verification path ran live in ScaleLab's action.
 * The apps are private, static-auth apps, one per portal (the agency pattern). A marketplace app with OAuth installs
   across portals is a different distribution, not built here.
-* The Salesforce metadata is generated and validated, not deployed to an org.
-* Who made a decision: HubSpot gives private app functions no user identity, so the cards pass the signed-in
-  user's email, and a user with the browser console could pass someone else's. HubSpot's own property history
-  records the change (made by the app), but the "who" in a case log is the card's word for it. Signed
-  `hubspot.fetch` requests, which carry a verified user ID, would close this and need each app's client secret.
+* Salesforce has not been deployed to an org yet. The metadata is generated and validated, the Lightning component
+  is tested, and the Apex parses; the deploy and the Apex tests need a Developer Edition org and run from
+  `salesforce-org.yml` or the runbook's two commands.
+* Verified identity is built and tested but switched on per portal: it needs that app's client secret, which a
+  person enters. Until then that portal's cards use the private functions and its logs say "(unverified)", because
+  the name is the card's word and a user with the browser console could pass someone else's. The signed request
+  has not been exercised against HubSpot's real signer from a card yet (webhooks and workflow actions, which use
+  the same v3 signature and the same verifier, have).
 * The provision function's signed envelope is valid for five minutes, so a captured request could be replayed
   within that window over TLS; every call it allows is idempotent at the loader level (creates are keyed), and it
   never deletes.
