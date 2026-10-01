@@ -28,6 +28,9 @@ STANDARD_TYPE_IDS = {"contacts": "0-1", "companies": "0-2", "deals": "0-3", "tic
                      "line_items": "0-8"}
 SCHEMA_OBJECT_NAMES = {"contacts": "CONTACT", "companies": "COMPANY", "deals": "DEAL", "tickets": "TICKET",
                        "products": "PRODUCT", "line_items": "LINE_ITEM"}
+# HubSpot mirrors product properties onto line items and back (they share property groups), so a property the model
+# declares on one is expected on the other and is not drift.
+MIRRORED = {"products": "line_items", "line_items": "products"}
 ORDER = ("create_schema", "create_schema_association", "create_group", "create_properties", "update_property",
          "create_pipeline", "create_stage", "update_stage", "create_label")
 
@@ -245,6 +248,9 @@ def plan(model: TenantModel, state: PortalState) -> Plan:
         if creates:
             ops.append(Op("create_properties", obj.name, f"{len(creates)} properties", creates))
         declared = set(obj.names)
+        twin = next((o for o in model.objects if o.name == MIRRORED.get(obj.name)), None)
+        if twin is not None:
+            declared |= set(twin.names)
         drift += [f"{obj.name}.{name} is in group {obj.group} but not in the model"
                   for name, body in sorted(actual.items())
                   if body.get("groupName") == obj.group and name not in declared]

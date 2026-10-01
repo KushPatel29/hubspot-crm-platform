@@ -1,0 +1,192 @@
+{
+  "at": "2026-10-01T09:57:02Z",
+  "load": {
+    "failures": [],
+    "links": {
+      "contacts->companies": {
+        "create": 300,
+        "present": 0,
+        "unresolved": 0
+      },
+      "deals->companies": {
+        "create": 359,
+        "present": 0,
+        "unresolved": 0
+      },
+      "deals->contacts": {
+        "create": 359,
+        "present": 0,
+        "unresolved": 0
+      },
+      "line_items->deals": {
+        "create": 480,
+        "present": 0,
+        "unresolved": 0
+      }
+    },
+    "objects": {
+      "companies": {
+        "create": 150,
+        "desired": 150,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 0,
+        "unmanaged": 0,
+        "update": 0
+      },
+      "contacts": {
+        "create": 150,
+        "desired": 150,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 0,
+        "unmanaged": 2,
+        "update": 0
+      },
+      "deals": {
+        "create": 359,
+        "desired": 359,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 0,
+        "unmanaged": 0,
+        "update": 0
+      },
+      "line_items": {
+        "create": 480,
+        "desired": 480,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 0,
+        "unmanaged": 0,
+        "update": 0
+      },
+      "products": {
+        "create": 240,
+        "desired": 240,
+        "fields_changed": [],
+        "orphans": 0,
+        "unchanged": 0,
+        "unmanaged": 0,
+        "update": 0
+      }
+    }
+  },
+  "portal": {
+    "account_type": "DEVELOPER_TEST",
+    "data_hosting": "na2",
+    "portal_id": "247574101",
+    "time_zone": "US/Eastern"
+  },
+  "requests": 139,
+  "schema_apply": {
+    "applied": [],
+    "conflicts": [],
+    "converged": true,
+    "drift": [
+      "line_items.meridian_brand_tier is in group meridian_pricing but not in the model",
+      "line_items.meridian_category is in group meridian_pricing but not in the model",
+      "line_items.meridian_floor_margin is in group meridian_pricing but not in the model",
+      "line_items.meridian_lifecycle is in group meridian_pricing but not in the model",
+      "line_items.meridian_stretch_margin is in group meridian_pricing but not in the model",
+      "line_items.meridian_sub_category is in group meridian_pricing but not in the model",
+      "line_items.meridian_supplier is in group meridian_pricing but not in the model",
+      "line_items.meridian_target_margin is in group meridian_pricing but not in the model"
+    ],
+    "summary": {}
+  },
+  "tenant": "meridian",
+  "verify": {
+    "converged": true,
+    "records": {
+      "failures": [],
+      "links": {
+        "contacts->companies": {
+          "create": 0,
+          "present": 300,
+          "unresolved": 0
+        },
+        "deals->companies": {
+          "create": 0,
+          "present": 359,
+          "unresolved": 0
+        },
+        "deals->contacts": {
+          "create": 0,
+          "present": 359,
+          "unresolved": 0
+        },
+        "line_items->deals": {
+          "create": 0,
+          "present": 480,
+          "unresolved": 0
+        }
+      },
+      "objects": {
+        "companies": {
+          "create": 0,
+          "desired": 150,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 150,
+          "unmanaged": 0,
+          "update": 0
+        },
+        "contacts": {
+          "create": 0,
+          "desired": 150,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 150,
+          "unmanaged": 2,
+          "update": 0
+        },
+        "deals": {
+          "create": 0,
+          "desired": 359,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 359,
+          "unmanaged": 0,
+          "update": 0
+        },
+        "line_items": {
+          "create": 0,
+          "desired": 480,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 480,
+          "unmanaged": 0,
+          "update": 0
+        },
+        "products": {
+          "create": 0,
+          "desired": 240,
+          "fields_changed": [],
+          "orphans": 0,
+          "unchanged": 240,
+          "unmanaged": 0,
+          "update": 0
+        }
+      }
+    },
+    "schema": {
+      "conflicts": [],
+      "converged": true,
+      "drift": [
+        "line_items.meridian_brand_tier is in group meridian_pricing but not in the model",
+        "line_items.meridian_category is in group meridian_pricing but not in the model",
+        "line_items.meridian_floor_margin is in group meridian_pricing but not in the model",
+        "line_items.meridian_lifecycle is in group meridian_pricing but not in the model",
+        "line_items.meridian_stretch_margin is in group meridian_pricing but not in the model",
+        "line_items.meridian_sub_category is in group meridian_pricing but not in the model",
+        "line_items.meridian_supplier is in group meridian_pricing but not in the model",
+        "line_items.meridian_target_margin is in group meridian_pricing but not in the model"
+      ],
+      "missing_requirements": [],
+      "operations": []
+    },
+    "writes": 0
+  },
+  "writes": 32
+}

@@ -200,6 +200,9 @@ class FakeHubSpot:
             else:
                 stored = {"description": "", "options": [], **prop}
                 self.properties[tid][prop["name"]] = stored
+                if tid in {"0-7", "0-8"}:  # like HubSpot, product and line-item properties mirror each other
+                    twin = "0-8" if tid == "0-7" else "0-7"
+                    self.properties[twin].setdefault(prop["name"], dict(stored))
                 results.append(stored)
         return (207 if errors else 201), {"results": results, "errors": errors}
 
