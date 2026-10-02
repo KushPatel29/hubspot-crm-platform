@@ -129,11 +129,8 @@ def permission_set_xml(model: TenantModel, fields: list[str], custom_objects: li
     return _xml("PermissionSet", body)
 
 
-def parity_fixture(records: list) -> dict[str, str]:
-    """Every Meridian deal's lines and the Python guardrail's answer for each, for the Apex test that holds the
-    Salesforce guardrail to the same rule (a static resource in the hand-written code directory)."""
-    from crm_platform import guardrails
-
+def deal_lines(records: list) -> dict[str, list[tuple[float, float, float, float]]]:
+    """Each Meridian deal's lines as the guardrail takes them: (price, cost, quantity, the product's target margin)."""
     targets = {r.key: float(r.properties["meridian_target_margin"]) for r in records if r.object_name == "products"}
     deals: dict[str, list[tuple[float, float, float, float]]] = {}
     for r in records:
@@ -142,6 +139,15 @@ def parity_fixture(records: list) -> dict[str, str]:
             deals.setdefault(r.links[0].to_key, []).append((
                 float(r.properties["price"]), float(r.properties["hs_cost_of_goods_sold"]),
                 float(r.properties["quantity"]), targets[product]))
+    return deals
+
+
+def parity_fixture(records: list) -> dict[str, str]:
+    """Every Meridian deal's lines and the Python guardrail's answer for each, for the Apex test that holds the
+    Salesforce guardrail to the same rule (a static resource in the hand-written code directory)."""
+    from crm_platform import guardrails
+
+    deals = deal_lines(records)
     cases = []
     for key in sorted(deals):
         score = guardrails.score_deal(deals[key])

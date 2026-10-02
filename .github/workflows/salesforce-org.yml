@@ -1,8 +1,9 @@
 name: Salesforce org checks
 
 # Deploys the generated metadata and the hand-written code to a Salesforce org and runs every Apex test there: the
-# only place Apex compiles and runs. It needs one repository secret, SFDX_AUTH_URL (from
-# `sf org display --verbose --json` on a Developer Edition org); without it the job says so and passes.
+# only place Apex compiles and runs. Then holds the deployed guardrail to the Python one through its REST API, every
+# Meridian deal. It needs one repository secret, SFDX_AUTH_URL (from `sf org auth show-sfdx-auth-url` on a Developer
+# Edition org); without it the job says so and passes.
 
 on:
   workflow_dispatch:
@@ -49,3 +50,13 @@ jobs:
         run: >
           sf project deploy start --source-dir force-app --source-dir code
           --test-level RunLocalTests --wait 30 --target-org ci-org
+      - uses: actions/setup-python@v7
+        if: env.SFDX_AUTH_URL != ''
+        with:
+          python-version: "3.12"
+      - name: Score every Meridian deal through the org's guardrail API and require Python's answers
+        if: env.SFDX_AUTH_URL != ''
+        run: |
+          python -m pip install -e .
+          python -m crm_platform.salesforce.parity meridian --org ci-org > parity.json
+          python -c "import json; r = json.load(open('parity.json')); print(r['agree'], 'of', r['deals'], 'deals agree')"

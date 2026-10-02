@@ -33,11 +33,16 @@ APPROVAL_TIERS: tuple[tuple[float, str], ...] = (
 APPROVERS = ("None", "Rep", "Sales manager", "Commercial director", "VP Finance")
 VERDICTS = ("Above stretch", "At target", "Below target", "Below floor", "Loss-making")  # best to worst
 TOLERANCE = 1e-9
+# The band around a product's target margin. Salesforce reads the same numbers, and the approval tiers' limits, from
+# the Meridian_Guardrail_Setting__mdt record "Default"; a test holds that record to these.
+FLOOR_MINIMUM = 0.05
+FLOOR_DROP = 0.09
+STRETCH_RISE = 0.08
 
 
 def band(target_margin: float) -> tuple[float, float, float]:
     """(floor, target, stretch) for a product, as the pricing project derives it."""
-    return max(0.05, target_margin - 0.09), target_margin, target_margin + 0.08
+    return max(FLOOR_MINIMUM, target_margin - FLOOR_DROP), target_margin, target_margin + STRETCH_RISE
 
 
 @dataclass(frozen=True)

@@ -24,30 +24,23 @@
                         <p class="gap slds-text-heading_medium">{gap}</p>
                     </div>
                 </div>
+                <!-- Stacked, not a table: on a record page this sits in a narrow column, where a four-column table
+                     pushed the verdict out of sight. -->
                 <div class={alertClass} role="alert">
-                    <h2 class="headline">{headline}</h2>
-                    <p class="worst slds-m-left_small">{worstText}</p>
+                    <p class="headline slds-text-title_bold">{headline}</p>
+                    <p class="worst slds-m-top_xx-small">{worstText}</p>
                 </div>
-                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-m-top_small">
-                    <thead>
-                        <tr class="slds-line-height_reset">
-                            <th scope="col">Line</th>
-                            <th scope="col">Margin</th>
-                            <th scope="col">Floor / target</th>
-                            <th scope="col">Verdict</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template for:each={rows} for:item="row">
-                            <tr key={row.id} class="line">
-                                <td>{row.name}</td>
-                                <td>{row.margin}</td>
-                                <td>{row.band}</td>
-                                <td><span class={row.badgeClass}>{row.verdict}</span></td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
+                <ul class="lines slds-has-dividers_top-space slds-m-top_small" aria-label="Lines">
+                    <template for:each={rows} for:item="row">
+                        <li key={row.id} class="line slds-item">
+                            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
+                                <p class="name slds-col slds-p-right_x-small">{row.name}</p>
+                                <span class={row.badgeClass}>{row.verdict}</span>
+                            </div>
+                            <p class="figures slds-text-body_small slds-text-color_weak">{row.figures}</p>
+                        </li>
+                    </template>
+                </ul>
                 <p class="unscored slds-text-body_small slds-m-top_x-small">{unscoredText}</p>
                 <p class="basis slds-text-body_small slds-text-color_weak">{result.basis}</p>
             </template>

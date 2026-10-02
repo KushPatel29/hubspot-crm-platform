@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-02T07:06:51Z",
+  "at": "2026-10-02T23:51:08Z",
   "load": {
     "failures": [],
     "objects": {
@@ -24,24 +24,20 @@
       "deals": {
         "create": 0,
         "desired": 359,
-        "fields_changed": [
-          "Meridian_Blended_Margin__c"
-        ],
+        "fields_changed": [],
         "orphans": 0,
         "sobject": "Opportunity",
-        "unchanged": 358,
-        "update": 1
+        "unchanged": 359,
+        "update": 0
       },
       "line_items": {
         "create": 0,
         "desired": 480,
-        "fields_changed": [
-          "UnitPrice"
-        ],
+        "fields_changed": [],
         "orphans": 0,
         "sobject": "OpportunityLineItem",
-        "unchanged": 479,
-        "update": 1
+        "unchanged": 480,
+        "update": 0
       },
       "products": {
         "create": 0,
@@ -65,7 +61,7 @@
     "organization_type": "Developer Edition",
     "sandbox": "false"
   },
-  "requests": 10,
+  "requests": 8,
   "tenant": "meridian",
   "verify": {
     "converged": true,
@@ -124,5 +120,5 @@
     },
     "writes": 0
   },
-  "writes": 2
+  "writes": 0
 }

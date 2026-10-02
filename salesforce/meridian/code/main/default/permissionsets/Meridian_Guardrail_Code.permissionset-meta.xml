@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <classAccesses>
+        <apexClass>GuardrailApi</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>GuardrailController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
-    <description>Lets a user open the Deal margin guardrail component (its Apex controller). Pair with Crm_Platform_Meridian, which grants the fields.</description>
+    <description>Lets a user open the Deal margin guardrail component (its Apex controller) and call the guardrail REST API (GuardrailApi). Pair with Crm_Platform_Meridian, which grants the fields.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Meridian guardrail code</label>
 </PermissionSet>

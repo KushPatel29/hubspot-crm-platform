@@ -1,6 +1,6 @@
 # HubSpot CRM Platform
 
-![Tests](https://img.shields.io/badge/tests-174%20passing-3B8C6E)
+![Tests](https://img.shields.io/badge/tests-178%20passing-3B8C6E)
 ![HubSpot developer platform 2026.09](https://img.shields.io/badge/HubSpot%20projects-2026.09-FF7A59)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
@@ -8,8 +8,9 @@
 portfolio; here each one gets a HubSpot portal built from code: custom objects, pipelines, association labels and
 records, loaded by the source system's key and proven to converge. Each portal also gets a private HubSpot app of
 its own, with React cards on the records, app functions behind them, and custom workflow actions. The same data
-model also compiles to Salesforce metadata, and Meridian's guardrail is written a third time in Apex with a Lightning
-Web Component and a Flow, so the design is not tied to one CRM.
+model also compiles to Salesforce metadata, and Meridian's guardrail is written a third time in Apex, deployed to a
+Salesforce org with a trigger, Batch Apex, a REST API, custom metadata, a Lightning Web Component on the record page
+and a Flow, so the design is not tied to one CRM.
 
 **Live in HubSpot, 1 October 2026.** Four developer test accounts on Enterprise tiers, one per business: 2,977
 records and 3,393 associations loaded through each app's own token, every portal re-planned to zero writes; all four
@@ -107,7 +108,8 @@ drifts from its sources.
 | Leaking data or keys | Errors carry category, property names and correlation ID only; evidence files hold counts, never values | `test_errors_name_category_properties_and_correlation_never_values`, `test_apply_converges_and_the_evidence_has_counts_not_values` |
 | What is deployed drifting from what is tested | Generated projects and Salesforce metadata rebuilt and compared in CI | `npm run check`, `test_generated_metadata_is_valid_and_committed` |
 | A live portal drifting from its model | A nightly job plans every portal read-only through its provision function and fails if anything is left to do (it needs each portal's key as a repository secret; without one that portal is skipped) | `test_the_provision_key_can_come_from_the_environment_and_is_preferred_to_the_file`, [`live-verify.yml`](.github/workflows/live-verify.yml) |
-| Three copies of the guardrail | Apex scores every Meridian deal in a fixture the Python guardrail generated, and must agree to 1e-9 (an Apex test: it runs in an org) | `test_the_apex_parity_fixture_is_every_meridian_deal_scored_by_the_python_guardrail`, `GuardrailServiceTest.everyMeridianDealScoresAsThePythonGuardrailDoes` |
+| Three copies of the guardrail | Apex scores every Meridian deal in a fixture the Python guardrail generated, and must agree to 1e-9 (an Apex test: it runs in an org); after each deploy, every deal goes through the org's REST API and must score as Python does; the Apex thresholds are a custom metadata record held to the Python rule | `test_the_apex_parity_fixture_is_every_meridian_deal_scored_by_the_python_guardrail`, `GuardrailServiceTest.everyMeridianDealScoresAsThePythonGuardrailDoes`, `test_every_meridian_deal_goes_to_the_api_in_calls_of_200_and_agrees`, `test_the_guardrail_settings_record_holds_the_python_rule` |
+| A product change leaving verdicts stale | A changed target margin starts a batch that rescores every opportunity selling the product, and a sweep repairs verdicts edited by hand | `GuardrailRescoreBatchTest.aNewTargetMarginRescoresEveryDealSellingTheProduct`, `GuardrailRescoreBatchTest.aSweepRepairsAVerdictThatWasEditedByHand` |
 
 ## What the real API taught (each one found live, each now in the test double)
 
@@ -131,33 +133,59 @@ drifts from its sources.
 Salesforce platform, the twin of the HubSpot build:
 
 * [`GuardrailService`](salesforce/meridian/code/main/default/classes/GuardrailService.cls): the rule in Apex, on
-  doubles, so it can be held to the Python and JavaScript versions. Its test scores all 359 Meridian deals from a
-  fixture the Python guardrail generated.
+  doubles, so it can be held to the Python and JavaScript versions. Its thresholds are configuration, a custom
+  metadata record ([`Meridian_Guardrail_Setting__mdt`](salesforce/meridian/code/main/default/objects/Meridian_Guardrail_Setting__mdt),
+  `Default`) that a Python test holds to `crm_platform/guardrails.py`; its Apex test scores all 359 Meridian deals
+  from a fixture the Python guardrail generated.
 * [`OpportunityLineItemGuardrail`](salesforce/meridian/code/main/default/triggers/OpportunityLineItemGuardrail.trigger)
   and [`OpportunityGuardrail`](salesforce/meridian/code/main/default/classes/OpportunityGuardrail.cls): a trigger that
   only collects opportunity IDs, and a handler that rescores them with one query and one update whatever the batch
   size (tested with 200 opportunities in one transaction).
-* [`dealMarginGuardrail`](salesforce/meridian/code/main/default/lwc/dealMarginGuardrail): a Lightning Web Component for
-  the Opportunity page, the twin of the HubSpot Deal margin card, over an Apex controller that runs in user mode
-  (field-level security enforced; its test runs as a sales user holding the permission sets, not as the admin).
+* [`GuardrailRescoreBatch`](salesforce/meridian/code/main/default/classes/GuardrailRescoreBatch.cls): Batch Apex,
+  Schedulable and stateful. A product's target margin moves the band of every line that sells it, so the
+  [`ProductGuardrail`](salesforce/meridian/code/main/default/triggers/ProductGuardrail.trigger) trigger hands a
+  changed target to this job instead of rescoring inline (a product can sit on thousands of lines); from inside a
+  batch, where a batch cannot start another, it goes through a queueable. Over every opportunity it is the nightly
+  sweep that repairs a verdict edited out of step.
+* [`GuardrailApi`](salesforce/meridian/code/main/default/classes/GuardrailApi.cls): Apex REST.
+  `POST /services/apexrest/meridian/guardrail/v1/score` scores up to 500 deals a call for systems that price outside
+  Salesforce; `GET .../opportunities/<key>` returns an opportunity's stored verdict beside a fresh score, in user
+  mode, and says whether they agree. Refusals are a status, a code and a path, never a value from the request.
+* [`dealMarginGuardrail`](salesforce/meridian/code/main/default/lwc/dealMarginGuardrail): a Lightning Web Component,
+  the twin of the HubSpot Deal margin card, over an Apex controller that runs in user mode (field-level security
+  enforced; its test runs as a sales user holding the permission sets, not as the admin). It sits on the
+  [`Meridian Opportunity`](salesforce/meridian/code/main/default/flexipages/Meridian_Opportunity_Record_Page.flexipage-meta.xml)
+  record page, made the org default by an action override in the metadata rather than a click in App Builder.
 * [`Meridian guardrail approval task`](salesforce/meridian/code/main/default/flows/Meridian_Guardrail_Approval_Task.flow-meta.xml):
   a record-triggered Flow that creates a task for the owner when an open opportunity needs a signature.
 
-**Loader.** `python -m crm_platform.salesforce.load meridian --org <alias>` loads the same records by
-`Crm_Platform_Key__c` and plans zero on a rerun, like the HubSpot loader. It is also the cross-system check: the loader
-writes each opportunity's verdict as Python computed it, inserting the lines fires the Apex trigger, and a rerun that
-plans nothing means the two agreed on every deal.
+![The Meridian Opportunity record page in the Developer Edition org: the record's details, and beside them the Deal margin guardrail component with a 53.8% blended margin, $164 under target, "Below target: Commercial director must approve", and each line with its margin, floor, target and verdict](docs/images/salesforce-opportunity-record-page.png)
+
+**Loader and live checks.** `python -m crm_platform.salesforce.load meridian --org <alias>` loads the same records
+by `Crm_Platform_Key__c` and plans zero on a rerun, like the HubSpot loader. It is also a cross-system check: the
+loader writes each opportunity's verdict as Python computed it, inserting the lines fires the Apex trigger, and a
+rerun that plans nothing means the two agreed. `python -m crm_platform.salesforce.parity meridian --org <alias>`
+sends every deal's lines through the REST API and holds each answer to the Python guardrail, against the code as
+deployed and the org's own settings; [`salesforce-org.yml`](.github/workflows/salesforce-org.yml) runs it after
+every deploy. [`scripts/salesforce_live_checks.py`](scripts/salesforce_live_checks.py) exercises the rest in the
+org: a read by key, a product's target moved and put back (the trigger and the batch), the sweep, and a line
+repriced until the Flow asks for a signature.
 
 **What is checked where.** Locally and in CI: the component's Jest tests, an Apex syntax check (the ANTLR grammar the
-Apex Dev Tools project keeps in step with the platform compiler), and the loader against an in-memory Salesforce.
-In an org, because Apex compiles and runs nowhere else: the deploy itself and the 11 Apex tests.
+Apex Dev Tools project keeps in step with the platform compiler), the loader and the parity check against stand-ins,
+and the settings record against the Python rule. In an org, because Apex compiles and runs nowhere else: the deploy
+itself and the 25 Apex tests.
 
-**Run in an org (2026-10-02, a Developer Edition org).** 46 components deployed, 11 of 11 Apex tests passed,
-including the 359-deal parity test, with every class at 93% coverage or more
-([`salesforce_deploy.json`](evidence/meridian/salesforce_deploy.json)). The loader then created 150 accounts, 150
-contacts, 240 products with their price-book entries, 359 opportunities and 480 lines in 12 bulk writes, and a rerun
-plans zero ([`salesforce_first_load.json`](evidence/meridian/salesforce_first_load.json),
-[`salesforce_load.json`](evidence/meridian/salesforce_load.json)).
+**Run in an org (Developer Edition, 2 and 3 October 2026).** 62 components deployed, 25 of 25 Apex tests passed,
+every class at 95% coverage or more ([`salesforce_deploy.json`](evidence/meridian/salesforce_deploy.json)). The loader
+created 150 accounts, 150 contacts, 240 products with their price-book entries, 359 opportunities and 480 lines in 12
+bulk writes, and reruns plan zero ([`salesforce_first_load.json`](evidence/meridian/salesforce_first_load.json),
+[`salesforce_load.json`](evidence/meridian/salesforce_load.json)). Through the REST API, all 359 deals score as Python
+scores them ([`salesforce_parity.json`](evidence/meridian/salesforce_parity.json)). Lowering one product's target by
+5 points rescored its 7 opportunities in the background and changed 5 verdicts, each as Python computes it, and
+putting it back restored every one; the sweep over all 359 changed nothing; a line repriced below its floor moved
+the approver to the VP Finance and the Flow created the task
+([`salesforce_live.json`](evidence/meridian/salesforce_live.json)).
 
 **What the real org taught** (none of it visible to a parser or a test double):
 
@@ -174,6 +202,9 @@ plans zero ([`salesforce_first_load.json`](evidence/meridian/salesforce_first_lo
   0.5312, so the loader and the trigger each saw the other's value as a change. The loader now breaks ties the way
   the other two do (`test_a_rounding_tie_goes_the_way_javascript_and_apex_send_it`), which also moved one line
   price from 20.62 to 20.63 in both CRMs.
+* SOQL takes no semi-join inside a semi-join, so "tasks on the opportunities that sell this product" is two queries.
+* The component's first screenshot on a real record page showed its four-column table cut off in the page's side
+  column, verdicts out of sight; the lines are now stacked, which fits any column.
 
 **Metadata** (generated). `python -m crm_platform.salesforce.metadata` compiles the same models to SFDX source format under
 [`salesforce/`](salesforce): custom objects and fields, `crm_platform_key` as an external ID for upserts, picklists
@@ -199,6 +230,11 @@ python -m crm_platform provision-key meridian --account meridian-supply  # per-p
 cd hubspot && npm run build && cd projects/meridian && npx hs project upload --profile live && npx hs project install-app --profile live
 python -m crm_platform apply meridian     # converge the schema, load the records, verify: through the app
 
+npx sf org login web --alias crm-dev      # Salesforce: a Developer Edition org, logged in in the browser
+cd salesforce/meridian && npx sf project deploy start --source-dir force-app --source-dir code --test-level RunLocalTests --target-org crm-dev && cd ../..
+python -m crm_platform.salesforce.load meridian --org crm-dev --write   # load, then plan again: zero
+python -m crm_platform.salesforce.parity meridian --org crm-dev         # every deal through the Apex REST API
+
 python -m pip install -e .[oauth]         # the other way in: the OAuth connector app
 python -m crm_platform oauth-secret connector    # the client secret, from the clipboard to the OS credential store
 python -m crm_platform connect meridian          # approve the install in the browser; the refresh token is stored
@@ -218,11 +254,12 @@ the [runbook](docs/runbook.md).
   app deployed to a test account, with the install flow, token refresh and a client transport tested against a
   stand-in for HubSpot's token endpoint. It has not been installed and run against the real one yet: that takes a
   person approving the install and copying the client secret. It is private distribution, not a marketplace listing.
-* Salesforce is deployed and loaded, by hand from the runbook. [`salesforce-org.yml`](.github/workflows/salesforce-org.yml)
-  repeats the deploy and the Apex tests in CI once the org's auth URL is stored as a repository secret, which a
-  person does; until then it reports that it skipped. The approval-task Flow is covered by an Apex test and has not
-  yet created a task on the loaded data: it fires when an open opportunity's approver changes, and the load sets
-  each approver once. The Lightning component is deployed but not yet placed on the Opportunity page.
+* Salesforce is deployed and loaded from the runbook's commands. [`salesforce-org.yml`](.github/workflows/salesforce-org.yml)
+  repeats the deploy, the Apex tests and the API parity check in CI once the org's auth URL is stored as a
+  repository secret, which a person does; until then it reports that it skipped. The rescore sweep is written to be
+  scheduled but is not scheduled in the org: by default Salesforce refuses to redeploy a class while a scheduled
+  job holds it, which would block the CI deploy. Code Analyzer (PMD) does not run here: it needs Java, which this
+  build does not install.
 * Verified identity is built and tested but switched on per portal: it needs that app's client secret, which a
   person enters. Until then that portal's cards use the private functions and its logs say "(unverified)", because
   the name is the card's word and a user with the browser console could pass someone else's. The signed request

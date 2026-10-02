@@ -70,6 +70,33 @@ private class GuardrailServiceTest {
     }
 
     @IsTest
+    static void theRuleIsReadFromCustomMetadataAndShipsWithThePythonNumbers() {
+        Assert.isNotNull(Meridian_Guardrail_Setting__mdt.getInstance('Default'), 'the Default setting is deployed');
+        GuardrailService.Settings rule = GuardrailService.settings();
+        near(d(0.05), rule.floorMinimum, 'floor minimum');
+        near(d(0.09), rule.floorDrop, 'floor drop');
+        near(d(0.08), rule.stretchRise, 'stretch rise');
+        Assert.areEqual(3, rule.tierLimits.size());
+        near(d(0.02), rule.tierLimits[0], 'rep limit');
+        near(d(0.05), rule.tierLimits[1], 'sales manager limit');
+        near(d(0.10), rule.tierLimits[2], 'commercial director limit');
+    }
+
+    @IsTest
+    static void aStricterRepLimitMovesTheSignatureUpALevel() {
+        // 1.5 points under a 30% target: a rep signs under the shipped rule.
+        Assert.areEqual('Rep', GuardrailService.scoreLine(100, d(71.5), 1, d(0.3)).approver);
+        GuardrailService.Settings stricter = new GuardrailService.Settings();
+        stricter.tierLimits = new List<Double>{ d(0.01), d(0.05), d(0.10) };
+        GuardrailService.current = stricter;
+        Assert.areEqual('Sales manager', GuardrailService.scoreLine(100, d(71.5), 1, d(0.3)).approver);
+        GuardrailService.Settings wider = new GuardrailService.Settings();
+        wider.floorDrop = d(0.20);
+        GuardrailService.current = wider;
+        near(d(0.10), GuardrailService.scoreLine(100, 60, 1, d(0.3)).floor, 'a wider band lowers the floor');
+    }
+
+    @IsTest
     static void everyMeridianDealScoresAsThePythonGuardrailDoes() {
         StaticResource fixture = [SELECT Body FROM StaticResource WHERE Name = 'GuardrailParity' LIMIT 1];
         List<Object> deals = (List<Object>) JSON.deserializeUntyped(fixture.Body.toString());

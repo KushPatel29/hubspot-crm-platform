@@ -134,19 +134,36 @@ Get-Content .secrets\meridian.provision.key | Set-Clipboard    # then paste into
 A free Developer Edition org (developer.salesforce.com/signup), then:
 
 ```bash
-npx sf org login web --alias crm-dev                           # log in in the browser it opens
+npx sf org login web --alias crm-dev                           # log in in the browser it opens (2-minute window;
+                                                               # set SF_WEB_OAUTH_SERVER_TIMEOUT=1800000 for longer)
 cd salesforce/meridian
 npx sf project deploy start --source-dir force-app --source-dir code --test-level RunLocalTests --target-org crm-dev
 npx sf org assign permset --name Crm_Platform_Meridian --name Meridian_Guardrail_Code --target-org crm-dev
 cd ../.. && python -m crm_platform.salesforce.load meridian --org crm-dev            # plan
 python -m crm_platform.salesforce.load meridian --org crm-dev --write               # load, then plan again: zero
+python -m crm_platform.salesforce.parity meridian --org crm-dev --evidence          # every deal through the REST API
+python scripts/salesforce_live_checks.py --org crm-dev                              # trigger, batch, sweep, Flow
 ```
 
-The deploy runs the 11 Apex tests, including the 359-deal parity test. The loader refuses anything but a Developer
-Edition org or a sandbox and binds the tenant to the first org it loads. Add the *Deal margin guardrail* component
-to the Opportunity record page in Lightning App Builder. For CI, store the org's auth URL
-(`npx sf org auth show-sfdx-auth-url --target-org crm-dev`; since CLI 2.15x `sf org display` no longer shows it) as
-the `SFDX_AUTH_URL` secret.
+The deploy runs the 25 Apex tests, including the 359-deal parity test, and makes the *Meridian Opportunity* record
+page (with the Deal margin guardrail component) the org default for opportunities on desktop. The loader refuses
+anything but a Developer Edition org or a sandbox and binds the tenant to the first org it loads. The live checks
+write to the org: a product's target margin is lowered and put back, and a demo opportunity with no key is left
+behind with its approval task.
+
+The guardrail's thresholds are the `Meridian_Guardrail_Setting__mdt` record named Default. Change them in
+`code/main/default/customMetadata` and in `crm_platform/guardrails.py` together (a test compares the two), then
+deploy and run the parity check. To sweep every opportunity nightly:
+
+```apex
+System.schedule('Meridian guardrail sweep', '0 0 3 * * ?', new GuardrailRescoreBatch());
+```
+
+A scheduled job holds its class: Salesforce refuses to redeploy `GuardrailRescoreBatch` while it is scheduled,
+unless *Allow deployments of components when corresponding Apex jobs are pending or in progress* is on in
+Deployment Settings. For CI, store the org's auth URL (`npx sf org auth show-sfdx-auth-url --target-org crm-dev`;
+since CLI 2.15x `sf org display` no longer shows it) as the `SFDX_AUTH_URL` secret; `salesforce-org.yml` then
+deploys, runs the Apex tests and the parity check on every change under `salesforce/`.
 
 ## Rotating a key
 

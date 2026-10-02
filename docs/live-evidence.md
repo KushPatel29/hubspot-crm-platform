@@ -21,11 +21,19 @@ Meridian's model and guardrail in a Developer Edition org (`00Daj00001A6vdFEAR`)
 
 | What | Result |
 |---|---|
-| Deploy `0Afaj00000mShrCCAS`, RunLocalTests | Succeeded: 46 of 46 components, 11 of 11 Apex tests, class coverage 93% to 100% |
+| Deploy `0Afaj00000mXi3RCAS`, RunLocalTests | Succeeded: 62 of 62 components, 25 of 25 Apex tests, class coverage 95% to 100% |
 | First load (2026-10-02) | Created companies 150, contacts 150, deals 359, line_items 480, products 240, price-book entries 240 in 12 writes, 0 failures; planned again, left to do: deals Meridian_Blended_Margin__c |
-| Latest load (2026-10-02) | 2 writes; planned again, converged: 1,379 records unchanged |
+| Latest load (2026-10-02) | 0 writes; planned again, converged: 1,379 records unchanged |
 
 The first load's leftover is the cross-system check doing its job: on one opportunity the Apex trigger and the loader rounded a blended margin of exactly 0.53125 differently. The loader's rounding was changed to match Apex and JavaScript, and the latest load is the rerun after that fix.
+
+| Exercised in the org | Result |
+|---|---|
+| Every Meridian deal through the guardrail REST API (2026-10-02) | 359 of 359 deals (480 lines, 2 calls) scored by the deployed Apex agree with the Python guardrail |
+| Read `RFQ-CU2000-2026-05-won` by its key | stored and freshly scored verdicts agree: Below floor, as Python says |
+| Product `20207`'s target margin lowered 5 points | the Product2 trigger started GuardrailRescoreBatch (completed, 0 errors): 7 opportunities rescored, 5 verdicts changed, 0 unlike Python's; put back, every verdict returned |
+| The sweep, as the nightly schedule runs it | 359 opportunities in 2 batches, 0 errors, 0 changed |
+| A demo line repriced below its floor | approver none → vp_finance; the Flow created 1 high-priority approval task |
 
 ## HubSpot calling the apps
 

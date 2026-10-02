@@ -1,0 +1,15 @@
+{
+  "agree": 359,
+  "at": "2026-10-02T23:51:01Z",
+  "calls": 2,
+  "deals": 359,
+  "disagree": {},
+  "endpoint": "/services/apexrest/meridian/guardrail/v1/score",
+  "lines": 480,
+  "org": {
+    "org_id": "00Daj00001A6vdFEAR",
+    "organization_type": "Developer Edition",
+    "sandbox": "false"
+  },
+  "tenant": "meridian"
+}

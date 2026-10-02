@@ -10,12 +10,13 @@
  *
  * Doubles throughout, not Decimals: the rule is defined on IEEE doubles in Python and JavaScript, and the parity
  * test compares to 1e-9.
+ *
+ * The band's numbers and the tiers' limits are configuration: the Meridian_Guardrail_Setting__mdt record named
+ * Default. The values below are the fallback when that record is missing, and the values it ships with; a Python
+ * test holds the committed record to crm_platform/guardrails.py.
  */
 public inherited sharing class GuardrailService {
     public static final Double TOLERANCE = 0.000000001;
-    public static final Double FLOOR_MINIMUM = 0.05;
-    public static final Double FLOOR_DROP = 0.09;
-    public static final Double STRETCH_RISE = 0.08;
     // A Double zero: a bare 0.0 literal is a Decimal in Apex, which would turn the arithmetic below into Decimals.
     private static final Double ZERO = 0.0;
     public static final List<String> VERDICTS = new List<String>{
@@ -24,7 +25,35 @@ public inherited sharing class GuardrailService {
     public static final List<String> APPROVERS = new List<String>{
         'None', 'Rep', 'Sales manager', 'Commercial director', 'VP Finance'
     };
-    private static final List<Double> TIER_LIMITS = new List<Double>{ 0.02, 0.05, 0.10 };
+
+    public class Settings {
+        public Double floorMinimum = 0.05;
+        public Double floorDrop = 0.09;
+        public Double stretchRise = 0.08;
+        // Rep, sales manager, commercial director; a gap beyond the last needs the VP Finance.
+        public List<Double> tierLimits = new List<Double>{ 0.02, 0.05, 0.10 };
+    }
+
+    @TestVisible
+    private static Settings current;
+
+    /** The rule's numbers, read once per transaction (getInstance does not count against the SOQL limit). */
+    public static Settings settings() {
+        if (current == null) {
+            current = new Settings();
+            Meridian_Guardrail_Setting__mdt row = Meridian_Guardrail_Setting__mdt.getInstance('Default');
+            if (row != null) {
+                current.floorMinimum = row.Floor_Minimum__c.doubleValue();
+                current.floorDrop = row.Floor_Drop__c.doubleValue();
+                current.stretchRise = row.Stretch_Rise__c.doubleValue();
+                current.tierLimits = new List<Double>{
+                    row.Rep_Limit__c.doubleValue(), row.Manager_Limit__c.doubleValue(),
+                    row.Director_Limit__c.doubleValue()
+                };
+            }
+        }
+        return current;
+    }
 
     public class Line {
         public Double price;
@@ -63,10 +92,11 @@ public inherited sharing class GuardrailService {
     }
 
     public static LineScore scoreLine(Double price, Double cost, Double quantity, Double targetMargin) {
+        Settings rule = settings();
         LineScore s = new LineScore();
-        s.floor = Math.max(FLOOR_MINIMUM, targetMargin - FLOOR_DROP);
+        s.floor = Math.max(rule.floorMinimum, targetMargin - rule.floorDrop);
         s.target = targetMargin;
-        s.stretch = targetMargin + STRETCH_RISE;
+        s.stretch = targetMargin + rule.stretchRise;
         s.revenue = price * quantity;
         s.marginPct = price > 0 ? (price - cost) / price : ZERO;
         if (s.marginPct >= s.stretch - TOLERANCE) {
@@ -84,8 +114,8 @@ public inherited sharing class GuardrailService {
         s.approver = 'None';
         if (s.gap > TOLERANCE) {
             s.approver = 'VP Finance';
-            for (Integer i = 0; i < TIER_LIMITS.size(); i++) {
-                if (s.gap <= TIER_LIMITS[i]) {
+            for (Integer i = 0; i < rule.tierLimits.size(); i++) {
+                if (s.gap <= rule.tierLimits[i]) {
                     s.approver = APPROVERS[i + 1];
                     break;
                 }

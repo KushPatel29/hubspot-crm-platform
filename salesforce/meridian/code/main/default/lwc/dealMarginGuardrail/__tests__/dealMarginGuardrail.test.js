@@ -56,11 +56,14 @@ describe('c-deal-margin-guardrail', () => {
         expect(text(element, '.blended')).toBe('30.0%');
         expect(text(element, '.gap')).toBe('$10');
         expect(element.shadowRoot.querySelector('[role="alert"]').className).toContain('slds-theme_warning');
-        const rows = [...element.shadowRoot.querySelectorAll('tr.line')].map((row) =>
-            [...row.querySelectorAll('td')].map((cell) => cell.textContent));
+        const rows = [...element.shadowRoot.querySelectorAll('li.line')].map((row) => [
+            row.querySelector('.name').textContent, row.querySelector('.figures').textContent,
+            row.querySelector('.slds-badge').textContent, row.querySelector('.slds-badge').className]);
         expect(rows).toEqual([
-            ['Kettle', '40.0%', '21% / 30%', 'Above stretch'],
-            ['Toaster', '25.0%', '21% / 30%', 'Below target']
+            ['Kettle', 'Margin 40.0% · floor 21% · target 30%', 'Above stretch',
+                'slds-badge slds-shrink-none slds-theme_success'],
+            ['Toaster', 'Margin 25.0% · floor 21% · target 30%', 'Below target',
+                'slds-badge slds-shrink-none slds-theme_warning']
         ]);
         expect(text(element, '.unscored')).toBe('Not scored (no product target or unit cost): Unbanded.');
     });
@@ -87,7 +90,7 @@ describe('c-deal-margin-guardrail', () => {
             deal: { blendedMarginPct: 0, verdict: 'At target', approver: 'None', gapDollars: 0, worstLine: -1 } });
         await settled();
         expect(text(element, '.empty')).toBe('This opportunity has no priced line items yet.');
-        expect(element.shadowRoot.querySelector('table')).toBeNull();
+        expect(element.shadowRoot.querySelector('ul.lines')).toBeNull();
 
         scoreOpportunity.error({ message: 'You do not have access to Unit_Cost__c' });
         await settled();

@@ -1,0 +1,76 @@
+{
+  "at": "2026-10-02T23:43:40Z",
+  "flow": {
+    "approver_after_repricing": "vp_finance",
+    "approver_at_a_healthy_price": "none",
+    "opportunity": "006aj00000ekqm9AAA",
+    "tasks_at_a_healthy_price": 0,
+    "tasks_created": [
+      {
+        "priority": "High",
+        "status": "Not Started",
+        "subject": "Price approval needed (vp_finance): Flow demo 2026-10-02 23:44: a line repriced below its floor"
+      }
+    ],
+    "verdict_after_repricing": "below_floor"
+  },
+  "org": {
+    "org_id": "00Daj00001A6vdFEAR",
+    "organization_type": "Developer Edition",
+    "sandbox": "false"
+  },
+  "read_by_key": {
+    "in_step": true,
+    "key": "RFQ-CU2000-2026-05-won",
+    "live_verdict": "Below floor",
+    "python_verdict": "Below floor",
+    "stored_approver": "vp_finance",
+    "unscored_lines": 0
+  },
+  "requests": 35,
+  "retarget": {
+    "after_lowering": {
+      "batch": {
+        "batches": 1,
+        "errors": 0,
+        "finished": "2026-10-02T23:43:55.000+0000",
+        "job": "707aj00001J1jsTAAR",
+        "started": "2026-10-02T23:43:46.000+0000",
+        "status": "Completed"
+      },
+      "disagree_with_python": [],
+      "fields_changed": 7,
+      "verdicts_changed": 5
+    },
+    "after_restoring": {
+      "batch": {
+        "batches": 1,
+        "errors": 0,
+        "finished": "2026-10-02T23:44:02.000+0000",
+        "job": "707aj00001J17yWAAR",
+        "started": "2026-10-02T23:44:01.000+0000",
+        "status": "Completed"
+      },
+      "identical_to_before": true
+    },
+    "lines": 7,
+    "open_opportunities": 0,
+    "opportunities": 7,
+    "product": "20207",
+    "signature_tasks_the_flow_created": 0,
+    "target_moved_by": -0.05
+  },
+  "sweep": {
+    "batch": {
+      "batches": 2,
+      "errors": 0,
+      "finished": "2026-10-02T23:44:21.000+0000",
+      "job": "707aj00001J1KpNAAV",
+      "started": "2026-10-02T23:44:14.000+0000",
+      "status": "Completed"
+    },
+    "changed": 0,
+    "opportunities": 359
+  },
+  "tenant": "meridian"
+}

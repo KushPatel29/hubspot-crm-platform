@@ -58,7 +58,36 @@ def _salesforce() -> list[str]:
             "",
             ("The first load's leftover is the cross-system check doing its job: on one opportunity the Apex trigger "
              "and the loader rounded a blended margin of exactly 0.53125 differently. The loader's rounding was "
-             "changed to match Apex and JavaScript, and the latest load is the rerun after that fix.")]
+             "changed to match Apex and JavaScript, and the latest load is the rerun after that fix."),
+            *_salesforce_live()]
+
+
+def _salesforce_live() -> list[str]:
+    """The deployed code exercised in the org: the REST API against Python, the async rescore, the Flow."""
+    parity = _load("meridian", "salesforce_parity")
+    live = _load("meridian", "salesforce_live")
+    if not (parity and live):
+        return []
+    read, retarget, sweep, flow = live["read_by_key"], live["retarget"], live["sweep"], live["flow"]
+    lowered, restored = retarget["after_lowering"], retarget["after_restoring"]
+    tasks = flow["tasks_created"]
+    return ["", "| Exercised in the org | Result |", "|---|---|",
+            (f"| Every Meridian deal through the guardrail REST API ({parity['at'][:10]}) | {parity['agree']} of "
+             f"{parity['deals']} deals ({parity['lines']} lines, {parity['calls']} calls) scored by the deployed Apex "
+             f"agree with the Python guardrail |"),
+            (f"| Read `{read['key']}` by its key | stored and freshly scored verdicts "
+             f"{'agree' if read['in_step'] else 'differ'}: {read['live_verdict']}, "
+             f"{'as Python says' if read['live_verdict'] == read['python_verdict'] else 'not what Python says'} |"),
+            (f"| Product `{retarget['product']}`'s target margin lowered 5 points | the Product2 trigger started "
+             f"GuardrailRescoreBatch ({lowered['batch']['status'].lower()}, {lowered['batch']['errors']} errors): "
+             f"{retarget['opportunities']} opportunities rescored, {lowered['verdicts_changed']} verdicts changed, "
+             f"{len(lowered['disagree_with_python'])} unlike Python's; put back, every verdict "
+             f"{'returned' if restored['identical_to_before'] else 'did not return'} |"),
+            (f"| The sweep, as the nightly schedule runs it | {sweep['opportunities']} opportunities in "
+             f"{sweep['batch']['batches']} batches, {sweep['batch']['errors']} errors, {sweep['changed']} changed |"),
+            (f"| A demo line repriced below its floor | approver {flow['approver_at_a_healthy_price']} → "
+             f"{flow['approver_after_repricing']}; the Flow created {len(tasks)} "
+             f"{tasks[0]['priority'].lower() if tasks else ''}-priority approval task |")]
 
 
 def render() -> str:

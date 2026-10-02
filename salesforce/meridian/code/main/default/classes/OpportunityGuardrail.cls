@@ -5,12 +5,16 @@
  *
  * A line is scored only when it has a unit cost and its product a target margin; the others are left out rather
  * than guessed. An opportunity with no scored line has its guardrail fields cleared.
+ *
+ * A product's target margin moves the band of every line that sells it, on every opportunity, so a change to it is
+ * handed to GuardrailRescoreBatch (from the Product2 trigger) rather than rescored here.
  */
 public inherited sharing class OpportunityGuardrail {
-    public static void rescore(Set<Id> opportunityIds) {
+    /** Rescores the opportunities and returns how many had a guardrail field change. */
+    public static Integer rescore(Set<Id> opportunityIds) {
         opportunityIds.remove(null);
         if (opportunityIds.isEmpty()) {
-            return;
+            return 0;
         }
         Map<Id, List<GuardrailService.Line>> linesByOpportunity = new Map<Id, List<GuardrailService.Line>>();
         for (Id oppId : opportunityIds) {
@@ -42,6 +46,18 @@ public inherited sharing class OpportunityGuardrail {
             }
         }
         update changed;
+        return changed.size();
+    }
+
+    /** Product2 after update: the products whose target margin changed have their opportunities rescored. */
+    public static Id targetMarginsChanged(List<Product2> products, Map<Id, Product2> before) {
+        Set<Id> moved = new Set<Id>();
+        for (Product2 product : products) {
+            if (product.Meridian_Target_Margin__c != before.get(product.Id).Meridian_Target_Margin__c) {
+                moved.add(product.Id);
+            }
+        }
+        return moved.isEmpty() ? null : GuardrailRescoreBatch.run(moved);
     }
 
     public static Boolean isScorable(OpportunityLineItem item) {

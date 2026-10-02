@@ -5,12 +5,13 @@ import { LightningElement, api, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 import scoreOpportunity from '@salesforce/apex/GuardrailController.scoreOpportunity';
 
+const BADGE = 'slds-badge slds-shrink-none';
 const TONE = {
-    'Above stretch': 'slds-badge slds-theme_success',
-    'At target': 'slds-badge slds-theme_success',
-    'Below target': 'slds-badge slds-theme_warning',
-    'Below floor': 'slds-badge slds-theme_error',
-    'Loss-making': 'slds-badge slds-theme_error'
+    'Above stretch': `${BADGE} slds-theme_success`,
+    'At target': `${BADGE} slds-theme_success`,
+    'Below target': `${BADGE} slds-theme_warning`,
+    'Below floor': `${BADGE} slds-theme_error`,
+    'Loss-making': `${BADGE} slds-theme_error`
 };
 
 function pct(value, digits = 1) {
@@ -70,7 +71,7 @@ export default class DealMarginGuardrail extends LightningElement {
         const { verdict, approver } = this.result.deal;
         const theme = verdict === 'Below floor' || verdict === 'Loss-making' ? 'slds-theme_error'
             : approver === 'None' ? 'slds-theme_success' : 'slds-theme_warning';
-        return `slds-notify slds-notify_alert ${theme}`;
+        return `slds-box slds-box_x-small ${theme}`;
     }
 
     get worstText() {
@@ -84,10 +85,10 @@ export default class DealMarginGuardrail extends LightningElement {
         return this.result.lines.map((line) => ({
             id: line.id,
             name: line.name,
-            margin: pct(line.score.marginPct),
-            band: `${pct(line.score.floor, 0)} / ${pct(line.score.target, 0)}`,
+            figures: `Margin ${pct(line.score.marginPct)} · floor ${pct(line.score.floor, 0)} · `
+                + `target ${pct(line.score.target, 0)}`,
             verdict: line.score.verdict,
-            badgeClass: TONE[line.score.verdict] ?? 'slds-badge'
+            badgeClass: TONE[line.score.verdict] ?? BADGE
         }));
     }
 

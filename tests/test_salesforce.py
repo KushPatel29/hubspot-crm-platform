@@ -133,3 +133,21 @@ def test_the_apex_parity_fixture_is_every_meridian_deal_scored_by_the_python_gua
                                                                      case["worstLine"])
         assert score.blended_margin_pct == case["blendedMarginPct"]  # JSON round-trips a double exactly
     assert ET.fromstring(files[f"{PARITY}.resource-meta.xml"]).findtext(f"{{{NS}}}contentType") == "application/json"
+
+
+def test_the_guardrail_settings_record_holds_the_python_rule():
+    """Salesforce reads the band and the tiers from custom metadata; the record that ships must be the Python rule."""
+    from crm_platform import guardrails
+
+    path = OUT / "meridian" / "code" / "main" / "default" / "customMetadata"
+    record = ET.parse(path / "Meridian_Guardrail_Setting.Default.md-meta.xml").getroot()
+    values = {v.findtext(f"{{{NS}}}field"): float(v.findtext(f"{{{NS}}}value") or "nan")
+              for v in record.iter(f"{{{NS}}}values")}
+    limits = [limit for limit, _ in guardrails.APPROVAL_TIERS[:-1]]
+    assert values == {"Floor_Minimum__c": guardrails.FLOOR_MINIMUM, "Floor_Drop__c": guardrails.FLOOR_DROP,
+                      "Stretch_Rise__c": guardrails.STRETCH_RISE, "Rep_Limit__c": limits[0],
+                      "Manager_Limit__c": limits[1], "Director_Limit__c": limits[2]}
+    fields = {f.stem.split(".")[0] for f in (path.parent / "objects" / "Meridian_Guardrail_Setting__mdt" / "fields")
+              .glob("*.field-meta.xml")}
+    assert fields == set(values), "every setting has a field and every field a value"
+
