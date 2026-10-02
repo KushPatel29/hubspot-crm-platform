@@ -145,7 +145,8 @@ python -m crm_platform.salesforce.load meridian --org crm-dev --write           
 The deploy runs the 11 Apex tests, including the 359-deal parity test. The loader refuses anything but a Developer
 Edition org or a sandbox and binds the tenant to the first org it loads. Add the *Deal margin guardrail* component
 to the Opportunity record page in Lightning App Builder. For CI, store the org's auth URL
-(`npx sf org display --verbose --json --target-org crm-dev`, the `sfdxAuthUrl` value) as the `SFDX_AUTH_URL` secret.
+(`npx sf org auth show-sfdx-auth-url --target-org crm-dev`; since CLI 2.15x `sf org display` no longer shows it) as
+the `SFDX_AUTH_URL` secret.
 
 ## Rotating a key
 

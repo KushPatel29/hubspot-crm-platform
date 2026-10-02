@@ -1,0 +1,21 @@
+{
+  "note": "The first Meridian load, from that run's report (apply.json as committed on 2026-10-01): apply.json in this folder is now the 2026-10-02 rerun that updated the two deals and one line item a rounding tie had left a cent or a basis point apart from what Salesforce and the HubSpot guardrail function compute.",
+  "at": "2026-10-01T09:57Z",
+  "portal_id": "247574101",
+  "created": {
+    "companies": 150,
+    "contacts": 150,
+    "deals": 359,
+    "line_items": 480,
+    "products": 240
+  },
+  "associations_created": {
+    "contacts->companies": 300,
+    "deals->companies": 359,
+    "deals->contacts": 359,
+    "line_items->deals": 480
+  },
+  "failures": 0,
+  "writes": 32,
+  "verify": "converged, zero writes"
+}

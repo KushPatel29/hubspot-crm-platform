@@ -15,6 +15,18 @@ Every portal is a HubSpot developer test account on Enterprise tiers, bound to o
 
 The AML row's second run is the idempotency check against the real API: all 1,018 records came back unchanged and every association was already present, so it wrote nothing but the two stage fixes it was rerun for.
 
+## Salesforce
+
+Meridian's model and guardrail in a Developer Edition org (`00Daj00001A6vdFEAR`), deployed and loaded from the runbook's commands.
+
+| What | Result |
+|---|---|
+| Deploy `0Afaj00000mShrCCAS`, RunLocalTests | Succeeded: 46 of 46 components, 11 of 11 Apex tests, class coverage 93% to 100% |
+| First load (2026-10-02) | Created companies 150, contacts 150, deals 359, line_items 480, products 240, price-book entries 240 in 12 writes, 0 failures; planned again, left to do: deals Meridian_Blended_Margin__c |
+| Latest load (2026-10-02) | 2 writes; planned again, converged: 1,379 records unchanged |
+
+The first load's leftover is the cross-system check doing its job: on one opportunity the Apex trigger and the loader rounded a blended margin of exactly 0.53125 differently. The loader's rounding was changed to match Apex and JavaScript, and the latest load is the rerun after that fix.
+
 ## HubSpot calling the apps
 
 | What | Result |

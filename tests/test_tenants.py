@@ -129,3 +129,18 @@ def test_synthetic_contacts_are_labelled_and_use_reserved_domains():
             if record.object_name == "contacts":
                 assert "synthetic" in record.properties["jobtitle"]
                 assert record.properties["email"].endswith(".example.com")
+
+
+def test_a_rounding_tie_goes_the_way_javascript_and_apex_send_it():
+    from crm_platform.snapshots import money, number
+
+    # Exact in binary, so a true tie: toFixed and HALF_UP round it up, an f-string would round it to even.
+    assert number(0.53125) == "0.5313"
+    assert number(-0.53125) == "-0.5313"
+    assert money(20.625) == "20.63"
+    # Not a tie: 2.675 is stored a little below, and every language says 2.67.
+    assert money(2.675) == "2.67"
+    assert (number(100, 0), number(0), number(-0.00001), number("3.10")) == ("100", "0", "0", "3.1")
+    # The one Meridian deal that is a tie carries the value the HubSpot function and the Apex trigger write.
+    deals = {r.key: r for r in TENANTS["meridian"].records() if r.object_name == "deals"}
+    assert deals["RFQ-CU2140-2026-06-won"].properties["meridian_blended_margin"] == "0.5313"

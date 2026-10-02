@@ -193,8 +193,10 @@ def stage_field_xml(pipeline: Pipeline) -> str:
 
 
 def business_process_xml(pipeline: Pipeline) -> str:
-    values = "".join("    <values>\n" + _tag("fullName", s.label, 2) + _tag("default", i == 0, 2) + "    </values>\n"
-                     for i, s in enumerate(pipeline.stages))
+    # No value is the default: an Opportunity sales process cannot carry one (a Lead or Case process can), and the
+    # org refuses the deploy with "Cannot specify a default on: Opportunity" if any value says true.
+    values = "".join("    <values>\n" + _tag("fullName", s.label, 2) + _tag("default", False, 2) + "    </values>\n"
+                     for s in pipeline.stages)
     return _xml("BusinessProcess", _tag("fullName", api_name(re.sub(r"[^a-z0-9]+", "_", pipeline.label.lower())
                                                                .strip("_")))
                 + _tag("isActive", True) + values)

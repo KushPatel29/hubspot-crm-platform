@@ -5,9 +5,15 @@
 @IsTest
 private class OpportunityGuardrailTest {
     // The stage values come from the org (the generated OpportunityStage set), so the test never hard-codes one.
+    // Read once: the bulk test builds 200 opportunities, and a query per opportunity is 101 queries too many.
+    private static String openStage;
+
     private static String stageName() {
-        return [SELECT ApiName FROM OpportunityStage WHERE IsActive = TRUE AND IsClosed = FALSE ORDER BY SortOrder LIMIT 1]
-            .ApiName;
+        if (openStage == null) {
+            openStage = [SELECT ApiName FROM OpportunityStage WHERE IsActive = TRUE AND IsClosed = FALSE
+                         ORDER BY SortOrder LIMIT 1].ApiName;
+        }
+        return openStage;
     }
 
     @TestSetup

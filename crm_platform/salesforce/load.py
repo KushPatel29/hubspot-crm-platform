@@ -26,9 +26,10 @@ line_items             OpportunityLineItem: Quantity, UnitPrice, Unit_Cost__c, t
 any other property     ``<Title_Case>__c``, numbers as numbers
 =====================  ================================================================================
 
-Authentication is the Salesforce CLI's: ``sf org display`` hands this process the org's instance URL and a session
-token, which stay in memory and are never printed. Only Developer Edition orgs, sandboxes and scratch orgs are
-written to, and a tenant stays bound to the first org it is loaded into.
+Authentication is the Salesforce CLI's: ``sf org display`` hands this process the org's instance URL and
+``sf org auth show-access-token`` a session token, which stay in memory and are never printed. Only Developer
+Edition orgs, sandboxes and scratch orgs are written to, and a tenant stays bound to the first org it is loaded
+into.
 """
 
 from __future__ import annotations
@@ -334,21 +335,38 @@ def converged(report: dict[str, Any]) -> bool:
     return all(p["create"] == 0 and p["update"] == 0 for p in plans) and not report["failures"]
 
 
+def cli_session(ask: Callable[[list[str]], dict[str, Any]], alias: str) -> tuple[str, str]:
+    """``(access token, instance URL)`` for ``alias``, from the CLI's answers to ``ask``.
+
+    ``sf org display`` used to carry the token. Since CLI 2.15x it carries "[REDACTED] Use 'sf org auth
+    show-access-token' to view" in the same field, which an org answers with INVALID_AUTH_HEADER, so anything
+    that is not a token (it has a space, or is missing) is fetched from that command instead.
+    """
+    shown = ask(["org", "display", "--target-org", alias, "--json"])
+    token = shown.get("accessToken") or ""
+    if not token or " " in token:
+        token = ask(["org", "auth", "show-access-token", "--target-org", alias, "--json"])["accessToken"]
+    return token, shown["instanceUrl"]
+
+
 def cli_transport(alias: str) -> Transport:
-    """The Salesforce CLI's session for ``alias``: instance URL and token read from ``sf org display``, kept in
-    memory, never printed."""
+    """The Salesforce CLI's session for ``alias``: instance URL and token read from the CLI, kept in memory, never
+    printed."""
     binary = shutil.which("sf") or shutil.which("sf.cmd")
     local = ROOT / "node_modules" / ".bin" / ("sf.cmd" if sys.platform == "win32" else "sf")
     command = [str(local)] if local.exists() else [binary] if binary else None
     if command is None:
         raise SystemExit("the Salesforce CLI is not installed: npm install (it is a devDependency), then "
                          "npx sf org login web --alias <alias>")
-    shown = subprocess.run([*command, "org", "display", "--target-org", alias, "--json"], capture_output=True,
-                           text=True, check=False, cwd=ROOT)
+
+    def ask(args: list[str]) -> dict[str, Any]:
+        done = subprocess.run([*command, *args], capture_output=True, text=True, check=False, cwd=ROOT)
+        return json.loads(done.stdout)["result"]
+
     try:
-        result = json.loads(shown.stdout)["result"]
-        return token_transport(result["accessToken"], base_url=result["instanceUrl"])
-    except (ValueError, KeyError):
+        token, base_url = cli_session(ask, alias)
+        return token_transport(token, base_url=base_url)
+    except (ValueError, KeyError, TypeError):
         raise SystemExit(f"no Salesforce login for {alias!r}: npx sf org login web --alias {alias}") from None
 
 

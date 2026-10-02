@@ -1,6 +1,6 @@
 # HubSpot CRM Platform
 
-![Tests](https://img.shields.io/badge/tests-172%20passing-3B8C6E)
+![Tests](https://img.shields.io/badge/tests-174%20passing-3B8C6E)
 ![HubSpot developer platform 2026.09](https://img.shields.io/badge/HubSpot%20projects-2026.09-FF7A59)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
@@ -150,9 +150,30 @@ plans nothing means the two agreed on every deal.
 
 **What is checked where.** Locally and in CI: the component's Jest tests, an Apex syntax check (the ANTLR grammar the
 Apex Dev Tools project keeps in step with the platform compiler), and the loader against an in-memory Salesforce.
-In an org, by [`salesforce-org.yml`](.github/workflows/salesforce-org.yml) once an org is connected: the deploy
-itself and the 11 Apex tests. Apex compiles and runs nowhere else, so until that has run, the Apex is parsed, not
-proven.
+In an org, because Apex compiles and runs nowhere else: the deploy itself and the 11 Apex tests.
+
+**Run in an org (2026-10-02, a Developer Edition org).** 46 components deployed, 11 of 11 Apex tests passed,
+including the 359-deal parity test, with every class at 93% coverage or more
+([`salesforce_deploy.json`](evidence/meridian/salesforce_deploy.json)). The loader then created 150 accounts, 150
+contacts, 240 products with their price-book entries, 359 opportunities and 480 lines in 12 bulk writes, and a rerun
+plans zero ([`salesforce_first_load.json`](evidence/meridian/salesforce_first_load.json),
+[`salesforce_load.json`](evidence/meridian/salesforce_load.json)).
+
+**What the real org taught** (none of it visible to a parser or a test double):
+
+* An Opportunity sales process cannot name a default stage ("Cannot specify a default on: Opportunity"); a Lead or
+  Case process can. The generator wrote one.
+* A `0.3` literal is a Decimal, and a Decimal argument does not widen to a Double parameter, though an Integer does.
+  The guardrail's own test did not compile.
+* The bulk test built 200 opportunities with a helper that queried the open stage each time: 101 queries, in the
+  test, about a handler that uses one.
+* Salesforce CLI 2.15x hides the session token in `sf org display` ("[REDACTED] ...") and hands it out from
+  `sf org auth show-access-token`; the loader sent the notice as a bearer token and got `INVALID_AUTH_HEADER`.
+* The cross-system check found a real disagreement on its first run, on 1 deal of 359: a blended margin of exactly
+  0.53125. Apex's `HALF_UP` and JavaScript's `toFixed` say 0.5313; Python's formatter rounds a tie to even and said
+  0.5312, so the loader and the trigger each saw the other's value as a change. The loader now breaks ties the way
+  the other two do (`test_a_rounding_tie_goes_the_way_javascript_and_apex_send_it`), which also moved one line
+  price from 20.62 to 20.63 in both CRMs.
 
 **Metadata** (generated). `python -m crm_platform.salesforce.metadata` compiles the same models to SFDX source format under
 [`salesforce/`](salesforce): custom objects and fields, `crm_platform_key` as an external ID for upserts, picklists
@@ -197,9 +218,11 @@ the [runbook](docs/runbook.md).
   app deployed to a test account, with the install flow, token refresh and a client transport tested against a
   stand-in for HubSpot's token endpoint. It has not been installed and run against the real one yet: that takes a
   person approving the install and copying the client secret. It is private distribution, not a marketplace listing.
-* Salesforce has not been deployed to an org yet. The metadata is generated and validated, the Lightning component
-  is tested, and the Apex parses; the deploy and the Apex tests need a Developer Edition org and run from
-  `salesforce-org.yml` or the runbook's two commands.
+* Salesforce is deployed and loaded, by hand from the runbook. [`salesforce-org.yml`](.github/workflows/salesforce-org.yml)
+  repeats the deploy and the Apex tests in CI once the org's auth URL is stored as a repository secret, which a
+  person does; until then it reports that it skipped. The approval-task Flow is covered by an Apex test and has not
+  yet created a task on the loaded data: it fires when an open opportunity's approver changes, and the load sets
+  each approver once. The Lightning component is deployed but not yet placed on the Opportunity page.
 * Verified identity is built and tested but switched on per portal: it needs that app's client secret, which a
   person enters. Until then that portal's cards use the private functions and its logs say "(unverified)", because
   the name is the card's word and a user with the browser console could pass someone else's. The signed request

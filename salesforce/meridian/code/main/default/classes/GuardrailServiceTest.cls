@@ -11,12 +11,17 @@ private class GuardrailServiceTest {
         Assert.isTrue(Math.abs(expected - actual) <= DELTA, label + ': expected ' + expected + ', got ' + actual);
     }
 
+    // A 0.3 literal is a Decimal, and a Decimal argument does not widen to a Double parameter (an Integer does).
+    private static Double d(Decimal value) {
+        return value.doubleValue();
+    }
+
     @IsTest
     static void bandFloorsAtFivePercent() {
-        GuardrailService.LineScore wide = GuardrailService.scoreLine(100, 60, 1, 0.3);
-        near(0.21, wide.floor, 'floor');
-        near(0.38, wide.stretch, 'stretch');
-        near(0.05, GuardrailService.scoreLine(100, 60, 1, 0.1).floor, 'floor never under 5%');
+        GuardrailService.LineScore wide = GuardrailService.scoreLine(100, 60, 1, d(0.3));
+        near(d(0.21), wide.floor, 'floor');
+        near(d(0.38), wide.stretch, 'stretch');
+        near(d(0.05), GuardrailService.scoreLine(100, 60, 1, d(0.1)).floor, 'floor never under 5%');
     }
 
     @IsTest
@@ -32,8 +37,8 @@ private class GuardrailServiceTest {
             new List<Object>{ -0.05, 'Loss-making', 'VP Finance' }
         };
         for (List<Object> c : cases) {
-            Double margin = ((Decimal) c[0]).doubleValue(); // a 0.4 literal in a List<Object> is a Decimal
-            GuardrailService.LineScore s = GuardrailService.scoreLine(100, 100 * (1 - margin), 1, 0.3);
+            Double margin = d((Decimal) c[0]); // a 0.4 literal in a List<Object> is a Decimal
+            GuardrailService.LineScore s = GuardrailService.scoreLine(100, 100 * (1 - margin), 1, d(0.3));
             Assert.areEqual(c[1], s.verdict, 'verdict at ' + margin);
             Assert.areEqual(c[2], s.approver, 'approver at ' + margin);
         }
@@ -42,9 +47,9 @@ private class GuardrailServiceTest {
     @IsTest
     static void worstLineAndMostSeniorSignature() {
         GuardrailService.DealScore deal = GuardrailService.scoreDeal(new List<GuardrailService.Line>{
-            new GuardrailService.Line(100, 60, 1, 0.3),
-            new GuardrailService.Line(100, 75, 1, 0.3),
-            new GuardrailService.Line(100, 71, 5, 0.3)
+            new GuardrailService.Line(100, 60, 1, d(0.3)),
+            new GuardrailService.Line(100, 75, 1, d(0.3)),
+            new GuardrailService.Line(100, 71, 5, d(0.3))
         });
         Assert.areEqual('Below target', deal.verdict);
         Assert.areEqual(1, deal.worstLine);

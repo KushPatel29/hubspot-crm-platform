@@ -120,3 +120,27 @@ def test_transient_failures_are_retried_and_errors_never_carry_the_message():
     with pytest.raises(sf.SalesforceError, match="MALFORMED_QUERY") as caught:
         refused.query("SELECT")
     assert "jane@example.com" not in str(caught.value)
+
+
+def test_the_session_token_comes_from_org_auth_when_org_display_hides_it():
+    asked = []
+
+    def new_cli(args):
+        asked.append(args[:2] if args[0] == "org" and args[1] == "display" else args[:3])
+        if args[1] == "display":
+            return {"accessToken": "[REDACTED] Use 'sf org auth show-access-token' to view",
+                    "instanceUrl": "https://example.my.salesforce.com"}
+        return {"accessToken": "00Dxx!session"}
+
+    assert sf.cli_session(new_cli, "crm-dev") == ("00Dxx!session", "https://example.my.salesforce.com")
+    assert asked == [["org", "display"], ["org", "auth", "show-access-token"]]
+
+    # An older CLI still answers with the token itself, and is asked once.
+    asked.clear()
+
+    def old_cli(args):
+        asked.append(args[:2])
+        return {"accessToken": "00Dxx!older", "instanceUrl": "https://example.my.salesforce.com"}
+
+    assert sf.cli_session(old_cli, "crm-dev")[0] == "00Dxx!older"
+    assert asked == [["org", "display"]]

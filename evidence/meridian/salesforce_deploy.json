@@ -1,0 +1,65 @@
+{
+  "org": {
+    "orgId": "00Daj00001A6vdFEAR",
+    "organizationType": "Developer Edition",
+    "tenant": "meridian"
+  },
+  "deployId": "0Afaj00000mShrCCAS",
+  "status": "Succeeded",
+  "completed": "2026-10-02T07:06:42.000Z",
+  "testLevel": "RunLocalTests",
+  "components": {
+    "deployed": 46,
+    "total": 46,
+    "errors": 0
+  },
+  "apexTests": {
+    "run": 11,
+    "failed": 0,
+    "passed": [
+      "GuardrailServiceTest.bandFloorsAtFivePercent",
+      "GuardrailServiceTest.everyMeridianDealScoresAsThePythonGuardrailDoes",
+      "GuardrailServiceTest.optionValuesMatchTheGeneratedPicklists",
+      "GuardrailServiceTest.verdictAndSignatureAgainstThirtyPercent",
+      "GuardrailServiceTest.worstLineAndMostSeniorSignature",
+      "OpportunityGuardrailTest.aRepricedLineMovesTheVerdictAndASignatureNeedsATask",
+      "OpportunityGuardrailTest.linesSetTheVerdictAndTheApprover",
+      "OpportunityGuardrailTest.nothingToRescoreCostsNothing",
+      "OpportunityGuardrailTest.theControllerShowsEachLineAndTheUnscoredOnes",
+      "OpportunityGuardrailTest.twoHundredOpportunitiesInOneTransaction",
+      "OpportunityGuardrailTest.unscorableLinesAreLeftOutAndNoLinesClearsTheFields"
+    ]
+  },
+  "coverage": {
+    "GuardrailController": {
+      "lines": 25,
+      "covered": 25
+    },
+    "GuardrailService": {
+      "lines": 78,
+      "covered": 78
+    },
+    "OpportunityGuardrail": {
+      "lines": 44,
+      "covered": 41
+    },
+    "OpportunityLineItemGuardrail": {
+      "lines": 4,
+      "covered": 4
+    }
+  },
+  "earlierAttempts": [
+    {
+      "deployId": "0Afaj00000mSiAXCA0",
+      "outcome": "refused: a default on an Opportunity sales process; Decimal literals passed to Double parameters in GuardrailServiceTest"
+    },
+    {
+      "deployId": "0Afaj00000mSSAeCAO",
+      "outcome": "10 of 11 tests: the bulk test's own helper ran a query per opportunity (101 queries)"
+    },
+    {
+      "deployId": "0Afaj00000mSik1CAC",
+      "outcome": "46 components, 11 of 11 tests"
+    }
+  ]
+}
