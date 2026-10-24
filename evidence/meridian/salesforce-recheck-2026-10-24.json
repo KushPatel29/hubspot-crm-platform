@@ -1,0 +1,36 @@
+{
+  "date": "2026-10-24",
+  "org_id": "00Daj00001A6vdFEAR",
+  "organization_type": "Developer Edition",
+  "scope": "Developer Edition only. Deployed the mixed-DML test-helper fix and explicit system access modes for trusted guardrail automation; removed debug-only logging. RunLocalTests transactions roll back. No business records, credential or new CI access was created.",
+  "apex": {
+    "outcome": "Passed",
+    "testsRan": 25,
+    "failing": 0,
+    "deploymentId": "0Afaj00000oyH7dCAE",
+    "componentErrors": 0
+  },
+  "parity": {
+    "deals": 359,
+    "agree": 359,
+    "lines": 480,
+    "calls": 2
+  },
+  "source_revision": "8856dc7753c3532f17a48bf8ef99ff26ea5aa169",
+  "deployed_source_sha256_lf": {
+    "GuardrailTestData.cls": "cf3264bb64a0933a5aeca8060d45cafd9e4dcb335dd200f74bdbebaf18145103",
+    "OpportunityGuardrail.cls": "1f569919e8cd62746a96d421204924806d961ae662d802b497810b034c4adcd2",
+    "GuardrailRescoreBatch.cls": "cd83e9504b52982a6c8b58b3f4793dca8a556f2216d095cdf3a71722f3bc250b"
+  },
+  "ci": {
+    "url": "https://github.com/KushPatel29/hubspot-crm-platform/actions/runs/40085706361",
+    "jobs": {
+      "Apex security, error-prone and performance rules (PMD)": "success",
+      "CLI installation (ubuntu-24.04)": "success",
+      "salesforce": "success",
+      "CLI installation (windows-latest)": "success",
+      "python": "success",
+      "hubspot-apps": "success"
+    }
+  }
+}

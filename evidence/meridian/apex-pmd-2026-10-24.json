@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-24",
+  "source_revision": "8856dc7753c3532f17a48bf8ef99ff26ea5aa169",
+  "ci_url": "https://github.com/KushPatel29/hubspot-crm-platform/actions/runs/40085706361",
+  "ruleset": "salesforce/pmd-ruleset.xml",
+  "project_root": "salesforce/meridian",
+  "analysis": {
+    "formatVersion": 0,
+    "pmdVersion": "7.28.0",
+    "timestamp": "2026-10-24T10:23:52.106Z",
+    "files": [],
+    "suppressedViolations": [],
+    "processingErrors": [],
+    "configurationErrors": []
+  }
+}
