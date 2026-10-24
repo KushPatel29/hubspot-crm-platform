@@ -3,7 +3,7 @@ name: Salesforce org checks
 # Deploys the generated metadata and the hand-written code to a Salesforce org and runs every Apex test there: the
 # only place Apex compiles and runs. Then holds the deployed guardrail to the Python one through its REST API, every
 # Meridian deal. It needs one repository secret, SFDX_AUTH_URL (from `sf org auth show-sfdx-auth-url` on a Developer
-# Edition org); without it the job says so and passes.
+# Edition org); without it the deploy/test job is explicitly skipped.
 
 on:
   workflow_dispatch:
@@ -22,7 +22,25 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  org-availability:
+    runs-on: ubuntu-24.04
+    outputs:
+      connected: ${{ steps.org.outputs.connected }}
+    steps:
+      - name: Report whether live org verification is configured
+        id: org
+        env:
+          HAS_ORG: ${{ secrets.SFDX_AUTH_URL != '' }}
+        run: |
+          echo "connected=$HAS_ORG" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_ORG" = "true" ]; then
+            echo "An org credential is configured; deploy and Apex checks will execute." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "**NOT EXECUTED:** no SFDX_AUTH_URL is configured. The deploy-and-test job is skipped; no Apex result is claimed." >> "$GITHUB_STEP_SUMMARY"
+          fi
   deploy-and-test:
+    needs: org-availability
+    if: needs.org-availability.outputs.connected == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
@@ -32,9 +50,6 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "22"
-      - name: No org connected
-        if: env.SFDX_AUTH_URL == ''
-        run: echo "::notice::No SFDX_AUTH_URL secret, so nothing was deployed. Add it to run the Apex tests in an org."
       - name: Install the Salesforce CLI
         if: env.SFDX_AUTH_URL != ''
         run: npm install --global @salesforce/cli@2.152.14

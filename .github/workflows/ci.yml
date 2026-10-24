@@ -12,6 +12,54 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  cli-install:
+    name: CLI installation (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts --no-fund --no-audit
+      - name: Both pinned CLIs must start without an account
+        run: |
+          node node_modules/@salesforce/cli/bin/run.js --version
+          node node_modules/@hubspot/cli/bin/hs.js --version
+
+  apex-static-analysis:
+    name: Apex security, error-prone and performance rules (PMD)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Download the checksum-pinned PMD distribution
+        run: |
+          curl --fail --location --retry 2 https://github.com/pmd/pmd/releases/download/pmd_releases%2F7.28.0/pmd-dist-7.28.0-bin.zip --output "$RUNNER_TEMP/pmd.zip"
+          echo "f974ba571f7bc01c73fffe11bade25fbc1f438698f9e9c00e416e8d65e9fbac2  $RUNNER_TEMP/pmd.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/pmd.zip" -d "$RUNNER_TEMP"
+      - name: Scan every Apex class and trigger; any finding fails
+        run: |
+          mkdir -p artifacts
+          "$RUNNER_TEMP/pmd-bin-7.28.0/bin/pmd" check --dir salesforce/meridian/code --rulesets salesforce/pmd-ruleset.xml --format json --report-file artifacts/pmd.json --no-cache
+      - name: Retain the full static-analysis report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: apex-pmd-report
+          path: artifacts/pmd.json
+          if-no-files-found: error
+          retention-days: 14
+
   python:
     runs-on: ubuntu-24.04
     timeout-minutes: 15

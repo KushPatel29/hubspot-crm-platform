@@ -46,13 +46,17 @@ public class GuardrailTestData {
         User u = new User(Alias = 'mrdn', Email = 'rep' + unique + '@example.com', EmailEncodingKey = 'UTF-8',
             LastName = 'Rep', LanguageLocaleKey = 'en_US', LocaleSidKey = 'en_US', ProfileId = standard.Id,
             TimeZoneSidKey = 'America/Vancouver', Username = 'rep' + unique + '@meridian.example.com');
-        insert u;
-        List<PermissionSetAssignment> grants = new List<PermissionSetAssignment>();
-        for (PermissionSet ps : [SELECT Id FROM PermissionSet
-                                 WHERE Name IN ('Crm_Platform_Meridian', 'Meridian_Guardrail_Code')]) {
-            grants.add(new PermissionSetAssignment(AssigneeId = u.Id, PermissionSetId = ps.Id));
+        // Setup-object DML is isolated in a test-only runAs context. Callers
+        // may already have created Product2/Opportunity data in this test.
+        System.runAs(new User(Id = UserInfo.getUserId())) {
+            insert u;
+            List<PermissionSetAssignment> grants = new List<PermissionSetAssignment>();
+            for (PermissionSet ps : [SELECT Id FROM PermissionSet
+                                     WHERE Name IN ('Crm_Platform_Meridian', 'Meridian_Guardrail_Code')]) {
+                grants.add(new PermissionSetAssignment(AssigneeId = u.Id, PermissionSetId = ps.Id));
+            }
+            insert grants;
         }
-        insert grants;
         return u;
     }
 }
