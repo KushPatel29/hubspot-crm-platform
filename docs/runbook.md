@@ -6,14 +6,25 @@ asks for a key in a file, a chat or an environment variable that gets committed.
 ## 0. Once per machine
 
 ```bash
-npm install                      # the HubSpot CLI, pinned in package.json
-npm install --prefix hubspot     # the apps workspace: cards, functions, tests, generator
+npm ci --ignore-scripts          # Node 24; both vendor CLIs, pinned in the root lockfile
+npm ci --prefix hubspot          # the apps workspace: cards, functions, tests, generator
 python -m pip install -e . -r requirements-dev.txt
 npx hs account auth              # paste a personal access key into the CLI's prompt
 ```
 
 The Python tools reach HubSpot through that login (`scripts/hs_bridge.mjs` uses the CLI's own library, which swaps
 the key for short-lived tokens), so they hold no key of their own.
+
+CI installs the root lockfile on Windows and Ubuntu and starts both CLIs without authentication. A separate
+Java 21 job runs checksum-pinned PMD 7.28.0 over every Apex class and trigger, with the Salesforce project root
+provided for cross-file analysis. All security, error-prone and performance rules are enabled; any finding fails
+and the complete JSON report is retained. This complements the org tests; it does not execute Apex.
+
+The guardrail's trigger/batch calculations explicitly use system mode for complete inputs and the four derived
+output fields. Record sharing is inherited from the caller; the batch intentionally runs without sharing. The
+separate read-only controller and REST endpoints enforce user mode. No PMD suppression is used for this policy.
+For batch operations, monitor `AsyncApexJob.Status`, `NumberOfErrors`, `JobItemsProcessed` and `TotalJobItems`
+in Setup's Apex Jobs or SOQL; successful completion does not require a temporary debug trace.
 
 ## 1. A portal per business
 
@@ -145,7 +156,8 @@ python -m crm_platform.salesforce.parity meridian --org crm-dev --evidence      
 python scripts/salesforce_live_checks.py --org crm-dev                              # trigger, batch, sweep, Flow
 ```
 
-The deploy runs the 25 Apex tests, including the 359-deal parity test, and makes the *Meridian Opportunity* record
+The deploy runs the 25 Apex tests; the separate read-only REST parity command checks the 359 loaded deals against
+Python. The full metadata deployment makes the *Meridian Opportunity* record
 page (with the Deal margin guardrail component) the org default for opportunities on desktop. The loader refuses
 anything but a Developer Edition org or a sandbox and binds the tenant to the first org it loads. The live checks
 write to the org: a product's target margin is lowered and put back, and a demo opportunity with no key is left

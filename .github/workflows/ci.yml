@@ -48,6 +48,8 @@ jobs:
           echo "f974ba571f7bc01c73fffe11bade25fbc1f438698f9e9c00e416e8d65e9fbac2  $RUNNER_TEMP/pmd.zip" | sha256sum --check
           unzip -q "$RUNNER_TEMP/pmd.zip" -d "$RUNNER_TEMP"
       - name: Scan every Apex class and trigger; any finding fails
+        env:
+          PMD_APEX_ROOT_DIRECTORY: ${{ github.workspace }}/salesforce/meridian
         run: |
           mkdir -p artifacts
           "$RUNNER_TEMP/pmd-bin-7.28.0/bin/pmd" check --dir salesforce/meridian/code --rulesets salesforce/pmd-ruleset.xml --format json --report-file artifacts/pmd.json --no-cache

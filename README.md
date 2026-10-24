@@ -173,7 +173,9 @@ repriced until the Flow asks for a signature.
 
 **What is checked where.** Locally and in CI: the component's Jest tests, an Apex syntax check (the ANTLR grammar the
 Apex Dev Tools project keeps in step with the platform compiler), the loader and the parity check against stand-ins,
-and the settings record against the Python rule. In an org, because Apex compiles and runs nowhere else: the deploy
+and the settings record against the Python rule. CI also runs checksum-pinned PMD 7.28.0 with all Apex security,
+error-prone and performance rules, fails on any finding and retains its JSON report. The root CLI lockfile is
+installed and both CLIs are started on Windows and Ubuntu with Node 24. In an org, because Apex compiles and runs nowhere else: the deploy
 itself and the 25 Apex tests.
 
 **Run in an org (Developer Edition, 2 and 3 October 2026).** 62 components deployed, 25 of 25 Apex tests passed,
@@ -218,10 +220,10 @@ output is parsed and checked against Salesforce's API-name rules in the tests.
 ## Run it
 
 ```bash
-python -m pip install -e . -r requirements-dev.txt && npm install && npm install --prefix hubspot
+python -m pip install -e . -r requirements-dev.txt && npm ci --ignore-scripts && npm ci --prefix hubspot  # Node 24
 python -m pytest -q                       # model, engine, both loaders, CLI, Salesforce compilation, JS parity
 npm test --prefix hubspot                 # cards (HubSpot's test renderer), functions, signatures, bundles
-npm install --prefix salesforce/meridian && npm run check --prefix salesforce/meridian   # LWC tests, Apex syntax
+npm ci --prefix salesforce/meridian && npm run check --prefix salesforce/meridian   # LWC tests, Apex syntax
 
 npx hs account auth --account <parent> --name dev        # the only credential step: typed into the CLI's prompt
 npx hs test-account create -a dev --name "Meridian Supply" --sales-level ENTERPRISE ...
@@ -254,12 +256,13 @@ the [runbook](docs/runbook.md).
   app deployed to a test account, with the install flow, token refresh and a client transport tested against a
   stand-in for HubSpot's token endpoint. It has not been installed and run against the real one yet: that takes a
   person approving the install and copying the client secret. It is private distribution, not a marketplace listing.
-* Salesforce is deployed and loaded from the runbook's commands. [`salesforce-org.yml`](.github/workflows/salesforce-org.yml)
+* Salesforce is deployed and loaded from the runbook's commands. The [2026-10-24 recheck](evidence/meridian/salesforce-recheck-2026-10-24.json)
+  records a fresh Developer Edition deployment, all 25 Apex tests and read-only parity for 359 deals. It also caught
+  and fixed mixed DML in a permission-test fixture. [`salesforce-org.yml`](.github/workflows/salesforce-org.yml)
   repeats the deploy, the Apex tests and the API parity check in CI once the org's auth URL is stored as a
   repository secret, which a person does; until then it reports that it skipped. The rescore sweep is written to be
   scheduled but is not scheduled in the org: by default Salesforce refuses to redeploy a class while a scheduled
-  job holds it, which would block the CI deploy. Code Analyzer (PMD) does not run here: it needs Java, which this
-  build does not install.
+  job holds it, which would block the CI deploy.
 * Verified identity is built and tested but switched on per portal: it needs that app's client secret, which a
   person enters. Until then that portal's cards use the private functions and its logs say "(unverified)", because
   the name is the card's word and a user with the browser console could pass someone else's. The signed request

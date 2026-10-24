@@ -10,7 +10,12 @@
  * handed to GuardrailRescoreBatch (from the Product2 trigger) rather than rescored here.
  */
 public inherited sharing class OpportunityGuardrail {
-    /** Rescores the opportunities and returns how many had a guardrail field change. */
+    /**
+     * Trusted trigger/batch automation: reads every scoring input and writes only the four derived fields below.
+     * Explicit system mode preserves complete calculations even when a rep cannot edit those derived fields.
+     * Record sharing is still inherited from the caller. This method is not AuraEnabled or a REST endpoint;
+     * GuardrailController and GuardrailApi enforce user mode on their separate, read-only entry points.
+     */
     public static Integer rescore(Set<Id> opportunityIds) {
         opportunityIds.remove(null);
         if (opportunityIds.isEmpty()) {
@@ -24,6 +29,7 @@ public inherited sharing class OpportunityGuardrail {
             SELECT OpportunityId, UnitPrice, Quantity, Unit_Cost__c, Product2.Meridian_Target_Margin__c
             FROM OpportunityLineItem
             WHERE OpportunityId IN :opportunityIds
+            WITH SYSTEM_MODE
             ORDER BY OpportunityId, SortOrder, CreatedDate, Id
         ]) {
             if (isScorable(item)) {
@@ -36,6 +42,7 @@ public inherited sharing class OpportunityGuardrail {
                 Meridian_Margin_Gap_Dollars__c
             FROM Opportunity
             WHERE Id IN :opportunityIds
+            WITH SYSTEM_MODE
         ]) {
             Opportunity next = scored(opp.Id, linesByOpportunity.get(opp.Id));
             if (next.Meridian_Guardrail_Verdict__c != opp.Meridian_Guardrail_Verdict__c
@@ -45,7 +52,7 @@ public inherited sharing class OpportunityGuardrail {
                 changed.add(next);
             }
         }
-        update changed;
+        update as system changed;
         return changed.size();
     }
 

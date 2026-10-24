@@ -61,8 +61,8 @@ public without sharing class GuardrailRescoreBatch implements Database.Batchable
     }
 
     public void finish(Database.BatchableContext context) {
-        System.debug(LoggingLevel.INFO, 'Meridian guardrail rescore: ' + opportunities + ' opportunities, '
-            + changed + ' changed');
+        // No debug-log dependency. Monitor completion and errors through AsyncApexJob (see the runbook).
+        // Stateful counters remain available to the batch and its deterministic tests.
     }
 
     /** As a scheduled job: start the same rescore as a batch. */
