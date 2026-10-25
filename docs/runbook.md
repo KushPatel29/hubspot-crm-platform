@@ -3,6 +3,9 @@
 Every step is a command; the only things a person types are credentials, into HubSpot's own prompts. Nothing here
 asks for a key in a file, a chat or an environment variable that gets committed.
 
+Start each command block at the repository root. Parenthesized blocks use a temporary working directory and return
+to the root when they finish.
+
 ## 0. Once per machine
 
 ```bash
@@ -56,11 +59,13 @@ the bound one. `apply` writes `evidence/<tenant>/apply.json`: operations, counts
 ## 3. The app (before loading: the loader writes through it)
 
 ```bash
+(                                               # keep later steps at the repository root
 cd hubspot && npm run build                       # regenerate projects/ from the shared cards and functions
 cd projects/meridian
 npx hs project upload --profile live              # src/hsprofile.live.json names the account
 npx hs project install-app --profile live
 npm run set-secret -- HUBSPOT_CLIENT_SECRET <portal id>   # only for apps with signed endpoints; reads the clipboard
+)
 ```
 
 `bind` sets `ENDPOINT_BASE_URL` itself (a public URL, not a credential). HubSpot shows an app's client secret only
@@ -105,9 +110,11 @@ rebuild and upload: the actions that record who acted move to signed endpoints a
 
 ```bash
 python -m crm_platform bind aml --account aml-investigations   # records that the secret now exists
+(
 cd hubspot && npm run build
 cd projects/aml && npx hs project upload --profile live
 npx hs project deploy --profile live --force --build <n>       # the private function is removed: HubSpot asks
+)
 ```
 
 A deploy that removes a component is refused with a warning until it is forced; `--force` needs `--build`.
@@ -147,10 +154,12 @@ A free Developer Edition org (developer.salesforce.com/signup), then:
 ```bash
 npx sf org login web --alias crm-dev                           # log in in the browser it opens (2-minute window;
                                                                # set SF_WEB_OAUTH_SERVER_TIMEOUT=1800000 for longer)
+(
 cd salesforce/meridian
 npx sf project deploy start --source-dir force-app --source-dir code --test-level RunLocalTests --target-org crm-dev
 npx sf org assign permset --name Crm_Platform_Meridian --name Meridian_Guardrail_Code --target-org crm-dev
-cd ../.. && python -m crm_platform.salesforce.load meridian --org crm-dev            # plan
+)
+python -m crm_platform.salesforce.load meridian --org crm-dev                       # plan
 python -m crm_platform.salesforce.load meridian --org crm-dev --write               # load, then plan again: zero
 python -m crm_platform.salesforce.parity meridian --org crm-dev --evidence          # every deal through the REST API
 python scripts/salesforce_live_checks.py --org crm-dev                              # trigger, batch, sweep, Flow
