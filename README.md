@@ -219,6 +219,8 @@ output is parsed and checked against Salesforce's API-name rules in the tests.
 
 ## Run it
 
+Run these commands from the repository root. Parenthesized commands return to that directory when they finish.
+
 ```bash
 python -m pip install -e . -r requirements-dev.txt && npm ci --ignore-scripts && npm ci --prefix hubspot  # Node 24
 python -m pytest -q                       # model, engine, both loaders, CLI, Salesforce compilation, JS parity
@@ -229,11 +231,11 @@ npx hs account auth --account <parent> --name dev        # the only credential s
 npx hs test-account create -a dev --name "Meridian Supply" --sales-level ENTERPRISE ...
 python -m crm_platform bind meridian --account meridian-supply           # pin the tenant; find its function domain
 python -m crm_platform provision-key meridian --account meridian-supply  # per-portal signing key, never printed
-cd hubspot && npm run build && cd projects/meridian && npx hs project upload --profile live && npx hs project install-app --profile live
+(cd hubspot && npm run build && cd projects/meridian && npx hs project upload --profile live && npx hs project install-app --profile live)
 python -m crm_platform apply meridian     # converge the schema, load the records, verify: through the app
 
 npx sf org login web --alias crm-dev      # Salesforce: a Developer Edition org, logged in in the browser
-cd salesforce/meridian && npx sf project deploy start --source-dir force-app --source-dir code --test-level RunLocalTests --target-org crm-dev && cd ../..
+(cd salesforce/meridian && npx sf project deploy start --source-dir force-app --source-dir code --test-level RunLocalTests --target-org crm-dev)
 python -m crm_platform.salesforce.load meridian --org crm-dev --write   # load, then plan again: zero
 python -m crm_platform.salesforce.parity meridian --org crm-dev         # every deal through the Apex REST API
 
