@@ -60,6 +60,10 @@ class CircuitOpen(RuntimeError):
     """Recent calls kept failing after retries; the client is cooling down before trying HubSpot again."""
 
 
+class PaginationError(RuntimeError):
+    """The provider repeated a continuation cursor; stop before replaying records."""
+
+
 def error_fields(body: Any) -> tuple[str, str, tuple[str, ...]]:
     """HubSpot's category, correlation ID and the property names an error body names."""
     if not isinstance(body, dict):
@@ -281,6 +285,7 @@ class HubSpotClient:
 
     def pages(self, path: str, key: str = "results") -> Iterator[dict]:
         after = None
+        seen_cursors: set[str] = set()
         while True:
             sep = "&" if "?" in path else "?"
             page = self.get(path + (f"{sep}after={after}" if after else ""))
@@ -288,3 +293,7 @@ class HubSpotClient:
             after = ((page.get("paging") or {}).get("next") or {}).get("after")
             if not after:
                 return
+            cursor = str(after)
+            if cursor in seen_cursors:
+                raise PaginationError("hubspot: repeated pagination cursor; load stopped before replaying records")
+            seen_cursors.add(cursor)
