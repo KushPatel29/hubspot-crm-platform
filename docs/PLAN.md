@@ -1,6 +1,6 @@
 # HubSpot CRM platform: build plan
 
-Decided with Kush on 2026-09-30:
+Scope decisions, 2026-09-30:
 - **Scope:** the four CRM-shaped projects only.
 - **Where:** a new flagship repo.
 - **Salesforce:** keep the core CRM-neutral so a Salesforce Developer Edition version can follow.
@@ -43,5 +43,5 @@ Decided with Kush on 2026-09-30:
    - Put the business logic in pure JS modules tested with `node --test`.
    - Add a JS-vs-Python guardrail parity test.
 4. CI: ruff, mypy, pytest, node tests, tsc, and a gate that fails if generated files change.
-5. Live work, which needs Kush's own `npx hs account auth` in the terminal: create 3 test accounts, apply the models, upload and install the apps, add the cards to record views, build the workflows, and capture evidence and screenshots.
+5. Live work, which needs an authenticated `npx hs account auth` session: create 3 test accounts, apply the models, upload and install the apps, add the cards to record views, build the workflows, and capture evidence and screenshots.
 6. README, site card (20 projects), profile, résumé and role-fit inventory.
